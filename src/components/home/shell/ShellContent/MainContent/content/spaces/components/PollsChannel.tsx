@@ -15,6 +15,19 @@ interface PollsChannelProps {
     spaceId: string;
 }
 
+function formatTimeLeft(expiresAt: number | undefined) {
+    if (!expiresAt) return null;
+    const now = Date.now();
+    if (now >= expiresAt) return "Expired";
+    const diff = expiresAt - now;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+    const minutes = Math.floor(diff / (1000 * 60)) % 60;
+    if (days > 0) return `Ends in ${days}d ${hours}h`;
+    if (hours > 0) return `Ends in ${hours}h ${minutes}m`;
+    return `Ends in ${minutes}m`;
+}
+
 export default function PollsChannel({ channel, spaceId }: PollsChannelProps) {
     const polls = useQuery(api.spaces.polls.getPolls, { spaceId: spaceId as Id<"spaces"> });
     const voteInPoll = useMutation(api.spaces.polls.vote);
@@ -65,6 +78,11 @@ export default function PollsChannel({ channel, spaceId }: PollsChannelProps) {
                                 <Typography sx={{ fontWeight: 800, color: themeVar("textLight"), fontSize: "1.2rem" }}>{poll.question}</Typography>
                                 <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", mt: 0.5 }}>
                                     Created by {poll.creator?.displayName} • {poll.totalVotes} votes
+                                    {poll.expiresAt && (
+                                        <Box component="span" sx={{ ml: 1, px: 0.8, py: 0.2, bgcolor: poll.expiresAt > Date.now() ? "rgba(255,255,255,0.05)" : "rgba(255,0,0,0.1)", color: poll.expiresAt > Date.now() ? themeVar("textSecondary") : themeVar("danger"), borderRadius: 1, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                            {formatTimeLeft(poll.expiresAt)}
+                                        </Box>
+                                    )}
                                     {poll.allowMultiSelect ? (
                                         <Box component="span" sx={{ ml: 1, px: 0.8, py: 0.2, bgcolor: "rgba(255,255,255,0.05)", borderRadius: 1, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                                             Multi-select
@@ -82,7 +100,8 @@ export default function PollsChannel({ channel, spaceId }: PollsChannelProps) {
                                     const voteCount = poll.votes[idx] || 0;
                                     const percentage = poll.totalVotes > 0 ? (voteCount / poll.totalVotes) * 100 : 0;
                                     const isMyVote = poll.myVoteIndices?.includes(idx);
-                                    const locked = !poll.allowMultiSelect ? (poll.myVoteIndices?.length || 0) > 0 : isMyVote;
+                                    const isExpired = poll.expiresAt ? Date.now() > poll.expiresAt : false;
+                                    const locked = isExpired || (!poll.allowMultiSelect ? (poll.myVoteIndices?.length || 0) > 0 : isMyVote);
 
                                     return (
                                         <Box

@@ -14,7 +14,9 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import { Plus, BarChart3, Trash2, Info, PlusCircle, XCircle, Megaphone } from "lucide-react";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import { Plus, BarChart3, Trash2, Info, PlusCircle, XCircle, Megaphone, Clock } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Id, Doc } from "convex/_generated/dataModel";
@@ -23,6 +25,19 @@ import { themeVar } from "@/theme/registry";
 interface PollsTabProps {
     space: Doc<"spaces">;
     role: "owner" | "admin" | "moderator";
+}
+
+function formatTimeLeft(expiresAt: number | undefined) {
+    if (!expiresAt) return null;
+    const now = Date.now();
+    if (now >= expiresAt) return "Expired";
+    const diff = expiresAt - now;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+    const minutes = Math.floor(diff / (1000 * 60)) % 60;
+    if (days > 0) return `Ends in ${days}d ${hours}h`;
+    if (hours > 0) return `Ends in ${hours}h ${minutes}m`;
+    return `Ends in ${minutes}m`;
 }
 
 export function PollsTab({ space, role }: PollsTabProps) {
@@ -36,6 +51,7 @@ export function PollsTab({ space, role }: PollsTabProps) {
     const [options, setOptions] = React.useState(["", ""]);
     const [showInAnnouncements, setShowInAnnouncements] = React.useState(true);
     const [allowMultiSelect, setAllowMultiSelect] = React.useState(false);
+    const [endDate, setEndDate] = React.useState("");
     const [pollToDelete, setPollToDelete] = React.useState<Id<"spacePolls"> | null>(null);
 
     const canCreate = role === "owner" || (role === "admin" && space.adminCanCreatePolls !== false) || (role === "moderator" && space.modCanCreatePolls);
@@ -55,18 +71,22 @@ export function PollsTab({ space, role }: PollsTabProps) {
     const handleCreate = async () => {
         if (!question.trim() || options.filter(o => o.trim()).length < 2) return;
 
+        const expiresAt = endDate ? new Date(endDate).getTime() : undefined;
+
         await createPoll({
             spaceId: space._id,
             question,
             options: options.filter(o => o.trim()),
             allowMultiSelect,
             showInAnnouncements,
+            expiresAt,
         });
 
         setIsCreateOpen(false);
         setQuestion("");
         setOptions(["", ""]);
         setAllowMultiSelect(false);
+        setEndDate("");
     };
 
     const handleDelete = async () => {
@@ -109,6 +129,11 @@ export function PollsTab({ space, role }: PollsTabProps) {
                                         <Typography sx={{ fontWeight: 800, color: themeVar("textLight"), fontSize: "1.1rem" }}>{poll.question}</Typography>
                                         <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", mt: 0.5 }}>
                                             Created by {poll.creator?.displayName} • {poll.totalVotes} votes
+                                            {poll.expiresAt && (
+                                                <Box component="span" sx={{ ml: 1, px: 0.8, py: 0.2, bgcolor: poll.expiresAt > Date.now() ? "rgba(255,255,255,0.05)" : "rgba(255,0,0,0.1)", color: poll.expiresAt > Date.now() ? themeVar("textSecondary") : themeVar("danger"), borderRadius: 1, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                                    {formatTimeLeft(poll.expiresAt)}
+                                                </Box>
+                                            )}
                                             {poll.allowMultiSelect ? (
                                                 <Box component="span" sx={{ ml: 1, px: 0.8, py: 0.2, bgcolor: "rgba(255,255,255,0.05)", borderRadius: 1, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                                                     Multi-select
@@ -132,7 +157,8 @@ export function PollsTab({ space, role }: PollsTabProps) {
                                         const voteCount = poll.votes[idx] || 0;
                                         const percentage = poll.totalVotes > 0 ? (voteCount / poll.totalVotes) * 100 : 0;
                                         const isMyVote = poll.myVoteIndices?.includes(idx);
-                                        const locked = !poll.allowMultiSelect ? poll.myVoteIndices?.length > 0 : isMyVote;
+                                        const isExpired = poll.expiresAt ? Date.now() > poll.expiresAt : false;
+                                        const locked = isExpired || (!poll.allowMultiSelect ? poll.myVoteIndices?.length > 0 : isMyVote);
 
                                         return (
                                             <Box
@@ -183,8 +209,58 @@ export function PollsTab({ space, role }: PollsTabProps) {
                             value={question}
                             onChange={e => setQuestion(e.target.value)}
                             InputLabelProps={{ sx: { color: themeVar("textSecondary") } }}
-                            InputProps={{ sx: { color: themeVar("textLight") } }}
+                            InputProps={{
+                                sx: {
+                                    color: themeVar("textLight"),
+                                    '.MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.2)" },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.3)" },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: themeVar("primary") }
+                                }
+                            }}
                         />
+
+                        <Box sx={{ position: "relative", width: "100%" }}>
+                            <Button
+                                variant="outlined"
+                                fullWidth
+                                startIcon={<Clock size={16} />}
+                                sx={{
+                                    color: themeVar("textLight"),
+                                    borderColor: "rgba(255,255,255,0.2)",
+                                    "&:hover": { borderColor: themeVar("primary") },
+                                    justifyContent: "flex-start",
+                                    textTransform: "none",
+                                    fontWeight: 600,
+                                    py: 1
+                                }}
+                            >
+                                {endDate ? `Ends: ${new Date(endDate).toLocaleString()}` : "Set End Time (Optional)"}
+                            </Button>
+                            <Box
+                                component="input"
+                                type="datetime-local"
+                                value={endDate}
+                                onChange={(e: any) => setEndDate(e.target.value)}
+                                sx={{
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    width: "100%",
+                                    height: "100%",
+                                    opacity: 0,
+                                    cursor: "pointer",
+                                    "&::-webkit-calendar-picker-indicator": {
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        width: "100%",
+                                        height: "100%",
+                                        cursor: "pointer",
+                                        background: "transparent"
+                                    }
+                                }}
+                            />
+                        </Box>
 
                         <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 800, mb: -2 }}>OPTIONS</Typography>
                         <Stack spacing={1}>
@@ -200,7 +276,14 @@ export function PollsTab({ space, role }: PollsTabProps) {
                                             newOptions[i] = e.target.value;
                                             setOptions(newOptions);
                                         }}
-                                        InputProps={{ sx: { color: themeVar("textLight") } }}
+                                        InputProps={{
+                                            sx: {
+                                                color: themeVar("textLight"),
+                                                '.MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.2)" },
+                                                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.3)" },
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: themeVar("primary") }
+                                            }
+                                        }}
                                     />
                                     {options.length > 2 && (
                                         <IconButton size="small" onClick={() => handleRemoveOption(i)} sx={{ color: themeVar("danger") }}>

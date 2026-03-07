@@ -95,9 +95,13 @@ export const toggleInvites = mutation({
     },
     handler: async (ctx, args) => {
         const user = await ensureUserActive(ctx);
-        const space = await ctx.db.get(args.spaceId);
-        if (!space || space.ownerId !== user._id) {
-            throw new Error("Unauthorized: Only the owner can toggle invite settings.");
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole || (myRole.role !== "owner" && myRole.role !== "admin")) {
+            throw new Error("Unauthorized: Only owners and admins can toggle invite settings.");
         }
 
         await ctx.db.patch(args.spaceId, { allowInvites: args.allowInvites });
@@ -271,6 +275,198 @@ export const getInvitedMembersByUser = query({
                 };
             })
         );
+    },
+});
+
+/**
+ * Get or create a private invite code for a regular member.
+ */
+export const getOrCreateMyInviteCode = mutation({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole) {
+            throw new Error("You must be a member of this space to get an invite code.");
+        }
+
+        const space = await ctx.db.get(args.spaceId);
+        if (!space) throw new Error("Space not found.");
+
+        if (space.allowInvites === false) {
+            throw new Error("Invites are currently disabled for this space.");
+        }
+
+        // Check for existing active invite by this user
+        const existingInvites = await ctx.db
+            .query("spaceInvites")
+            .withIndex("by_creator", (q) => q.eq("spaceId", args.spaceId).eq("invitedBy", user._id))
+            .filter((q) => q.eq(q.field("isRevoked"), false))
+            .collect();
+
+        const validInvite = existingInvites.find(i => !i.expiresAt || i.expiresAt > Date.now());
+
+        if (validInvite) {
+            return validInvite.code;
+        }
+
+        // Generate new one
+        const now = Date.now();
+        const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+        await ctx.db.insert("spaceInvites", {
+            spaceId: args.spaceId,
+            invitedBy: user._id,
+            code,
+            uses: 0,
+            isRevoked: false,
+            createdAt: now,
+        });
+
+        // Add to action logs for tracking
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id, // the regular user generating code, not entirely an admin action, but handled via same table for simplicity or could be skipped
+            actionType: "create_invite",
+            details: `User created personal invite code: ${code}`,
+            timestamp: now,
+        });
+
+        return code;
+    },
+});
+
+/**
+ * Regenerate a private invite code for a regular member.
+ */
+export const regenerateMyInviteCode = mutation({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole) {
+            throw new Error("You must be a member of this space to get an invite code.");
+        }
+
+        const space = await ctx.db.get(args.spaceId);
+        if (!space) throw new Error("Space not found.");
+
+        if (space.allowInvites === false) {
+            throw new Error("Invites are currently disabled for this space.");
+        }
+
+        // Revoke all existing valid active invites created by this user
+        const existingInvites = await ctx.db
+            .query("spaceInvites")
+            .withIndex("by_creator", (q) => q.eq("spaceId", args.spaceId).eq("invitedBy", user._id))
+            .filter((q) => q.eq(q.field("isRevoked"), false))
+            .collect();
+
+        for (const invite of existingInvites) {
+            await ctx.db.patch(invite._id, { isRevoked: true });
+        }
+
+        // Generate new one
+        const now = Date.now();
+        const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+        await ctx.db.insert("spaceInvites", {
+            spaceId: args.spaceId,
+            invitedBy: user._id,
+            code,
+            uses: 0,
+            isRevoked: false,
+            createdAt: now,
+        });
+
+        // Add to action logs for tracking
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "create_invite",
+            details: `User regenerated personal invite code: ${code}`,
+            timestamp: now,
+        });
+
+        return code;
+    },
+});
+
+/**
+ * Revoke all active invite codes.
+ */
+export const revokeAllInvites = mutation({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole || (myRole.role !== "owner" && myRole.role !== "admin")) {
+            throw new Error("Unauthorized: Only owners and admins can revoke all invites.");
+        }
+
+        const activeInvites = await ctx.db
+            .query("spaceInvites")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .filter((q) => q.eq(q.field("isRevoked"), false))
+            .collect();
+
+        for (const invite of activeInvites) {
+            await ctx.db.patch(invite._id, { isRevoked: true });
+        }
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "revoke_invite",
+            details: `Revoked all ${activeInvites.length} active invite codes`,
+            timestamp: Date.now(),
+        });
+
+        return activeInvites.length;
+    },
+});
+
+/**
+ * Get users who were invited by a specific member.
+ */
+export const getInvitedMembers = query({
+    args: {
+        spaceId: v.id("spaces"),
+        inviterId: v.id("users"),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx).catch(() => null);
+        if (!user) return [];
+
+        const members = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .filter((q) => q.eq(q.field("invitedBy"), args.inviterId))
+            .collect();
+
+        return await Promise.all(members.map(async (m) => {
+            const memberUser = await ctx.db.get(m.userId);
+            return {
+                userId: m.userId,
+                displayName: memberUser?.displayName || "Unknown",
+                avatarUrl: memberUser?.avatarUrl,
+                joinedAt: m.joinedAt,
+                role: m.role,
+            };
+        }));
     },
 });
 

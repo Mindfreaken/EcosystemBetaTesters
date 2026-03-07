@@ -18,6 +18,7 @@ import ChannelChat from "./components/ChannelChat";
 import ScheduleChannel from "./components/ScheduleChannel";
 import PollsChannel from "./components/PollsChannel";
 import VoiceRoom from "./components/VoiceRoom";
+import UserMembersPortal from "./components/UserMembersPortal";
 import { useVoiceContext } from "@/context/VoiceContext";
 
 interface SpaceViewProps {
@@ -37,7 +38,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
     const unreadStatuses = useQuery(api.spaces.channels.getUnreadStatuses, { spaceId: sId });
     const trackView = useMutation(api.spaces.analytics.trackSpaceView);
     const markAsRead = useMutation(api.spaces.channels.markChannelAsRead);
-    const [currentView, setCurrentView] = React.useState<"main" | "owner" | "admin" | "mod" | "chat">("main");
+    const [currentView, setCurrentView] = React.useState<"main" | "owner" | "admin" | "mod" | "chat" | "members">("main");
     const [activeChannelId, setActiveChannelId] = React.useState<Id<"spaceChannels"> | null>(null);
     const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>({});
 
@@ -277,15 +278,16 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                     {activeChannel?.type === "voice" && currentView === "chat" ? <Volume2 size={20} /> : <MessageSquare size={20} />}
                                 </Box>
                             )}
-                            <Typography sx={{ fontWeight: 700, color: (currentView === "chat" || currentView === "main" || currentView === "owner" || currentView === "admin" || currentView === "mod") ? themeVar("textLight") : themeVar("textSecondary") }}>
+                            <Typography sx={{ fontWeight: 700, color: (currentView === "chat" || currentView === "main" || currentView === "owner" || currentView === "admin" || currentView === "mod" || currentView === "members") ? themeVar("textLight") : themeVar("textSecondary") }}>
                                 {currentView === "owner" ? "Owner Portal" :
                                     currentView === "admin" ? "Admin Portal" :
                                         currentView === "mod" ? "Moderator Portal" :
-                                            (activeChannel?.name || "welcome")}
+                                            currentView === "members" ? "Members Portal" :
+                                                (activeChannel?.name || "welcome")}
                             </Typography>
                         </Box>
 
-                        {(myRole === "owner" || myRole === "admin" || myRole === "moderator") && (
+                        {(myRole === "owner" || myRole === "admin" || myRole === "moderator" || myRole === "member") && (
                             <Box sx={{ display: "flex", alignItems: "center", gap: 1, ml: 2 }}>
                                 {myRole === "owner" && (
                                     <Button
@@ -335,6 +337,20 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                         Mod
                                     </Button>
                                 )}
+                                <Button
+                                    size="small"
+                                    startIcon={<Users size={14} />}
+                                    onClick={() => setCurrentView("members")}
+                                    sx={{
+                                        color: currentView === "members" ? themeVar("primary") : themeVar("textSecondary"),
+                                        fontWeight: 700,
+                                        fontSize: "0.75rem",
+                                        textTransform: "none",
+                                        "&:hover": { color: themeVar("textLight") }
+                                    }}
+                                >
+                                    Members
+                                </Button>
                             </Box>
                         )}
                     </Box>
@@ -349,6 +365,8 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                         <AdminPortal space={space} />
                     ) : currentView === "mod" && space ? (
                         <ModeratorPortal space={space} />
+                    ) : currentView === "members" && space ? (
+                        <UserMembersPortal space={space} />
                     ) : currentView === "chat" && activeChannel ? (
                         activeChannel.type === "voice" ? (
                             <VoiceRoom roomId={activeChannel._id} roomName={activeChannel.name} spaceId={spaceId} />
@@ -461,6 +479,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                             <Box sx={{ display: "flex", gap: 2 }}>
                                 <Button
                                     variant="contained"
+                                    onClick={() => setCurrentView("members")}
                                     startIcon={<Users size={18} />}
                                     sx={{
                                         bgcolor: themeVar("primary"),

@@ -13,6 +13,9 @@ import MainContent from "./ShellContent/MainContent";
 import GlobalVoicePanel from "./ShellContent/GlobalVoicePanel";
 import { ShellViewProvider, ShellView } from "./ShellContent/viewContext";
 import { useSearchParams } from "next/navigation";
+import { useQuery } from "convex/react";
+import { api } from "convex/_generated/api";
+import { useEffect, useRef } from "react";
 
 interface ShellLayoutProps {
   children?: React.ReactNode;
@@ -26,6 +29,39 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
   const viewParam = (searchParams?.get("view") || "home") as ShellView;
   const [leftSidebarState, setLeftSidebarState] = useState<LeftSidebarState>("open");
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
+
+  // Global Message Sound Logic
+  const me = useQuery(api.users.onboarding.queries.me, {});
+  const latestMessage = useQuery(
+    api.chat.functions.messages.getLatestMessageForUser as any,
+    me?._id ? { userId: me._id } : "skip"
+  ) as { _id: string; senderId?: string; _creationTime: number } | null | undefined;
+
+  const lastMessageIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!latestMessage || !me?._id) return;
+
+    const latestId = (latestMessage._id as any).toString();
+
+    // Only play if it's a NEW message (not just loading the state)
+    // and if we aren't the sender
+    if (lastMessageIdRef.current && lastMessageIdRef.current !== latestId) {
+      const isMine =
+        latestMessage.senderId &&
+        latestMessage.senderId.toString() === (me._id as any).toString();
+
+      if (!isMine) {
+        const audio = new Audio("/sounds/Ecosystem_message.mp3");
+        audio.volume = 0.5;
+        audio.play().catch((err) => {
+          console.debug("[ShellLayout] Global message sound play blocked:", err);
+        });
+      }
+    }
+
+    lastMessageIdRef.current = latestId;
+  }, [latestMessage?._id, me?._id]);
 
   const toggleLeftSidebar = () => {
     setLeftSidebarState((prev) => {

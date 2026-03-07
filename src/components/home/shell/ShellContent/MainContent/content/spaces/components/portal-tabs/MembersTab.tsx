@@ -12,13 +12,15 @@ import Avatar from "@mui/material/Avatar";
 import InputAdornment from "@mui/material/InputAdornment";
 import Tooltip from "@mui/material/Tooltip";
 import Dialog from "@mui/material/Dialog";
+import Switch from "@mui/material/Switch";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
 import { Search, Plus, Link, Trophy, Trash2, ShieldAlert, FileText, UserMinus } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
-import { Doc } from "convex/_generated/dataModel";
+import { Doc, Id } from "convex/_generated/dataModel";
 import MemberNotesDialog from "../MemberNotesDialog";
+import InvitedMembersDialog from "./InvitedMembersDialog";
 
 interface MembersTabProps {
     space: Doc<"spaces">;
@@ -32,6 +34,8 @@ export default function MembersTab({ space, role }: MembersTabProps) {
 
     const createInvite = useMutation(api.spaces.invites.createInvite);
     const revokeInvite = useMutation(api.spaces.invites.revokeInvite);
+    const toggleInvites = useMutation(api.spaces.invites.toggleInvites);
+    const revokeAllInvites = useMutation(api.spaces.invites.revokeAllInvites);
     const kickMember = useMutation(api.spaces.members.kickMember);
     const setRole = useMutation(api.spaces.members.setMemberRole);
 
@@ -39,6 +43,7 @@ export default function MembersTab({ space, role }: MembersTabProps) {
     const [creatingInvite, setCreatingInvite] = React.useState(false);
     const [notesDialogOpen, setNotesDialogOpen] = React.useState(false);
     const [notesDialogMember, setNotesDialogMember] = React.useState<any>(null);
+    const [invitedMembersDialog, setInvitedMembersDialog] = React.useState<{ open: boolean; inviterId: Id<"users"> | null; inviterName: string; }>({ open: false, inviterId: null, inviterName: "" });
 
     const [confirmDialog, setConfirmDialog] = React.useState<{
         open: boolean;
@@ -60,7 +65,7 @@ export default function MembersTab({ space, role }: MembersTabProps) {
         }
     };
 
-    const filteredMembers = members?.filter(m =>
+    const filteredMembers = members?.filter((m: any) =>
         m.user?.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         m.user?._id.toString().includes(searchQuery)
     );
@@ -210,31 +215,50 @@ export default function MembersTab({ space, role }: MembersTabProps) {
                         <Box>
                             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
                                 <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textSecondary") }}>INVITE MANAGEMENT</Typography>
-                                <IconButton size="small" disabled={creatingInvite || space.allowInvites === false} onClick={handleCreateInviteCode} sx={{ color: themeVar("primary") }}>
-                                    <Plus size={20} />
-                                </IconButton>
-                            </Box>
-
-                            <Box sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}`, mb: 3 }}>
-                                <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("textSecondary"), mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
-                                    <Link size={14} /> ACTIVE CODES
-                                </Typography>
-                                <Stack spacing={1} sx={{ maxHeight: 250, overflowY: "auto" }}>
-                                    {invites?.map((invite: any) => (
-                                        <Box key={invite._id} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 1, borderRadius: 1.5, bgcolor: "rgba(0,0,0,0.2)", border: `1px solid ${themeVar("border")}` }}>
-                                            <Box sx={{ minWidth: 0 }}>
-                                                <Typography variant="body2" sx={{ fontWeight: 900, color: themeVar("primary"), fontSize: "0.8rem" }}>{invite.code}</Typography>
-                                                <Typography variant="caption" sx={{ color: themeVar("textSecondary") }}>{invite.uses} uses</Typography>
-                                            </Box>
-                                            <IconButton size="small" onClick={() => revokeInvite({ spaceId: space._id, inviteId: invite._id })} sx={{ color: themeVar("danger") }}>
-                                                <Trash2 size={12} />
+                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                    <Tooltip title={space.allowInvites !== false ? "Disable Invites for Space" : "Enable Invites for Space"}>
+                                        <Switch
+                                            size="small"
+                                            checked={space.allowInvites !== false}
+                                            onChange={(e) => toggleInvites({ spaceId: space._id, allowInvites: e.target.checked })}
+                                            sx={{
+                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                    color: themeVar("success"),
+                                                    '& + .MuiSwitch-track': {
+                                                        backgroundColor: themeVar("success"),
+                                                        opacity: 0.5,
+                                                    },
+                                                },
+                                                '& .MuiSwitch-switchBase': {
+                                                    color: themeVar("danger"),
+                                                },
+                                                '& .MuiSwitch-track': {
+                                                    backgroundColor: themeVar("danger"),
+                                                    opacity: 0.5,
+                                                }
+                                            }}
+                                        />
+                                    </Tooltip>
+                                    <Tooltip title="Revoke All Active Invites">
+                                        <span>
+                                            <IconButton size="small" onClick={() => {
+                                                setConfirmDialog({
+                                                    open: true, title: "Revoke All Invites", message: "Are you sure you want to revoke all active invite codes? Existing users are not affected, but all outstanding links will become invalid.", confirmLabel: "Revoke All", isDanger: true,
+                                                    onConfirm: async () => { await revokeAllInvites({ spaceId: space._id }); setConfirmDialog(prev => ({ ...prev, open: false })); }
+                                                });
+                                            }} sx={{ color: themeVar("danger") }} disabled={!invites || invites.length === 0}>
+                                                <Trash2 size={20} />
                                             </IconButton>
-                                        </Box>
-                                    ))}
-                                    {(!invites || invites.length === 0) && (
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontStyle: "italic", textAlign: "center", py: 2, display: "block" }}>No active invites.</Typography>
-                                    )}
-                                </Stack>
+                                        </span>
+                                    </Tooltip>
+                                    <Tooltip title="Create New Invite">
+                                        <span>
+                                            <IconButton size="small" disabled={creatingInvite || space.allowInvites === false} onClick={handleCreateInviteCode} sx={{ color: themeVar("primary") }}>
+                                                <Plus size={20} />
+                                            </IconButton>
+                                        </span>
+                                    </Tooltip>
+                                </Box>
                             </Box>
 
                             <Box sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
@@ -243,10 +267,18 @@ export default function MembersTab({ space, role }: MembersTabProps) {
                                 </Typography>
                                 <Stack spacing={1} sx={{ maxHeight: 250, overflowY: "auto" }}>
                                     {leaderboard?.map((entry: any, index: number) => (
-                                        <Box key={entry.userId} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 1 }}>
+                                        <Box
+                                            key={entry.userId}
+                                            onClick={() => setInvitedMembersDialog({ open: true, inviterId: entry.userId, inviterName: entry.displayName })}
+                                            sx={{
+                                                display: "flex", alignItems: "center", justifyContent: "space-between", p: 1,
+                                                borderRadius: 1, cursor: "pointer", transition: "all 0.2s ease",
+                                                "&:hover": { bgcolor: "rgba(255,255,255,0.05)" }
+                                            }}
+                                        >
                                             <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
                                                 <Typography variant="caption" sx={{ fontWeight: 900, color: index === 0 ? themeVar("highlight") : themeVar("textSecondary"), width: 12 }}>{index + 1}.</Typography>
-                                                <Avatar src={entry.avatarUrl} sx={{ width: 20, height: 20 }} />
+                                                <Avatar src={entry.avatarUrl} sx={{ width: 24, height: 24 }} />
                                                 <Typography variant="caption" sx={{ fontWeight: 700, color: themeVar("textLight"), whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{entry.displayName}</Typography>
                                             </Box>
                                             <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("primary") }}>{entry.count}</Typography>
@@ -270,17 +302,31 @@ export default function MembersTab({ space, role }: MembersTabProps) {
                 </DialogActions>
             </Dialog>
 
-            {notesDialogOpen && notesDialogMember && (
-                <MemberNotesDialog
-                    open={notesDialogOpen}
-                    onClose={() => setNotesDialogOpen(false)}
-                    spaceId={space._id}
-                    userId={notesDialogMember.userId}
-                    username={notesDialogMember.user?.displayName || "User"}
-                    avatarUrl={notesDialogMember.user?.avatarUrl}
-                    myRole={role}
-                />
-            )}
-        </Box>
+            {
+                notesDialogOpen && notesDialogMember && (
+                    <MemberNotesDialog
+                        open={notesDialogOpen}
+                        onClose={() => setNotesDialogOpen(false)}
+                        spaceId={space._id}
+                        userId={notesDialogMember.userId}
+                        username={notesDialogMember.user?.displayName || "User"}
+                        avatarUrl={notesDialogMember.user?.avatarUrl}
+                        myRole={role}
+                    />
+                )
+            }
+
+            {
+                invitedMembersDialog.open && invitedMembersDialog.inviterId && (
+                    <InvitedMembersDialog
+                        open={invitedMembersDialog.open}
+                        onClose={() => setInvitedMembersDialog(prev => ({ ...prev, open: false }))}
+                        spaceId={space._id}
+                        inviterId={invitedMembersDialog.inviterId!}
+                        inviterName={invitedMembersDialog.inviterName}
+                    />
+                )
+            }
+        </Box >
     );
 }

@@ -34,7 +34,7 @@ export const sendMessage = mutation({
     } else {
       await ctx.db.patch(args.chatId, { lastActivityAt: Date.now() });
     }
-    
+
     return await ctx.db.insert("messages", {
       chatId: args.chatId,
       content: args.content,
@@ -782,5 +782,54 @@ export const deleteMessage = mutation({
     });
 
     return true;
+  },
+});
+
+// Get the latest message across all chats a user is in (used for global notifications)
+export const getLatestMessageForUser = query({
+  args: { userId: v.id("users") },
+  returns: v.union(
+    v.object({
+      _id: v.id("messages"),
+      senderId: v.optional(v.id("users")),
+      sentAt: v.optional(v.number()),
+      _creationTime: v.number(),
+    }),
+    v.null()
+  ),
+  handler: async (ctx, args) => {
+    const allChats = await ctx.db.query("chats").collect();
+    const userChatIds = allChats
+      .filter((chat) => chat.participants.includes(args.userId))
+      .map((chat) => chat._id);
+
+    if (userChatIds.length === 0) return null;
+
+    // This is not extremely efficient but safe for small-to-medium datasets.
+    // For large scale, we'd need a cross-chat index or a user-specific message feed.
+    let latestMessage: any = null;
+
+    for (const chatId of userChatIds) {
+      const msg = await ctx.db
+        .query("messages")
+        .withIndex("by_chat_and_time", (q) => q.eq("chatId", chatId))
+        .order("desc")
+        .first();
+
+      if (msg) {
+        if (!latestMessage || msg._creationTime > latestMessage._creationTime) {
+          latestMessage = msg;
+        }
+      }
+    }
+
+    if (!latestMessage) return null;
+
+    return {
+      _id: latestMessage._id,
+      senderId: latestMessage.senderId,
+      sentAt: latestMessage.sentAt,
+      _creationTime: latestMessage._creationTime,
+    };
   },
 });
