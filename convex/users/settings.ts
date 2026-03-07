@@ -17,6 +17,9 @@ export const getSettings = query({
     useThemeColorForRage: v.optional(v.boolean()),
     nerdleKeyboardHintDismissed: v.optional(v.boolean()),
     disableThemeVoteConfirm: v.optional(v.boolean()),
+    preferredMicrophoneId: v.optional(v.string()),
+    preferredCameraId: v.optional(v.string()),
+    preferredSpeakerId: v.optional(v.string()),
   })),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -39,6 +42,9 @@ export const getSettings = query({
       useThemeColorForRage: result.useThemeColorForRage,
       nerdleKeyboardHintDismissed: result.nerdleKeyboardHintDismissed,
       disableThemeVoteConfirm: result.disableThemeVoteConfirm,
+      preferredMicrophoneId: result.preferredMicrophoneId,
+      preferredCameraId: result.preferredCameraId,
+      preferredSpeakerId: result.preferredSpeakerId,
     };
   },
 });
@@ -97,6 +103,9 @@ export const updateSettings = mutation({
       useThemeColorForRage: v.optional(v.boolean()),
       nerdleKeyboardHintDismissed: v.optional(v.boolean()),
       disableThemeVoteConfirm: v.optional(v.boolean()),
+      preferredMicrophoneId: v.optional(v.string()),
+      preferredCameraId: v.optional(v.string()),
+      preferredSpeakerId: v.optional(v.string()),
     })
   },
   returns: v.null(),

@@ -23,66 +23,86 @@ import {
     usePinnedTracks,
     useParticipantInfo,
     useEnsureTrackRef,
+    useRoomContext,
 } from "@livekit/components-react";
-import { Track, ConnectionState, Participant, RemoteAudioTrack } from "livekit-client";
+import { Track, ConnectionState, Participant, RemoteAudioTrack, RoomEvent } from "livekit-client";
 import { isEqualTrackRef, isTrackReference, TrackReferenceOrPlaceholder } from '@livekit/components-core';
 import { PhoneCall, Maximize, Minimize } from "lucide-react";
 
 interface VoiceRoomProps {
     roomId: string;
     roomName: string;
+    spaceId: string;
 }
 
-export default function VoiceRoom({ roomId, roomName }: VoiceRoomProps) {
-    const { roomName: connectedRoom, joinRoom, leaveRoom } = useVoiceContext();
+export default function VoiceRoom({ roomId, roomName, spaceId }: VoiceRoomProps) {
+    const { roomName: connectedRoom, joinRoom, leaveRoom, me, prefetchedTokens, prefetchToken } = useVoiceContext();
     const [isConnecting, setIsConnecting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const me = useQuery(api.spaces.core.getMe);
 
     // Check if we are already connected to THIS specific room
     const isConnectedToThisRoom = connectedRoom === roomId;
 
+    // --- TIMEOUT CHECK ---
+    const myFullMembership = useQuery(api.spaces.members.getSpaceMember, me?._id ? { spaceId: spaceId as any, userId: me._id } : "skip");
+    const isTimedOut = !!(myFullMembership?.timeoutUntil && myFullMembership.timeoutUntil > Date.now());
+
     const handleJoin = React.useCallback(async () => {
+        if (isConnecting) return;
+
+        // Check if we already have a prefetched token for this room
+        if (prefetchedTokens[roomId]) {
+            joinRoom(roomId, roomName, spaceId, prefetchedTokens[roomId]);
+            return;
+        }
+
         // Wait until `me` is loaded
         if (me === undefined) return;
 
         setIsConnecting(true);
         setError(null);
         try {
-            const nameParam = me ? `&participantName=${encodeURIComponent(me.displayName || me.username || "User")}` : "";
-            const resp = await fetch(`/api/livekit/get-token?room=${encodeURIComponent(roomId)}${nameParam}`);
-            if (!resp.ok) {
+            const response = await fetch(`/api/livekit/get-token?room=${encodeURIComponent(roomId)}&participantName=${encodeURIComponent(me?.displayName || me?.username || 'User')}`);
+            if (!response.ok) {
                 throw new Error("Failed to get connection token");
             }
-            const data = await resp.json();
-            if (data.error) throw new Error(data.error);
-
-            // Tell Global context to connect LiveKitRoom wrapper
-            joinRoom(roomId, roomName, data.token);
+            const data = await response.json();
+            if (data.token) {
+                joinRoom(roomId, roomName, spaceId, data.token);
+            } else {
+                setError(data.error || "Failed to join");
+            }
         } catch (err: any) {
-            setError(err.message || "Failed to join voice");
+            setError(err.message || "Failed to connect to voice server");
         } finally {
             setIsConnecting(false);
         }
-    }, [roomId, joinRoom, roomName, me]);
+    }, [roomId, roomName, spaceId, joinRoom, isConnecting, me, prefetchedTokens]);
 
     // Track if we've already tried to auto-join this room,
     // so we don't spam if they explicitly disconnect
     const hasAttemptedJoin = React.useRef(false);
+    const [hasExplicitlyLeft, setHasExplicitlyLeft] = useState(false);
 
-    // Reset attempt tracker if they navigate to a different room
+    // Reset guards if they navigate to a different room
     React.useEffect(() => {
         hasAttemptedJoin.current = false;
+        setHasExplicitlyLeft(false);
     }, [roomId]);
+
+    const handleLeave = React.useCallback(() => {
+        setHasExplicitlyLeft(true);
+        leaveRoom();
+    }, [leaveRoom]);
 
     // Automatically join the room when the user navigates to it, 
     // IF they aren't already connected to it AND haven't explicitly left (AND `me` is loaded)
     React.useEffect(() => {
-        if (!isConnectedToThisRoom && !isConnecting && !error && !hasAttemptedJoin.current && me !== undefined) {
+        if (!isConnectedToThisRoom && !isConnecting && !error && !hasAttemptedJoin.current && !hasExplicitlyLeft && me !== undefined && !isTimedOut) {
             hasAttemptedJoin.current = true;
             handleJoin();
         }
-    }, [isConnectedToThisRoom, isConnecting, error, handleJoin, me]);
+    }, [isConnectedToThisRoom, isConnecting, error, handleJoin, me, isTimedOut, hasExplicitlyLeft]);
 
     if (!isConnectedToThisRoom) {
         return (
@@ -100,37 +120,56 @@ export default function VoiceRoom({ roomId, roomName }: VoiceRoomProps) {
                 <Typography variant="h5" sx={{ color: "var(--text)" }}>
                     {roomName}
                 </Typography>
-                <Typography variant="body1" sx={{ color: "var(--text-secondary)", textAlign: "center", maxWidth: 400 }}>
-                    Join this voice channel to talk with others in the space.
-                </Typography>
 
-                {error && (
-                    <Typography variant="body2" sx={{ color: "var(--error, #ef4444)" }}>
-                        {error}
-                    </Typography>
+                {isTimedOut ? (
+                    <Box sx={{ textAlign: "center", maxWidth: 400 }}>
+                        <Typography variant="body1" sx={{ color: "var(--error, #ef4444)", fontWeight: 700, mb: 1 }}>
+                            Access Restricted
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "var(--text-secondary)" }}>
+                            You are currently timed out in this space and cannot join voice channels until Your timeout expires.
+                            {myFullMembership.timeoutUntil && (
+                                <Box component="span" sx={{ display: "block", mt: 1, fontWeight: 600 }}>
+                                    Expires: {new Date(myFullMembership.timeoutUntil).toLocaleString()}
+                                </Box>
+                            )}
+                        </Typography>
+                    </Box>
+                ) : (
+                    <>
+                        <Typography variant="body1" sx={{ color: "var(--text-secondary)", textAlign: "center", maxWidth: 400 }}>
+                            Join this voice channel to talk with others in the space.
+                        </Typography>
+
+                        {error && (
+                            <Typography variant="body2" sx={{ color: "var(--error, #ef4444)" }}>
+                                {error}
+                            </Typography>
+                        )}
+
+                        <Button
+                            variant="contained"
+                            size="large"
+                            onClick={handleJoin}
+                            disabled={isConnecting}
+                            startIcon={isConnecting ? <CircularProgress size={20} color="inherit" /> : <PhoneCall size={20} />}
+                            sx={{
+                                mt: 2,
+                                backgroundColor: "var(--primary)",
+                                color: "var(--background)",
+                                fontWeight: 600,
+                                borderRadius: 2,
+                                textTransform: "none",
+                                px: 4,
+                                "&:hover": {
+                                    backgroundColor: "color-mix(in oklab, var(--primary), black 10%)"
+                                }
+                            }}
+                        >
+                            {isConnecting ? "Connecting..." : "Retry Connection"}
+                        </Button>
+                    </>
                 )}
-
-                <Button
-                    variant="contained"
-                    size="large"
-                    onClick={handleJoin}
-                    disabled={isConnecting}
-                    startIcon={isConnecting ? <CircularProgress size={20} color="inherit" /> : <PhoneCall size={20} />}
-                    sx={{
-                        mt: 2,
-                        backgroundColor: "var(--primary)",
-                        color: "var(--background)",
-                        fontWeight: 600,
-                        borderRadius: 2,
-                        textTransform: "none",
-                        px: 4,
-                        "&:hover": {
-                            backgroundColor: "color-mix(in oklab, var(--primary), black 10%)"
-                        }
-                    }}
-                >
-                    {isConnecting ? "Connecting..." : "Retry Connection"}
-                </Button>
             </Box>
         );
     }
@@ -138,7 +177,7 @@ export default function VoiceRoom({ roomId, roomName }: VoiceRoomProps) {
     // If connected, render the LiveKit participant grid!
     // Note: We do NOT need <LiveKitRoom> here because it is rendering globally in our layout.
     // The hooks and components from @livekit/components-react will automatically find it.
-    return <ActiveRoom roomName={roomName} onLeave={leaveRoom} />;
+    return <ActiveRoom roomName={roomName} onLeave={handleLeave} />;
 }
 
 /**
@@ -237,7 +276,8 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
         const participant = trackReference.participant;
 
         // Ensure identity is fetched reactively from LiveKit's observer in case it arrives late
-        const { identity: clerkUserId } = useParticipantInfo({ participant: participant as Participant });
+        const participantInfo = useParticipantInfo({ participant: participant as Participant });
+        const clerkUserId = participantInfo?.identity;
 
         // Evaluate if this specific track tile should show a camera placeholder
         const isCameraTrack = trackReference.source === Track.Source.Camera;
@@ -333,9 +373,53 @@ CustomParticipantTile.displayName = "CustomParticipantTile";
 
 function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => void }) {
     const connectionState = useConnectionState();
+    const roomContext = useRoomContext();
+    const hasPlayedOwnJoinSound = React.useRef(false);
 
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [isFullscreen, setIsFullscreen] = React.useState(false);
+
+    // Join Sound Logic
+    React.useEffect(() => {
+        const room = roomContext; // useRoomContext returns the Room object directly
+        if (!room) {
+            console.debug("[JoinSound] No room object from useRoomContext yet");
+            return;
+        }
+
+        console.log("[JoinSound] Initializing sound logic for room:", room.name);
+
+        const playJoinSound = (participant?: any) => {
+            console.log("[JoinSound] playJoinSound called. Is local participant:", !participant);
+            const audio = new Audio('/sounds/join_sound.mp3');
+            audio.volume = 0.5;
+            audio.play()
+                .then(() => console.log("[JoinSound] Audio played successfully"))
+                .catch(err => {
+                    console.warn("[JoinSound] Audio playback failed (possibly blocked by browser):", err);
+                });
+        };
+
+        // Play when others join
+        const onParticipantConnected = (participant: any) => {
+            console.log("[JoinSound] Participant joined:", participant.identity);
+            playJoinSound(participant);
+        };
+
+        room.on(RoomEvent.ParticipantConnected, onParticipantConnected);
+
+        // Play when WE join for the first time
+        if (connectionState === ConnectionState.Connected && !hasPlayedOwnJoinSound.current) {
+            console.log("[JoinSound] ConnectionState is Connected, playing own join sound");
+            hasPlayedOwnJoinSound.current = true;
+            playJoinSound();
+        }
+
+        return () => {
+            console.debug("[JoinSound] Cleaning up room events for:", room.name);
+            room.off(RoomEvent.ParticipantConnected, onParticipantConnected);
+        };
+    }, [roomContext, connectionState]);
 
     React.useEffect(() => {
         const handleFullscreenChange = () => {
@@ -470,14 +554,14 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
                                         </GridLayout>
                                     </div>
                                 ) : (
-                                    <div className="lk-focus-layout-wrapper" style={{ height: '100%', width: '100%', flex: 1, display: 'flex' }}>
-                                        <FocusLayoutContainer style={{ height: "100%", width: "100%", display: "flex", flex: 1 }}>
+                                    <div className="lk-focus-layout-wrapper" style={{ height: '100%', width: '100%', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                                        <FocusLayoutContainer style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column", flex: 1 }}>
                                             <CarouselLayout tracks={carouselTracks}>
                                                 <CustomParticipantTile />
                                             </CarouselLayout>
                                             {focusTrack && (
-                                                <Box sx={{ flex: 1, height: '100%', position: 'relative' }}>
-                                                    <CustomParticipantTile trackRef={focusTrack} />
+                                                <Box sx={{ flex: 1, width: '100%', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+                                                    <CustomParticipantTile trackRef={focusTrack} style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
                                                 </Box>
                                             )}
                                         </FocusLayoutContainer>
@@ -487,10 +571,6 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
                         </LayoutContextProvider>
                     </Box>
                 )}
-
-                {/* Global components needed for audio and connection notifications */}
-                <RoomAudioRenderer />
-                <ConnectionStateToast />
             </Box>
 
             {/* Internal Room Controls overlay */}

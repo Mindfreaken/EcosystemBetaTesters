@@ -74,4 +74,40 @@ export const getSpaceStats = query({
         };
     },
 });
+/**
+ * Get detailed time-series stats for a space.
+ */
+export const getDetailedStats = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
 
+        if (!membership || (membership.role !== "owner" && membership.role !== "admin" && membership.role !== "moderator")) {
+            throw new Error("Unauthorized: Analytics are restricted to staff.");
+        }
+
+        // Get last 30 days of stats
+        const stats = await ctx.db
+            .query("spaceDailyStats")
+            .withIndex("by_day", (q) => q.eq("spaceId", args.spaceId))
+            .order("desc")
+            .take(30);
+
+        const enrichedStats = await Promise.all(stats.map(async (stat) => {
+            const visitors = await ctx.db
+                .query("spaceDailyActive")
+                .withIndex("by_day", (q) => q.eq("spaceId", args.spaceId).eq("day", stat.day))
+                .collect();
+            return {
+                ...stat,
+                uniqueVisitors: visitors.length
+            };
+        }));
+
+        return enrichedStats.reverse();
+    },
+});

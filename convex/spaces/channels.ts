@@ -17,6 +17,16 @@ export const getChannels = query({
 });
 
 /**
+ * Get a single channel by ID.
+ */
+export const getChannel = query({
+    args: { channelId: v.id("spaceChannels") },
+    handler: async (ctx, args) => {
+        return await ctx.db.get(args.channelId);
+    },
+});
+
+/**
  * Get all categories for a space.
  */
 export const getCategories = query({
@@ -363,6 +373,85 @@ export const deleteChannel = mutation({
 });
 
 /**
+ * Mark a channel as read for the current user.
+ */
+export const markChannelAsRead = mutation({
+    args: { channelId: v.id("spaceChannels") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const existing = await ctx.db
+            .query("spaceChannelReadStatus")
+            .withIndex("by_user_channel", (q) => q.eq("userId", user._id).eq("channelId", args.channelId))
+            .unique();
+
+        if (existing) {
+            await ctx.db.patch(existing._id, { lastReadAt: Date.now() });
+        } else {
+            await ctx.db.insert("spaceChannelReadStatus", {
+                userId: user._id,
+                channelId: args.channelId,
+                lastReadAt: Date.now(),
+            });
+        }
+    },
+});
+
+/**
+ * Get unread statuses for all channels in a space for the current user.
+ */
+export const getUnreadStatuses = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx).catch(() => null);
+        if (!user) return {};
+
+        const channels = await ctx.db
+            .query("spaceChannels")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
+
+        const statuses = await ctx.db
+            .query("spaceChannelReadStatus")
+            .filter((q) => q.eq(q.field("userId"), user._id))
+            .collect();
+
+        const statusMap = new Map(statuses.map((s) => [s.channelId, s.lastReadAt]));
+        const result: Record<string, boolean> = {};
+
+        for (const channel of channels) {
+            const lastReadAt = statusMap.get(channel._id) || 0;
+
+            if (channel.type === "schedule") {
+                // Check for new events
+                const events = await ctx.db
+                    .query("spaceEvents")
+                    .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+                    .collect();
+                result[channel._id] = events.some((e) => e.createdAt > lastReadAt);
+            } else if (channel.type === "polls") {
+                // Check for new polls
+                const polls = await ctx.db
+                    .query("spacePolls")
+                    .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+                    .collect();
+                result[channel._id] = polls.some((p) => p.createdAt > lastReadAt);
+            } else if (channel.type === "text") {
+                // Check for new messages
+                const newestMessage = await ctx.db
+                    .query("spaceChannelMessages")
+                    .withIndex("by_channel_time", (q) => q.eq("channelId", channel._id))
+                    .order("desc")
+                    .first();
+                result[channel._id] = !!newestMessage && newestMessage.createdAt > lastReadAt;
+            } else {
+                result[channel._id] = false;
+            }
+        }
+
+        return result;
+    },
+});
+/**
  * Update channel management permissions for a space.
  */
 export const updateChannelPermissions = mutation({
@@ -372,29 +461,96 @@ export const updateChannelPermissions = mutation({
         modCanEdit: v.optional(v.boolean()),
         adminCanPostInReadOnly: v.optional(v.boolean()),
         modCanPostInReadOnly: v.optional(v.boolean()),
+        adminCanCreatePolls: v.optional(v.boolean()),
+        modCanCreatePolls: v.optional(v.boolean()),
     },
     handler: async (ctx, args) => {
         const user = await ensureUserActive(ctx);
-        const space = await ctx.db.get(args.spaceId);
-        if (!space) throw new Error("Space not found.");
-        if (space.ownerId !== user._id) throw new Error("Unauthorized: Only the owner can change channel permissions.");
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
 
-        const patches: any = {};
-        if (args.adminCanEdit !== undefined) patches.adminCanEditChannels = args.adminCanEdit;
-        if (args.modCanEdit !== undefined) patches.modCanEditChannels = args.modCanEdit;
-        if (args.adminCanPostInReadOnly !== undefined) patches.adminCanPostInReadOnly = args.adminCanPostInReadOnly;
-        if (args.modCanPostInReadOnly !== undefined) patches.modCanPostInReadOnly = args.modCanPostInReadOnly;
+        if (!membership || membership.role !== "owner") {
+            throw new Error("Only owners can change permissions.");
+        }
 
-        await ctx.db.patch(args.spaceId, patches);
+        const updates: any = {};
+        if (args.adminCanEdit !== undefined) updates.adminCanEditChannels = args.adminCanEdit;
+        if (args.modCanEdit !== undefined) updates.modCanEditChannels = args.modCanEdit;
+        if (args.adminCanPostInReadOnly !== undefined) updates.adminCanPostInReadOnly = args.adminCanPostInReadOnly;
+        if (args.modCanPostInReadOnly !== undefined) updates.modCanPostInReadOnly = args.modCanPostInReadOnly;
+        if (args.adminCanCreatePolls !== undefined) updates.adminCanCreatePolls = args.adminCanCreatePolls;
+        if (args.modCanCreatePolls !== undefined) updates.modCanCreatePolls = args.modCanCreatePolls;
 
-        // Log the action
-        await ctx.db.insert("spaceAdminActions", {
-            spaceId: args.spaceId,
-            adminId: user._id,
-            actionType: "update_channel_permissions",
-            details: "Updated channel management permissions.",
-            timestamp: Date.now(),
-        });
+        await ctx.db.patch(args.spaceId, updates);
     },
 });
 
+/**
+ * Reorder categories in a space.
+ */
+export const reorderCategories = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        categories: v.array(v.object({
+            id: v.id("spaceCategories"),
+            order: v.number(),
+        })),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!membership || (membership.role !== "owner" && membership.role !== "admin")) {
+            throw new Error("Unauthorized");
+        }
+
+        for (const cat of args.categories) {
+            await ctx.db.patch(cat.id, { order: cat.order });
+        }
+    },
+});
+
+/**
+ * Reorder channels and optionally move them to a different category.
+ */
+export const reorderChannels = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        channels: v.array(v.object({
+            id: v.id("spaceChannels"),
+            channelOrder: v.number(),
+            categoryId: v.optional(v.id("spaceCategories")),
+        })),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!membership || (membership.role !== "owner" && membership.role !== "admin")) {
+            if (membership?.role === "moderator") {
+                const space = await ctx.db.get(args.spaceId);
+                if (!space?.modCanEditChannels) {
+                    throw new Error("Unauthorized");
+                }
+            } else {
+                throw new Error("Unauthorized");
+            }
+        }
+
+        for (const ch of args.channels) {
+            const patch: any = { channelOrder: ch.channelOrder };
+            if (ch.categoryId !== undefined) {
+                patch.categoryId = ch.categoryId;
+            }
+            await ctx.db.patch(ch.id, patch);
+        }
+    },
+});

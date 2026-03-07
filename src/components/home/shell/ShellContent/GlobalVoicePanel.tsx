@@ -2,25 +2,27 @@ import React from "react";
 import { Box, Typography, IconButton, Stack } from "@mui/material";
 import { Mic, MicOff, Headphones, PhoneOff, Signal } from "lucide-react";
 import { useVoiceContext } from "@/context/VoiceContext";
-import { useConnectionState, useRoomInfo, useTrackToggle } from "@livekit/components-react";
+import { useConnectionState, useRoomInfo, useTrackToggle, RoomAudioRenderer, ConnectionStateToast } from "@livekit/components-react";
 import { ConnectionState, Track } from "livekit-client";
 import { useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
+import { useShellView } from "./viewContext";
 
 export default function GlobalVoicePanel() {
-    const { roomName, channelName, token, leaveRoom } = useVoiceContext();
+    const { roomName, channelName, spaceId, token, leaveRoom } = useVoiceContext();
 
     // We only conditionally call LiveKit hooks if we're actually connected 
     // to avoid errors when LiveKitRoom is not in the tree
     if (!roomName || !token) return null;
 
-    return <ActiveVoiceControls leaveRoom={leaveRoom} roomId={roomName} channelName={channelName || ""} />;
+    return <ActiveVoiceControls leaveRoom={leaveRoom} roomId={roomName} channelName={channelName || ""} spaceId={spaceId} />;
 }
 
 // Rendered inside LiveKitRoom context
-function ActiveVoiceControls({ leaveRoom, roomId, channelName }: { leaveRoom: () => void, roomId: string, channelName: string }) {
+function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leaveRoom: () => void, roomId: string, channelName: string, spaceId: string | null }) {
     const connectionState = useConnectionState();
+    const { setView, setSelectedSpaceId } = useShellView();
     // LiveKit hook to automatically toggle and read local mic state
     const { buttonProps, enabled } = useTrackToggle({ source: Track.Source.Microphone });
     const isMuted = !enabled;
@@ -47,6 +49,13 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName }: { leaveRoom: ()
         };
     }, [isConnected, heartbeat, leavePresence, roomId]);
 
+    const handleNavigate = () => {
+        if (spaceId) {
+            setSelectedSpaceId(spaceId);
+            setView("spaces");
+        }
+    };
+
     return (
         <Box
             sx={{
@@ -59,7 +68,16 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName }: { leaveRoom: ()
                 gap: 1,
             }}
         >
-            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0, flex: 1 }}>
+            <RoomAudioRenderer />
+            <ConnectionStateToast />
+
+            <Stack
+                direction="row"
+                alignItems="center"
+                spacing={1.5}
+                sx={{ minWidth: 0, flex: 1, cursor: "pointer", "&:hover": { opacity: 0.8 } }}
+                onClick={handleNavigate}
+            >
                 <Box sx={{ position: "relative", display: "flex" }}>
                     <Signal size={20} color={isConnected ? "var(--success, #22c55e)" : "var(--text-secondary)"} />
                 </Box>

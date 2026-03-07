@@ -59,8 +59,6 @@ export default function SpacesContent() {
 
   return (
     <ContentTemplate
-      title="Spaces"
-      subtitle="Discover communities or build your own dedicated home for your squad."
     >
       <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4 }}>
         {/* Header Section */}
@@ -75,7 +73,7 @@ export default function SpacesContent() {
               textShadow: `0 0 20px color-mix(in oklab, ${themeVar("primary")}, transparent 70%)`,
             }}
           >
-            Your Worlds, Organized.
+            Your Space, Your World.
           </Typography>
           <Typography
             variant="body1"
@@ -87,7 +85,7 @@ export default function SpacesContent() {
               lineHeight: 1.6,
             }}
           >
-            Spaces are the heart of EcoFullCB. Whether it's for your gaming clan, a project team, or just close friends.
+            Spaces are private, dedicated homes for your communities within the Ecosystem. Think of them as your own personal servers—built for gaming, projects, or just hanging out with friends.
           </Typography>
         </Box>
 
@@ -223,34 +221,6 @@ export default function SpacesContent() {
             </Typography>
           </Box>
         )}
-
-        {/* Footer Notice */}
-        <Box
-          sx={{
-            p: 3,
-            borderRadius: 3,
-            backgroundColor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 40%)`,
-            border: `1px solid ${themeVar("border")}`,
-            textAlign: "center",
-          }}
-        >
-          <Typography variant="body2" sx={{ color: themeVar("textSecondary") }}>
-            Spaces are currently in active development. Need more than 5 spaces?
-            <Box
-              component="span"
-              onClick={goToFeatureRequests}
-              sx={{
-                color: themeVar("primary"),
-                fontWeight: 700,
-                ml: 1,
-                cursor: "pointer",
-                "&:hover": { textDecoration: "underline" }
-              }}
-            >
-              Request higher limits or share feedback &rarr;
-            </Box>
-          </Typography>
-        </Box>
       </Box>
 
       <CreateSpaceModal

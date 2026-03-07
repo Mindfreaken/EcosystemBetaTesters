@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { query, mutation } from "../_generated/server";
 import { Id } from "../_generated/dataModel";
 import { ensureUserActive } from "../auth/helpers";
+import { SPACE_ASSISTANT_ID } from "./constants";
 
 /**
  * Get messages for a space channel.
@@ -12,6 +13,9 @@ export const getChannelMessages = query({
         const user = await ensureUserActive(ctx);
         const channel = await ctx.db.get(args.channelId);
         if (!channel) throw new Error("Channel not found.");
+
+        const space = await ctx.db.get(channel.spaceId);
+        if (!space) throw new Error("Space not found.");
 
         // Check if user is a member of the space
         const membership = await ctx.db
@@ -41,12 +45,18 @@ export const getChannelMessages = query({
                     .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", m.senderId))
                     .unique();
 
+                // Override assistant avatar with space logo
+                let avatarUrl = sender?.avatarUrl;
+                if (sender?.clerkUserId === SPACE_ASSISTANT_ID) {
+                    avatarUrl = space.avatarUrl || avatarUrl;
+                }
+
                 return {
                     ...m,
                     sender: sender ? {
                         displayName: sender.displayName,
                         username: sender.username,
-                        avatarUrl: sender.avatarUrl,
+                        avatarUrl: avatarUrl,
                         timeoutUntil: senderMembership?.timeoutUntil,
                     } : null,
                     reactions: reactions.map(r => ({
@@ -74,6 +84,8 @@ export const sendChannelMessage = mutation({
         const channel = await ctx.db.get(args.channelId);
         if (!channel) throw new Error("Channel not found.");
 
+        const space = await ctx.db.get(channel.spaceId);
+
         // Check membership
         const membership = await ctx.db
             .query("spaceMembers")
@@ -86,16 +98,45 @@ export const sendChannelMessage = mutation({
             throw new Error("You are currently timed out and cannot send messages.");
         }
 
-        if (channel.isReadOnly && membership.role === "member") {
-            throw new Error("Unauthorized: This channel is read-only. Only space staff can send messages here.");
+        if (channel.isReadOnly) {
+            const isOwner = membership.role === "owner";
+            const isAdmin = membership.role === "admin";
+            const isMod = membership.role === "moderator";
+
+            const canPost = isOwner ||
+                (isAdmin && (space?.adminCanPostInReadOnly ?? false)) ||
+                (isMod && (space?.modCanPostInReadOnly ?? false));
+
+            if (!canPost) {
+                throw new Error("Unauthorized: This channel is read-only. Only space staff with permission can send messages here.");
+            }
         }
 
+        const now = Date.now();
         const messageId = await ctx.db.insert("spaceChannelMessages", {
             channelId: args.channelId,
             senderId: user._id,
             content: args.content,
-            createdAt: Date.now(),
+            createdAt: now,
         });
+
+        // Track analytics
+        const day = new Date(now).toISOString().split("T")[0];
+        const stats = await ctx.db
+            .query("spaceDailyStats")
+            .withIndex("by_day", (q) => q.eq("spaceId", channel.spaceId).eq("day", day))
+            .unique();
+
+        if (stats) {
+            await ctx.db.patch(stats._id, { totalMessages: stats.totalMessages + 1 });
+        } else {
+            await ctx.db.insert("spaceDailyStats", {
+                spaceId: channel.spaceId,
+                day,
+                totalMessages: 1,
+                totalVoiceMinutes: 0,
+            });
+        }
 
         return messageId;
     },

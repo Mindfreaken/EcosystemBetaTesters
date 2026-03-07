@@ -34,54 +34,36 @@ export const setupWelcomeCategory = mutation({
             .query("spaceCategories")
             .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
             .filter(q => q.eq(q.field("name"), "welcome"))
-            .first();
-
-        let categoryId: Id<"spaceCategories">;
-        let rulesChannelId: Id<"spaceChannels"> | undefined;
-        let announcementsChannelId: Id<"spaceChannels"> | undefined;
+            .unique();
 
         if (existingWelcomeCategory) {
-            categoryId = existingWelcomeCategory._id;
+            await ctx.db.delete(existingWelcomeCategory._id);
+        }
 
-            // Find existing channels
-            const channels = await ctx.db
-                .query("spaceChannels")
-                .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
-                .filter(q => q.eq(q.field("categoryId"), categoryId))
-                .collect();
+        // Find existing channels by name (they may have been in a category before)
+        const channels = await ctx.db
+            .query("spaceChannels")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
 
-            const rulesChannel = channels.find(c => c.name === "rules");
-            if (rulesChannel) rulesChannelId = rulesChannel._id;
+        const rulesChannel = channels.find(c => c.name === "rules");
+        let rulesChannelId = rulesChannel?._id;
 
-            const announcementsChannel = channels.find(c => c.name === "announcements");
-            if (announcementsChannel) announcementsChannelId = announcementsChannel._id;
+        const announcementsChannel = channels.find(c => c.name === "announcements");
+        let announcementsChannelId = announcementsChannel?._id;
 
-        } else {
-            const existingCategories = await ctx.db
-                .query("spaceCategories")
-                .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
-                .collect();
-
-            // Shift existing categories down by 1
-            for (const cat of existingCategories) {
-                if (cat.name !== "welcome") {
-                    await ctx.db.patch(cat._id, { order: cat.order + 1 });
-                }
-            }
-
-            categoryId = await ctx.db.insert("spaceCategories", {
-                spaceId: args.spaceId,
-                name: "welcome",
-                order: 0,
-                createdAt: Date.now(),
-            });
+        // If they exist, ensure they are uncategorized
+        if (rulesChannel && rulesChannel.categoryId) {
+            await ctx.db.patch(rulesChannel._id, { categoryId: undefined });
+        }
+        if (announcementsChannel && announcementsChannel.categoryId) {
+            await ctx.db.patch(announcementsChannel._id, { categoryId: undefined });
         }
 
         // Insert channels if they don't exist
         if (!rulesChannelId) {
             rulesChannelId = await ctx.db.insert("spaceChannels", {
                 spaceId: args.spaceId,
-                categoryId,
                 name: "rules",
                 type: "text",
                 description: "Space rules and guidelines.",
@@ -94,7 +76,6 @@ export const setupWelcomeCategory = mutation({
         if (!announcementsChannelId) {
             announcementsChannelId = await ctx.db.insert("spaceChannels", {
                 spaceId: args.spaceId,
-                categoryId,
                 name: "announcements",
                 type: "text",
                 description: "Important updates and announcements.",
@@ -113,8 +94,6 @@ export const setupWelcomeCategory = mutation({
             .collect();
         for (const msg of rulesMessages) await ctx.db.delete(msg._id);
 
-
-
         // Send initial messages
         if (args.rulesItems && args.rulesItems.length > 0) {
             const content = "=== SERVER RULES ===\n\n" + args.rulesItems.map(rule => {
@@ -130,7 +109,7 @@ export const setupWelcomeCategory = mutation({
             });
         }
 
-        // Only insert an announcement if it's explicitly provided (usually only on first creation, or if they want to post a new one via setup)
+        // Only insert an announcement if it's explicitly provided
         if (args.announcementText && args.announcementText.trim() !== "") {
             await ctx.db.insert("spaceChannelMessages", {
                 channelId: announcementsChannelId,
@@ -144,11 +123,11 @@ export const setupWelcomeCategory = mutation({
             spaceId: args.spaceId,
             adminId: user._id,
             actionType: "setup_welcome",
-            details: existingWelcomeCategory ? "Updated Welcome category rules and announcements." : "Set up Welcome category with rules and announcements.",
+            details: (rulesChannel || announcementsChannel) ? "Updated Rules and Announcements." : "Set up Rules and Announcements.",
             timestamp: now,
         });
 
-        return categoryId;
+        return undefined;
     }
 });
 

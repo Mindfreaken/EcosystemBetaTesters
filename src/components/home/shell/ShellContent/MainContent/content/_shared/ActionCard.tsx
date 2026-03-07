@@ -91,7 +91,11 @@ export default function ActionCard({
                             mb: 0.5,
                             color: themeVar("textLight"),
                             fontSize: "1.1rem",
-                            lineHeight: 1.2
+                            lineHeight: 1.2,
+                            display: "-webkit-box",
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden"
                         }}
                     >
                         {title}
@@ -102,7 +106,11 @@ export default function ActionCard({
                             color: themeVar("textSecondary"),
                             fontSize: "0.85rem",
                             lineHeight: 1.4,
-                            opacity: 0.9
+                            opacity: 0.9,
+                            display: "-webkit-box",
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden"
                         }}
                     >
                         {description}

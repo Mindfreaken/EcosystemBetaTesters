@@ -124,9 +124,25 @@ export default function CreateSpaceModal({ open, onClose, onSuccess }: CreateSpa
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         disabled={loading}
-                        required
                         variant="outlined"
                         size="small"
+                        inputProps={{ maxLength: 32 }}
+                        helperText={`${name.length}/32`}
+                        FormHelperTextProps={{ sx: { textAlign: "right", color: "rgba(255,255,255,0.3)" } }}
+                        InputProps={{
+                            sx: {
+                                bgcolor: "rgba(0,0,0,0.2)",
+                                color: themeVar("textLight"),
+                                "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+                                "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") }
+                            }
+                        }}
+                        InputLabelProps={{
+                            sx: {
+                                color: "rgba(255,255,255,0.7)",
+                                "&.Mui-focused": { color: themeVar("primary") }
+                            }
+                        }}
                     />
 
                     <TextField
@@ -140,6 +156,23 @@ export default function CreateSpaceModal({ open, onClose, onSuccess }: CreateSpa
                         rows={3}
                         variant="outlined"
                         size="small"
+                        inputProps={{ maxLength: 150 }}
+                        helperText={`${description.length}/150`}
+                        FormHelperTextProps={{ sx: { textAlign: "right", color: "rgba(255,255,255,0.3)" } }}
+                        InputProps={{
+                            sx: {
+                                bgcolor: "rgba(0,0,0,0.2)",
+                                color: themeVar("textLight"),
+                                "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+                                "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") }
+                            }
+                        }}
+                        InputLabelProps={{
+                            sx: {
+                                color: "rgba(255,255,255,0.7)",
+                                "&.Mui-focused": { color: themeVar("primary") }
+                            }
+                        }}
                     />
 
                     <Box

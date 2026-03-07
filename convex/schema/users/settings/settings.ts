@@ -13,6 +13,9 @@ export const userSettingTables = {
     useThemeColorForRage: v.optional(v.boolean()),
     nerdleKeyboardHintDismissed: v.optional(v.boolean()),
     disableThemeVoteConfirm: v.optional(v.boolean()),
+    preferredMicrophoneId: v.optional(v.string()),
+    preferredCameraId: v.optional(v.string()),
+    preferredSpeakerId: v.optional(v.string()),
   }).index("by_clerk_id_unique", ["clerkUserId"]),
 
   userVoiceSettings: defineTable({

@@ -65,6 +65,9 @@ export const createSpace = mutation({
     handler: async (ctx, args) => {
         const user = await ensureUserActive(ctx);
 
+        if (args.name.length > 32) throw new Error("Space name cannot exceed 32 characters.");
+        if (args.description && args.description.length > 150) throw new Error("Description cannot exceed 150 characters.");
+
         // Enforce limit: max 5 owned spaces
         const ownedCount = await ctx.db
             .query("spaces")
@@ -125,6 +128,7 @@ export const updateSpaceMetadata = mutation({
         coverUrl: v.optional(v.string()),
         description: v.optional(v.string()),
         livekitUrl: v.optional(v.string()),
+        hideAssistantAvatarTip: v.optional(v.boolean()),
     },
     handler: async (ctx, args) => {
         const user = await ensureUserActive(ctx);
@@ -133,9 +137,12 @@ export const updateSpaceMetadata = mutation({
             .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
             .unique();
 
-        if (!membership || membership.role !== "owner") {
-            throw new Error("Unauthorized: Only the owner can update space metadata.");
+        if (!membership || (membership.role !== "owner" && membership.role !== "admin")) {
+            throw new Error("Unauthorized: Only owners and admins can update space metadata.");
         }
+
+        if (args.name && args.name.length > 32) throw new Error("Space name cannot exceed 32 characters.");
+        if (args.description && args.description.length > 150) throw new Error("Description cannot exceed 150 characters.");
 
         const updates: any = { updatedAt: Date.now() };
         if (args.name !== undefined) updates.name = args.name;
@@ -143,6 +150,7 @@ export const updateSpaceMetadata = mutation({
         if (args.coverUrl !== undefined) updates.coverUrl = args.coverUrl;
         if (args.description !== undefined) updates.description = args.description;
         if (args.livekitUrl !== undefined) updates.livekitUrl = args.livekitUrl;
+        if (args.hideAssistantAvatarTip !== undefined) updates.hideAssistantAvatarTip = args.hideAssistantAvatarTip;
 
         await ctx.db.patch(args.spaceId, updates);
 

@@ -36,8 +36,6 @@ export default function DailiesContent() {
     <Box sx={{ flex: 1, height: "100%", display: "flex", flexDirection: "column" }}>
       {!selected ? (
         <ContentTemplate
-          title="Dailies"
-          subtitle="Quick launch your favorites, track progress, and reconnect with friends across titles."
         >
           <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4 }}>
             {/* Header Section */}
@@ -95,21 +93,6 @@ export default function DailiesContent() {
                   }
                 />
               ))}
-            </Box>
-
-            {/* Footer Notice */}
-            <Box
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                backgroundColor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 40%)`,
-                border: `1px solid ${themeVar("border")}`,
-                textAlign: "center",
-              }}
-            >
-              <Typography variant="body2" sx={{ color: themeVar("textSecondary") }}>
-                Check back tomorrow for fresh rewards and new challenges.
-              </Typography>
             </Box>
           </Box>
         </ContentTemplate>

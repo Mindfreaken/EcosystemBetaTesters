@@ -16,8 +16,11 @@ export const spacesTables = {
         modCanEditChannels: v.optional(v.boolean()),
         adminCanPostInReadOnly: v.optional(v.boolean()),
         modCanPostInReadOnly: v.optional(v.boolean()),
+        adminCanCreatePolls: v.optional(v.boolean()),
+        modCanCreatePolls: v.optional(v.boolean()),
         tier: v.optional(v.string()), // "free" | "premium"
         livekitUrl: v.optional(v.string()), // For voice/video calling
+        hideAssistantAvatarTip: v.optional(v.boolean()),
     })
         .index("by_owner", ["ownerId"])
         .index("by_name", ["name"]),
@@ -151,4 +154,65 @@ export const spacesTables = {
         .index("by_channel", ["channelId"])
         .index("by_user", ["userId"])
         .index("by_user_channel", ["userId", "channelId"]),
+
+    spaceMemberNotes: defineTable({
+        spaceId: v.id("spaces"),
+        userId: v.id("users"), // The member the note is about
+        authorId: v.id("users"), // The staff member who wrote the note
+        note: v.string(),
+        createdAt: v.number(),
+    })
+        .index("by_space", ["spaceId"])
+        .index("by_user", ["userId"])
+        .index("by_space_user", ["spaceId", "userId"]),
+
+    spaceEvents: defineTable({
+        spaceId: v.id("spaces"),
+        creatorId: v.id("users"),
+        title: v.string(),
+        description: v.optional(v.string()),
+        startTime: v.number(),
+        endTime: v.number(),
+        showInAnnouncements: v.optional(v.boolean()),
+        createdAt: v.number(),
+    })
+        .index("by_space", ["spaceId"])
+        .index("by_space_time", ["spaceId", "startTime"]),
+
+    spaceChannelReadStatus: defineTable({
+        userId: v.id("users"),
+        channelId: v.id("spaceChannels"),
+        lastReadAt: v.number(),
+    })
+        .index("by_user_channel", ["userId", "channelId"]),
+
+    spaceDailyStats: defineTable({
+        spaceId: v.id("spaces"),
+        day: v.string(), // YYYY-MM-DD
+        totalMessages: v.number(),
+        totalVoiceMinutes: v.number(),
+    })
+        .index("by_day", ["spaceId", "day"]),
+
+    spacePolls: defineTable({
+        spaceId: v.id("spaces"),
+        creatorId: v.id("users"),
+        question: v.string(),
+        options: v.array(v.string()),
+        allowMultiSelect: v.boolean(),
+        showInAnnouncements: v.boolean(),
+        createdAt: v.number(),
+        expiresAt: v.optional(v.number()),
+    })
+        .index("by_space", ["spaceId"])
+        .index("by_creator", ["creatorId"]),
+
+    spacePollVotes: defineTable({
+        pollId: v.id("spacePolls"),
+        userId: v.id("users"),
+        optionIndices: v.array(v.number()),
+        createdAt: v.number(),
+    })
+        .index("by_poll", ["pollId"])
+        .index("by_poll_user", ["pollId", "userId"]),
 } as const;

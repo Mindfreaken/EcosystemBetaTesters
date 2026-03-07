@@ -8,14 +8,17 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
 import { themeVar } from "@/theme/registry";
-import { Settings, Users, MessageSquare, Hash, Layout, Info, Crown, Shield, ChevronDown, ChevronRight, Volume2 } from "lucide-react";
+import { Settings, Users, MessageSquare, Hash, Layout, Info, Crown, Shield, ChevronDown, ChevronRight, Volume2, Calendar, BarChart3 } from "lucide-react";
 import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 import OwnerPortal from "./components/OwnerPortal";
 import AdminPortal from "./components/AdminPortal";
 import ModeratorPortal from "./components/ModeratorPortal";
 import ChannelChat from "./components/ChannelChat";
+import ScheduleChannel from "./components/ScheduleChannel";
+import PollsChannel from "./components/PollsChannel";
 import VoiceRoom from "./components/VoiceRoom";
+import { useVoiceContext } from "@/context/VoiceContext";
 
 interface SpaceViewProps {
     spaceId: string;
@@ -24,11 +27,16 @@ interface SpaceViewProps {
 export default function SpaceView({ spaceId }: SpaceViewProps) {
     const sId = spaceId as Id<"spaces">;
     const space = useQuery(api.spaces.core.getSpace, { spaceId: sId });
+    const me = useQuery(api.spaces.core.getMe);
     const myRole = useQuery(api.spaces.members.getMyRole, { spaceId: sId });
+    const { prefetchTokensForSpace, clearPrefetchedTokensForSpace } = useVoiceContext();
     const channels = useQuery(api.spaces.channels.getChannels, { spaceId: sId });
     const categories = useQuery(api.spaces.channels.getCategories, { spaceId: sId });
     const voicePresence = useQuery(api.spaces.voice.getVoicePresence, { spaceId: sId });
+    const events = useQuery(api.spaces.schedule.getEvents, { spaceId: sId });
+    const unreadStatuses = useQuery(api.spaces.channels.getUnreadStatuses, { spaceId: sId });
     const trackView = useMutation(api.spaces.analytics.trackSpaceView);
+    const markAsRead = useMutation(api.spaces.channels.markChannelAsRead);
     const [currentView, setCurrentView] = React.useState<"main" | "owner" | "admin" | "mod" | "chat">("main");
     const [activeChannelId, setActiveChannelId] = React.useState<Id<"spaceChannels"> | null>(null);
     const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>({});
@@ -55,6 +63,25 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
             trackView({ spaceId: sId });
         }
     }, [spaceId, trackView, sId]);
+
+    // Pre-fetch tokens for all voice rooms in this space
+    React.useEffect(() => {
+        if (spaceId && channels && me) {
+            const voiceChannelIds = channels.filter(c => c.type === "voice").map(c => c._id);
+            if (voiceChannelIds.length > 0) {
+                prefetchTokensForSpace(spaceId, voiceChannelIds, me.displayName || me.username || "User");
+            }
+        }
+    }, [spaceId, channels, me, prefetchTokensForSpace]);
+
+    // Cleanup prefetched tokens when leaving the space
+    React.useEffect(() => {
+        return () => {
+            if (spaceId) {
+                clearPrefetchedTokensForSpace(spaceId);
+            }
+        };
+    }, [spaceId, clearPrefetchedTokensForSpace]);
 
     if (space === undefined) {
         return (
@@ -92,13 +119,11 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                         borderBottom: `1px solid ${themeVar("border")}`,
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-between",
                     }}
                 >
                     <Typography variant="subtitle1" noWrap sx={{ fontWeight: 800, color: themeVar("textLight") }}>
                         {space.name}
                     </Typography>
-                    <Settings size={18} style={{ color: themeVar("textSecondary"), cursor: "pointer" }} />
                 </Box>
 
                 {/* Channel List */}
@@ -120,13 +145,26 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                 }}
                             />
 
-                            {/* Uncategorized Channels */}
-                            {channels.filter((c: any) => !c.categoryId).map((channel: any) => (
+                            {/* System Channels (Rules & Announcements) */}
+                            {channels.filter((c: any) => !c.categoryId && (c.name === "rules" || c.name === "announcements")).sort((a: any, b: any) => a.channelOrder - b.channelOrder).map((channel: any) => (
+                                <ChannelItem
+                                    key={channel._id}
+                                    icon={<MessageSquare size={16} />}
+                                    label={channel.name}
+                                    active={activeChannelId === channel._id && currentView === "chat"}
+                                    unread={!!unreadStatuses?.[channel._id]}
+                                    onClick={() => handleChannelClick(channel._id)}
+                                />
+                            ))}
+
+                            {/* Uncategorized Channels (Rest) */}
+                            {channels.filter((c: any) => !c.categoryId && c.name !== "rules" && c.name !== "announcements").map((channel: any) => (
                                 <React.Fragment key={channel._id}>
                                     <ChannelItem
-                                        icon={channel.type === "voice" ? <Volume2 size={16} /> : <Hash size={16} />}
+                                        icon={channel.type === "voice" ? <Volume2 size={16} /> : (channel.type === "schedule" ? <Calendar size={16} /> : (channel.type === "polls" ? <BarChart3 size={16} /> : <MessageSquare size={16} />))}
                                         label={channel.name}
                                         active={activeChannelId === channel._id && currentView === "chat"}
+                                        unread={!!unreadStatuses?.[channel._id]}
                                         onClick={() => handleChannelClick(channel._id)}
                                     />
                                     {channel.type === "voice" && voicePresence && voicePresence.filter((p: any) => p.channelId === channel._id).length > 0 && (
@@ -172,9 +210,10 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                         {isExpanded && categoryChannels.map((channel: any) => (
                                             <React.Fragment key={channel._id}>
                                                 <ChannelItem
-                                                    icon={channel.type === "voice" ? <Volume2 size={16} /> : <Hash size={16} />}
+                                                    icon={channel.type === "voice" ? <Volume2 size={16} /> : (channel.type === "schedule" ? <Calendar size={16} /> : (channel.type === "polls" ? <BarChart3 size={16} /> : <MessageSquare size={16} />))}
                                                     label={channel.name}
                                                     active={activeChannelId === channel._id && currentView === "chat"}
+                                                    unread={!!unreadStatuses?.[channel._id]}
                                                     onClick={() => handleChannelClick(channel._id)}
                                                     indent={true}
                                                 />
@@ -235,7 +274,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                 <Shield size={20} style={{ color: themeVar("warning") }} />
                             ) : (
                                 <Box sx={{ display: "flex", alignItems: "center", color: (currentView === "chat" || currentView === "main") ? themeVar("primary") : themeVar("textSecondary") }}>
-                                    {activeChannel?.type === "voice" && currentView === "chat" ? <Volume2 size={20} /> : <Hash size={20} />}
+                                    {activeChannel?.type === "voice" && currentView === "chat" ? <Volume2 size={20} /> : <MessageSquare size={20} />}
                                 </Box>
                             )}
                             <Typography sx={{ fontWeight: 700, color: (currentView === "chat" || currentView === "main" || currentView === "owner" || currentView === "admin" || currentView === "mod") ? themeVar("textLight") : themeVar("textSecondary") }}>
@@ -299,7 +338,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                             </Box>
                         )}
                     </Box>
-                    <Info size={18} style={{ color: themeVar("textSecondary"), cursor: "pointer" }} />
+                    {/* Removed inactive Info button */}
                 </Box>
 
                 {/* Content Area Rendering */}
@@ -312,7 +351,11 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                         <ModeratorPortal space={space} />
                     ) : currentView === "chat" && activeChannel ? (
                         activeChannel.type === "voice" ? (
-                            <VoiceRoom roomId={activeChannel._id} roomName={activeChannel.name} />
+                            <VoiceRoom roomId={activeChannel._id} roomName={activeChannel.name} spaceId={spaceId} />
+                        ) : activeChannel.type === "schedule" ? (
+                            <ScheduleChannel channel={activeChannel} spaceId={spaceId} />
+                        ) : activeChannel.type === "polls" ? (
+                            <PollsChannel channel={activeChannel} spaceId={spaceId} />
                         ) : (
                             <ChannelChat channel={activeChannel} userRole={myRole || undefined} />
                         )
@@ -364,7 +407,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                     letterSpacing: "-0.02em"
                                 }}
                             >
-                                Welcome to #{space.name}!
+                                Welcome to {space.name}!
                             </Typography>
                             <Typography
                                 variant="h6"
@@ -377,6 +420,43 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                             >
                                 {space.description || `This is the start of your journey in ${space.name}. Start by inviting members or configuring your first channels.`}
                             </Typography>
+
+                            {/* Schedule Area */}
+                            {(() => {
+                                const upcomingEvents = (events || []).filter(e => e.endTime > Date.now());
+                                if (upcomingEvents.length === 0) return null;
+
+                                return (
+                                    <Box sx={{ maxWidth: 600, width: "100%", mb: 4, textAlign: "left" }}>
+                                        <Typography variant="overline" sx={{ fontWeight: 800, color: "rgba(255,255,255,0.5)", display: "block", mb: 1, pl: 1 }}>UPCOMING EVENTS</Typography>
+                                        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                                            {upcomingEvents.slice(0, 3).map(event => {
+                                                const startDate = new Date(event.startTime);
+                                                const endDate = new Date(event.endTime);
+                                                const dateStr = startDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+                                                const timeStr = `${startDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })} - ${endDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`;
+
+                                                return (
+                                                    <Box key={event._id} sx={{ p: 2, borderRadius: 2, bgcolor: "rgba(0,0,0,0.4)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "flex-start", gap: 2 }}>
+                                                        <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)`, color: themeVar("primary") }}>
+                                                            <Calendar size={20} />
+                                                        </Box>
+                                                        <Box>
+                                                            <Typography sx={{ color: "white", fontWeight: 700 }}>{event.title}</Typography>
+                                                            <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.6)", display: "block", fontWeight: 600 }}>{dateStr} • {timeStr}</Typography>
+                                                        </Box>
+                                                    </Box>
+                                                );
+                                            })}
+                                            {upcomingEvents.length > 3 && (
+                                                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.5)", textAlign: "center", mt: 1, display: "block" }}>
+                                                    + {upcomingEvents.length - 3} more
+                                                </Typography>
+                                            )}
+                                        </Box>
+                                    </Box>
+                                );
+                            })()}
 
                             <Box sx={{ display: "flex", gap: 2 }}>
                                 <Button
@@ -402,7 +482,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
     );
 }
 
-function ChannelItem({ icon, label, active = false, onClick, indent = false }: { icon: React.ReactNode; label: string; active?: boolean; onClick?: () => void; indent?: boolean }) {
+function ChannelItem({ icon, label, active = false, unread = false, onClick, indent = false }: { icon: React.ReactNode; label: string; active?: boolean; unread?: boolean; onClick?: () => void; indent?: boolean }) {
     return (
         <Box
             onClick={onClick}
@@ -416,7 +496,8 @@ function ChannelItem({ icon, label, active = false, onClick, indent = false }: {
                 mb: 0.25,
                 borderRadius: 1.5,
                 cursor: "pointer",
-                color: active ? themeVar("textLight") : themeVar("textSecondary"),
+                position: "relative",
+                color: active ? themeVar("textLight") : (unread ? themeVar("textLight") : themeVar("textSecondary")),
                 bgcolor: active ? `color-mix(in oklab, ${themeVar("primary")}, transparent 85%)` : "transparent",
                 "&:hover": {
                     bgcolor: active ? `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)` : `color-mix(in oklab, ${themeVar("textLight")}, transparent 95%)`,
@@ -426,9 +507,20 @@ function ChannelItem({ icon, label, active = false, onClick, indent = false }: {
             }}
         >
             <Box sx={{ display: "flex", alignItems: "center" }}>{icon}</Box>
-            <Typography variant="body2" sx={{ fontWeight: active ? 700 : 500 }}>
+            <Typography variant="body2" sx={{ fontWeight: (active || unread) ? 900 : 500, flex: 1 }}>
                 {label}
             </Typography>
+            {unread && !active && (
+                <Box
+                    sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: "50%",
+                        bgcolor: themeVar("primary"),
+                        boxShadow: `0 0 10px ${themeVar("primary")}`,
+                    }}
+                />
+            )}
         </Box>
     );
 }

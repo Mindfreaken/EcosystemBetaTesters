@@ -1,0 +1,286 @@
+"use client";
+
+import React from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import { themeVar } from "@/theme/registry";
+import Stack from "@mui/material/Stack";
+import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Avatar from "@mui/material/Avatar";
+import InputAdornment from "@mui/material/InputAdornment";
+import Tooltip from "@mui/material/Tooltip";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
+import { Search, Plus, Link, Trophy, Trash2, ShieldAlert, FileText, UserMinus } from "lucide-react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "convex/_generated/api";
+import { Doc } from "convex/_generated/dataModel";
+import MemberNotesDialog from "../MemberNotesDialog";
+
+interface MembersTabProps {
+    space: Doc<"spaces">;
+    role: "owner" | "admin" | "moderator";
+}
+
+export default function MembersTab({ space, role }: MembersTabProps) {
+    const members = useQuery(api.spaces.members.getSpaceMembers, { spaceId: space._id });
+    const invites = useQuery(api.spaces.invites.getSpaceInvites, { spaceId: space._id });
+    const leaderboard = useQuery(api.spaces.invites.getInviteLeaderboard, { spaceId: space._id });
+
+    const createInvite = useMutation(api.spaces.invites.createInvite);
+    const revokeInvite = useMutation(api.spaces.invites.revokeInvite);
+    const kickMember = useMutation(api.spaces.members.kickMember);
+    const setRole = useMutation(api.spaces.members.setMemberRole);
+
+    const [searchQuery, setSearchQuery] = React.useState("");
+    const [creatingInvite, setCreatingInvite] = React.useState(false);
+    const [notesDialogOpen, setNotesDialogOpen] = React.useState(false);
+    const [notesDialogMember, setNotesDialogMember] = React.useState<any>(null);
+
+    const [confirmDialog, setConfirmDialog] = React.useState<{
+        open: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        confirmLabel?: string;
+        isDanger?: boolean;
+    }>({
+        open: false, title: "", message: "", onConfirm: () => { }
+    });
+
+    const handleCreateInviteCode = async () => {
+        setCreatingInvite(true);
+        try {
+            await createInvite({ spaceId: space._id });
+        } finally {
+            setCreatingInvite(false);
+        }
+    };
+
+    const filteredMembers = members?.filter(m =>
+        m.user?.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        m.user?._id.toString().includes(searchQuery)
+    );
+
+    const canManageRoles = role === "owner" || role === "admin";
+    const canManageInvites = role === "owner" || role === "admin";
+
+    return (
+        <Box sx={{ maxWidth: 1200 }}>
+            <Box sx={{ display: "grid", gridTemplateColumns: canManageInvites ? "1fr 400px" : "1fr", gap: 4 }}>
+                {/* Member Management Section */}
+                <Box>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textSecondary") }}>MEMBER MANAGEMENT</Typography>
+                        <TextField
+                            size="small" placeholder="Search members..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                            InputProps={{
+                                startAdornment: <InputAdornment position="start"><Search size={14} style={{ color: themeVar("textSecondary") }} /></InputAdornment>,
+                                sx: {
+                                    fontSize: "0.8rem",
+                                    height: 32,
+                                    bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
+                                    color: themeVar("textLight"),
+                                    border: `1px solid ${themeVar("border")}`,
+                                    borderRadius: 1,
+                                    "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                                    "& input::placeholder": { color: themeVar("textSecondary"), opacity: 1 }
+                                }
+                            }}
+                        />
+                    </Box>
+                    <Stack spacing={1} sx={{ maxHeight: 600, overflowY: "auto", pr: 1 }}>
+                        {filteredMembers?.map((member: any) => (
+                            <Box
+                                key={member._id}
+                                sx={{
+                                    p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}`,
+                                    display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.2s ease",
+                                    "&:hover": { borderColor: themeVar("primary") }
+                                }}
+                            >
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                    <Avatar src={member.user?.avatarUrl} sx={{ width: 40, height: 40 }} />
+                                    <Box>
+                                        <Typography sx={{ fontWeight: 700, color: themeVar("textLight") }}>{member.user?.displayName || "User"}</Typography>
+                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary") }}>Joined {new Date(member.joinedAt).toLocaleDateString()}</Typography>
+                                    </Box>
+                                </Box>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                    <Box sx={{
+                                        px: 1, py: 0.25, borderRadius: 1, mr: 1,
+                                        bgcolor: member.role === "owner" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` : member.role === "admin" ? `color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)` : member.role === "moderator" ? `color-mix(in oklab, ${themeVar("warning")}, transparent 90%)` : "rgba(0,0,0,0.2)",
+                                        border: `1px solid ${member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("warning") : themeVar("border")}`
+                                    }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("warning") : themeVar("textSecondary") }}>
+                                            {member.role.toUpperCase()}
+                                        </Typography>
+                                    </Box>
+
+                                    <Tooltip title="View Notes">
+                                        <IconButton size="small" sx={{ color: themeVar("textSecondary"), "&:hover": { bgcolor: "rgba(255,255,255,0.1)", color: themeVar("textLight") } }} onClick={() => { setNotesDialogMember(member); setNotesDialogOpen(true); }}>
+                                            <FileText size={18} />
+                                        </IconButton>
+                                    </Tooltip>
+
+                                    {/* Permission checks for kicking: Owner can kick anyone but owner, Admin can kick mods and members, Mod can only kick members */}
+                                    {member.userId !== space.ownerId && (
+                                        (role === "owner") ||
+                                        (role === "admin" && member.role !== "owner" && member.role !== "admin") ||
+                                        (role === "moderator" && member.role === "member")
+                                    ) && (
+                                            <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                                {canManageRoles && member.role === "member" && (
+                                                    <Tooltip title={`Promote to ${role === "owner" ? "Admin" : "Moderator"}`}>
+                                                        <IconButton
+                                                            size="small"
+                                                            sx={{ color: themeVar("warning") }}
+                                                            onClick={() => {
+                                                                const promoteTo = role === "owner" ? "admin" : "moderator";
+                                                                setConfirmDialog({
+                                                                    open: true, title: "Promote Member", message: `Promote ${member.user?.displayName} to ${promoteTo}?`, confirmLabel: "Promote", isDanger: false,
+                                                                    onConfirm: async () => { await setRole({ spaceId: space._id, userId: member.userId, role: promoteTo }); setConfirmDialog(prev => ({ ...prev, open: false })); }
+                                                                });
+                                                            }}
+                                                        >
+                                                            <ShieldAlert size={18} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                                {canManageRoles && member.role === "moderator" && role === "owner" && (
+                                                    <Tooltip title="Promote to Admin">
+                                                        <IconButton
+                                                            size="small"
+                                                            sx={{ color: themeVar("secondary") }}
+                                                            onClick={() => {
+                                                                setConfirmDialog({
+                                                                    open: true, title: "Promote Member", message: `Promote ${member.user?.displayName} to Admin?`, confirmLabel: "Promote", isDanger: false,
+                                                                    onConfirm: async () => { await setRole({ spaceId: space._id, userId: member.userId, role: "admin" }); setConfirmDialog(prev => ({ ...prev, open: false })); }
+                                                                });
+                                                            }}
+                                                        >
+                                                            <ShieldAlert size={18} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+                                                {canManageRoles && (member.role === "admin" || member.role === "moderator") && role === "owner" && (
+                                                    <Tooltip title="Demote to Member">
+                                                        <IconButton
+                                                            size="small"
+                                                            sx={{ color: themeVar("textSecondary") }}
+                                                            onClick={() => {
+                                                                setConfirmDialog({
+                                                                    open: true, title: "Demote Member", message: `Demote ${member.user?.displayName} to regular member?`, confirmLabel: "Demote", isDanger: true,
+                                                                    onConfirm: async () => { await setRole({ spaceId: space._id, userId: member.userId, role: "member" }); setConfirmDialog(prev => ({ ...prev, open: false })); }
+                                                                });
+                                                            }}
+                                                        >
+                                                            <UserMinus size={18} />
+                                                        </IconButton>
+                                                    </Tooltip>
+                                                )}
+
+                                                <Tooltip title="Kick Member">
+                                                    <IconButton
+                                                        size="small" sx={{ color: themeVar("danger") }}
+                                                        onClick={() => {
+                                                            setConfirmDialog({
+                                                                open: true, title: "Kick Member", message: `Are you sure you want to kick ${member.user?.displayName}? They will need a new invite to join back.`, confirmLabel: "Kick", isDanger: true,
+                                                                onConfirm: async () => { await kickMember({ spaceId: space._id, targetUserId: member.userId }); setConfirmDialog(prev => ({ ...prev, open: false })); }
+                                                            });
+                                                        }}
+                                                    >
+                                                        <UserMinus size={18} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Box>
+                                        )}
+                                </Box>
+                            </Box>
+                        ))}
+                    </Stack>
+                </Box>
+
+                {/* Sidebar: Invite Management */}
+                {canManageInvites && (
+                    <Stack spacing={4}>
+                        <Box>
+                            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textSecondary") }}>INVITE MANAGEMENT</Typography>
+                                <IconButton size="small" disabled={creatingInvite || space.allowInvites === false} onClick={handleCreateInviteCode} sx={{ color: themeVar("primary") }}>
+                                    <Plus size={20} />
+                                </IconButton>
+                            </Box>
+
+                            <Box sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}`, mb: 3 }}>
+                                <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("textSecondary"), mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+                                    <Link size={14} /> ACTIVE CODES
+                                </Typography>
+                                <Stack spacing={1} sx={{ maxHeight: 250, overflowY: "auto" }}>
+                                    {invites?.map((invite: any) => (
+                                        <Box key={invite._id} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 1, borderRadius: 1.5, bgcolor: "rgba(0,0,0,0.2)", border: `1px solid ${themeVar("border")}` }}>
+                                            <Box sx={{ minWidth: 0 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: 900, color: themeVar("primary"), fontSize: "0.8rem" }}>{invite.code}</Typography>
+                                                <Typography variant="caption" sx={{ color: themeVar("textSecondary") }}>{invite.uses} uses</Typography>
+                                            </Box>
+                                            <IconButton size="small" onClick={() => revokeInvite({ spaceId: space._id, inviteId: invite._id })} sx={{ color: themeVar("danger") }}>
+                                                <Trash2 size={12} />
+                                            </IconButton>
+                                        </Box>
+                                    ))}
+                                    {(!invites || invites.length === 0) && (
+                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontStyle: "italic", textAlign: "center", py: 2, display: "block" }}>No active invites.</Typography>
+                                    )}
+                                </Stack>
+                            </Box>
+
+                            <Box sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
+                                <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("textSecondary"), mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+                                    <Trophy size={14} /> LEADERBOARD
+                                </Typography>
+                                <Stack spacing={1} sx={{ maxHeight: 250, overflowY: "auto" }}>
+                                    {leaderboard?.map((entry: any, index: number) => (
+                                        <Box key={entry.userId} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", p: 1 }}>
+                                            <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
+                                                <Typography variant="caption" sx={{ fontWeight: 900, color: index === 0 ? themeVar("highlight") : themeVar("textSecondary"), width: 12 }}>{index + 1}.</Typography>
+                                                <Avatar src={entry.avatarUrl} sx={{ width: 20, height: 20 }} />
+                                                <Typography variant="caption" sx={{ fontWeight: 700, color: themeVar("textLight"), whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{entry.displayName}</Typography>
+                                            </Box>
+                                            <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("primary") }}>{entry.count}</Typography>
+                                        </Box>
+                                    ))}
+                                    {(!leaderboard || leaderboard.length === 0) && (
+                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontStyle: "italic", textAlign: "center", py: 2, display: "block" }}>No leaderboard data.</Typography>
+                                    )}
+                                </Stack>
+                            </Box>
+                        </Box>
+                    </Stack>
+                )}
+            </Box>
+
+            <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))} PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: "none" } }}>
+                <DialogTitle>{confirmDialog.title}</DialogTitle>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))} sx={{ color: themeVar("textSecondary") }}>Cancel</Button>
+                    <Button variant="contained" onClick={confirmDialog.onConfirm} sx={{ bgcolor: confirmDialog.isDanger ? themeVar("danger") : themeVar("primary"), color: "white" }}>{confirmDialog.confirmLabel}</Button>
+                </DialogActions>
+            </Dialog>
+
+            {notesDialogOpen && notesDialogMember && (
+                <MemberNotesDialog
+                    open={notesDialogOpen}
+                    onClose={() => setNotesDialogOpen(false)}
+                    spaceId={space._id}
+                    userId={notesDialogMember.userId}
+                    username={notesDialogMember.user?.displayName || "User"}
+                    avatarUrl={notesDialogMember.user?.avatarUrl}
+                    myRole={role}
+                />
+            )}
+        </Box>
+    );
+}

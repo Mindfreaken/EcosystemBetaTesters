@@ -18,6 +18,16 @@ export const heartbeatVoicePresence = mutation({
 
         const now = Date.now();
 
+        // Check if user is timed out
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (membership?.timeoutUntil && membership.timeoutUntil > now) {
+            throw new Error("You are currently timed out and cannot join voice channels.");
+        }
+
         // Check if existing presence
         const existing = await ctx.db
             .query("spaceVoicePresence")
@@ -35,7 +45,28 @@ export const heartbeatVoicePresence = mutation({
                 lastSeen: now,
             });
         } else {
+            const elapsedMs = now - existing.lastSeen;
+            const elapsedMins = elapsedMs / (1000 * 60);
+
             await ctx.db.patch(existing._id, { lastSeen: now });
+
+            // Track analytics
+            const day = new Date(now).toISOString().split("T")[0];
+            const stats = await ctx.db
+                .query("spaceDailyStats")
+                .withIndex("by_day", (q) => q.eq("spaceId", channel.spaceId).eq("day", day))
+                .unique();
+
+            if (stats) {
+                await ctx.db.patch(stats._id, { totalVoiceMinutes: stats.totalVoiceMinutes + elapsedMins });
+            } else {
+                await ctx.db.insert("spaceDailyStats", {
+                    spaceId: channel.spaceId,
+                    day,
+                    totalMessages: 0,
+                    totalVoiceMinutes: elapsedMins,
+                });
+            }
         }
     },
 });
@@ -98,3 +129,47 @@ export const getVoicePresence = query({
     },
 });
 
+/**
+ * Consolidate all details needed for jointing a voice room.
+ * Reduces round-trips for token generation.
+ */
+export const getJoinDetails = query({
+    args: {
+        channelId: v.id("spaceChannels"),
+        clerkUserId: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_clerk_id", (q) => q.eq("clerkUserId", args.clerkUserId))
+            .unique();
+
+        if (!user) return { error: "User not found" };
+
+        const channel = await ctx.db.get(args.channelId);
+        if (!channel) return { error: "Channel not found" };
+
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", user._id))
+            .unique();
+
+        return {
+            user: {
+                _id: user._id,
+                displayName: user.displayName,
+                username: user.username,
+            },
+            channel: {
+                _id: channel._id,
+                spaceId: channel.spaceId,
+                name: channel.name,
+            },
+            membership: membership ? {
+                _id: membership._id,
+                role: membership.role,
+                timeoutUntil: membership.timeoutUntil,
+            } : null,
+        };
+    },
+});

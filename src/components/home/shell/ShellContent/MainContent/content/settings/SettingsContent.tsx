@@ -12,11 +12,81 @@ import { useShellView } from "../../../viewContext";
 import { UserProfile } from "@clerk/nextjs";
 import UiButton from "@/components/ui/UiButton";
 import { MuiCard } from "@/components/ui/MuiCard";
-import { MediaDeviceMenu } from "@livekit/components-react";
+import { useMediaDeviceSelect } from "@livekit/components-react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "convex/_generated/api";
+
+function ConvexMediaDeviceSelect({
+  kind,
+  value,
+  onChange
+}: {
+  kind: 'audioinput' | 'videoinput' | 'audiooutput',
+  value?: string | null,
+  onChange: (id: string) => void
+}) {
+  const { devices, activeDeviceId, setActiveMediaDevice } = useMediaDeviceSelect({ kind });
+
+  // Sync convex value down to LiveKit strictly when it changes
+  React.useEffect(() => {
+    if (value && value !== "" && value !== activeDeviceId) {
+      setActiveMediaDevice(value).catch(console.error);
+    }
+  }, [value, activeDeviceId, setActiveMediaDevice]);
+
+  // Sync LiveKit's naturally chosen default UP to Convex initially if Convex has no saved preference yet
+  React.useEffect(() => {
+    if (!value && activeDeviceId) {
+      onChange(activeDeviceId);
+    }
+  }, [value, activeDeviceId, onChange]);
+
+  const handleChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const defaultVal = e.target.value;
+    onChange(defaultVal);
+    await setActiveMediaDevice(defaultVal).catch(console.error);
+  };
+
+  return (
+    <select
+      value={value || activeDeviceId || ""}
+      onChange={handleChange}
+      style={{
+        width: '100%',
+        padding: '8px',
+        borderRadius: '8px',
+        backgroundColor: 'var(--card-hover)',
+        color: 'white',
+        border: '1px solid var(--card-border)',
+        outline: 'none',
+        appearance: 'none',
+        cursor: 'pointer'
+      }}
+    >
+      <option value="" disabled>Select device...</option>
+      {devices.map(device => (
+        <option key={device.deviceId} value={device.deviceId}>
+          {device.label || `Device ${device.deviceId}`}
+        </option>
+      ))}
+    </select>
+  );
+}
 
 export default function SettingsContent() {
   const { setView } = useShellView();
   const [showClerkProfile, setShowClerkProfile] = React.useState(false);
+
+  const settings = useQuery(api.users.settings.getSettings);
+  const updateSettings = useMutation(api.users.settings.updateSettings);
+
+  const handleDeviceChange = (kind: 'audioinput' | 'videoinput' | 'audiooutput', deviceId: string) => {
+    const field = kind === 'audioinput' ? 'preferredMicrophoneId'
+      : kind === 'videoinput' ? 'preferredCameraId'
+        : 'preferredSpeakerId';
+    updateSettings({ settings: { [field]: deviceId } });
+  };
+
   return (
     <ContentTemplate
       title="Settings"
@@ -57,15 +127,27 @@ export default function SettingsContent() {
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box>
               <Typography variant="caption" sx={{ color: "var(--textSecondary)", display: 'block', mb: 0.5 }}>Microphone</Typography>
-              <MediaDeviceMenu kind="audioinput" style={{ width: '100%', padding: '8px', borderRadius: '8px', backgroundColor: 'var(--card-hover)', color: 'white', border: '1px solid var(--card-border)' }} />
+              <ConvexMediaDeviceSelect
+                kind="audioinput"
+                value={settings?.preferredMicrophoneId}
+                onChange={(id) => handleDeviceChange('audioinput', id)}
+              />
             </Box>
             <Box>
               <Typography variant="caption" sx={{ color: "var(--textSecondary)", display: 'block', mb: 0.5 }}>Camera</Typography>
-              <MediaDeviceMenu kind="videoinput" style={{ width: '100%', padding: '8px', borderRadius: '8px', backgroundColor: 'var(--card-hover)', color: 'white', border: '1px solid var(--card-border)' }} />
+              <ConvexMediaDeviceSelect
+                kind="videoinput"
+                value={settings?.preferredCameraId}
+                onChange={(id) => handleDeviceChange('videoinput', id)}
+              />
             </Box>
             <Box>
               <Typography variant="caption" sx={{ color: "var(--textSecondary)", display: 'block', mb: 0.5 }}>Output (Speakers)</Typography>
-              <MediaDeviceMenu kind="audiooutput" style={{ width: '100%', padding: '8px', borderRadius: '8px', backgroundColor: 'var(--card-hover)', color: 'white', border: '1px solid var(--card-border)' }} />
+              <ConvexMediaDeviceSelect
+                kind="audiooutput"
+                value={settings?.preferredSpeakerId}
+                onChange={(id) => handleDeviceChange('audiooutput', id)}
+              />
             </Box>
           </Box>
         </MuiCard>

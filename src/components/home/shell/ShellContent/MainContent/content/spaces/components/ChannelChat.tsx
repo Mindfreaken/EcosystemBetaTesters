@@ -18,7 +18,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import { Send, Hash, Smile, Trash2, Shield, Clock, Ban } from "lucide-react";
+import { Send, Hash, Smile, Trash2, Shield, Clock, Ban, FileText, ExternalLink, AlertTriangle, MessageSquare, CheckCheck } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import { themeVar } from "@/theme/registry";
@@ -28,6 +28,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { EMOJI_CATEGORIES } from "@/constants/emojis";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import MemberNotesDialog from "./MemberNotesDialog";
 
 const COMMON_EMOJIS = ["👍", "❤️", "😂", "🔥", "😮", "🚀"];
 
@@ -78,10 +79,18 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
         }
     }, [messages?.length]);
 
-    // Reset init scroll when switching channels
     useEffect(() => {
         hasInitScrollRef.current = false;
     }, [channel._id]);
+
+    const markAsRead = useMutation(api.spaces.channels.markChannelAsRead);
+
+    // Mark as read when new messages arrive while viewing
+    useEffect(() => {
+        if (messages && messages.length > 0) {
+            markAsRead({ channelId: channel._id });
+        }
+    }, [messages?.length, channel._id, markAsRead]);
 
     const sendMessage = useMutation(api.spaces.messages.sendChannelMessage);
     const toggleReaction = useMutation(api.spaces.messages.toggleChannelMessageReaction);
@@ -93,15 +102,17 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
     const bulkDeleteMut = useMutation(api.spaces.messages.bulkDeleteUserMessages);
 
     // Evaluate if user can post in read-only channels based on space settings
-    let isReadOnlyForMe = channel.isReadOnly && userRole === "member";
+    let isReadOnlyForMe = false;
     if (channel.isReadOnly) {
-        if (userRole === "owner") {
-            isReadOnlyForMe = false;
-        } else if (userRole === "admin") {
-            isReadOnlyForMe = !space?.adminCanPostInReadOnly;
-        } else if (userRole === "moderator") {
-            isReadOnlyForMe = !space?.modCanPostInReadOnly;
-        }
+        const isAdmin = userRole === "admin";
+        const isMod = userRole === "moderator";
+        const isOwner = userRole === "owner";
+
+        const canPost = isOwner ||
+            (isAdmin && (space?.adminCanPostInReadOnly ?? false)) ||
+            (isMod && (space?.modCanPostInReadOnly ?? false));
+
+        isReadOnlyForMe = !canPost;
     }
 
     const isTimedOut = membership?.timeoutUntil && membership.timeoutUntil > Date.now();
@@ -109,13 +120,15 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
 
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const [activeMsgId, setActiveMsgId] = useState<Id<"spaceChannelMessages"> | null>(null);
-    const [modMenuAnchor, setModMenuAnchor] = useState<{ el: HTMLElement, msgId: Id<"spaceChannelMessages">, userId: Id<"users">, username: string } | null>(null);
+    const [modMenuAnchor, setModMenuAnchor] = useState<{ el: HTMLElement, msgId: Id<"spaceChannelMessages">, userId: Id<"users">, username: string, avatarUrl?: string } | null>(null);
     const [modDialogOpen, setModDialogOpen] = useState(false);
     const [modActionType, setModActionType] = useState<"timeout" | "ban" | "delete_messages" | null>(null);
     const [timeoutHours, setTimeoutHours] = useState(1);
     const [deleteCount, setDeleteCount] = useState<number | "all" | "this">(0);
     const [deleteScope, setDeleteScope] = useState<"channel" | "space">("channel");
     const [isProcessingMod, setIsProcessingMod] = useState(false);
+    const [notesDialogOpen, setNotesDialogOpen] = useState(false);
+    const [externalLink, setExternalLink] = useState<{ url: string, text: string } | null>(null);
 
     const handleReactionClick = (event: React.MouseEvent<HTMLElement>, msgId: Id<"spaceChannelMessages">) => {
         setAnchorEl(event.currentTarget);
@@ -142,6 +155,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                 content,
             });
             setInput("");
+            markAsRead({ channelId: channel._id });
         } catch (e) {
             console.error("Failed to send message", e);
         }
@@ -214,50 +228,22 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                             <Typography sx={{ color: themeVar("textSecondary") }}>No document content available.</Typography>
                         </Box>
                     ) : (
-                        <Box sx={{ mt: "auto", mb: 4, px: 2 }}>
-                            <Box sx={{
-                                width: 68,
-                                height: 68,
-                                borderRadius: "50%",
-                                bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)`,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                mb: 2
-                            }}>
-                                <Hash size={32} style={{ color: themeVar("primary") }} />
-                            </Box>
-                            <Typography variant="h4" sx={{ fontWeight: 900, color: themeVar("textLight"), mb: 1 }}>
-                                Welcome to #{channel.name}!
-                            </Typography>
-                            <Typography variant="body1" sx={{ color: themeVar("textSecondary") }}>
-                                This is the start of the #{channel.name} channel.
+                        <Box sx={{ mt: "auto", mb: 4, px: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 1, opacity: 0.4 }}>
+                            <Box sx={{ width: 40, height: 1, bgcolor: themeVar("border") }} />
+                            <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", fontSize: "0.65rem" }}>
+                                No messages yet
                             </Typography>
                         </Box>
                     )
                 ) : (
                     <>
                         {!isDocumentChannel && (
-                            <Box sx={{ mb: 4, pt: 4 }}>
-                                <Box sx={{
-                                    width: 48,
-                                    height: 48,
-                                    borderRadius: "50%",
-                                    bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)`,
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    mb: 1.5
-                                }}>
-                                    <Hash size={24} style={{ color: themeVar("primary") }} />
-                                </Box>
-                                <Typography variant="h5" sx={{ fontWeight: 900, color: themeVar("textLight") }}>
-                                    Welcome to #{channel.name}!
+                            <Box sx={{ mb: 3, pt: 4, display: "flex", alignItems: "center", gap: 2, opacity: 0.35 }}>
+                                <Box sx={{ flex: 1, height: 1, bgcolor: themeVar("border") }} />
+                                <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", fontSize: "0.6rem", whiteSpace: "nowrap" }}>
+                                    Start of {channel.name}
                                 </Typography>
-                                <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", mt: 0.5 }}>
-                                    This is the very beginning of this channel.
-                                </Typography>
-                                <Box sx={{ borderBottom: `1px solid ${themeVar("border")}`, mt: 4, opacity: 0.3 }} />
+                                <Box sx={{ flex: 1, height: 1, bgcolor: themeVar("border") }} />
                             </Box>
                         )}
 
@@ -314,9 +300,10 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                                 </Typography>
                                             </Box>
                                         )}
-                                        <Typography variant="body2" sx={{ color: themeVar("textLight"), whiteSpace: "pre-wrap", wordBreak: "break-word", lineHeight: 1.5 }}>
-                                            {m.content}
-                                        </Typography>
+                                        <MarkdownText
+                                            content={m.content}
+                                            onLinkClick={(url, text) => setExternalLink({ url, text })}
+                                        />
 
                                         {/* Reactions Display */}
                                         {groupedReactions && Object.keys(groupedReactions).length > 0 && (
@@ -380,7 +367,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                         {canMod && (
                                             <IconButton
                                                 size="small"
-                                                onClick={(e) => setModMenuAnchor({ el: e.currentTarget, msgId: m._id, userId: m.senderId, username: m.sender?.displayName || "User" })}
+                                                onClick={(e) => setModMenuAnchor({ el: e.currentTarget, msgId: m._id, userId: m.senderId, username: m.sender?.displayName || "User", avatarUrl: m.sender?.avatarUrl })}
                                                 sx={{ color: themeVar("textSecondary"), "&:hover": { color: themeVar("warning") } }}
                                             >
                                                 <Shield size={18} />
@@ -424,6 +411,9 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                         >
                             <MenuItem onClick={() => { setModActionType("timeout"); setTimeoutHours(1); setModDialogOpen(true); setModMenuAnchor(prev => prev ? { ...prev, el: prev.el } : null); setAnchorEl(null); }} sx={{ gap: 1.5, fontSize: "0.875rem", "&:hover": { bgcolor: "rgba(255,255,255,0.05)" } }}>
                                 <Clock size={16} /> Timeout (1 Hour)
+                            </MenuItem>
+                            <MenuItem onClick={() => { setNotesDialogOpen(true); setModMenuAnchor(prev => prev ? { ...prev, el: prev.el } : null); setAnchorEl(null); }} sx={{ gap: 1.5, fontSize: "0.875rem", "&:hover": { bgcolor: "rgba(255,255,255,0.05)" } }}>
+                                <FileText size={16} /> Staff Notes
                             </MenuItem>
                             <MenuItem onClick={() => { setModActionType("timeout"); setTimeoutHours(24); setModDialogOpen(true); setModMenuAnchor(prev => prev ? { ...prev, el: prev.el } : null); setAnchorEl(null); }} sx={{ gap: 1.5, fontSize: "0.875rem", "&:hover": { bgcolor: "rgba(255,255,255,0.05)" } }}>
                                 <Clock size={16} /> Timeout (24 Hours)
@@ -489,7 +479,78 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                             </DialogActions>
                         </Dialog>
 
+                        {modMenuAnchor && (
+                            <MemberNotesDialog
+                                open={notesDialogOpen}
+                                onClose={() => { setNotesDialogOpen(false); setModMenuAnchor(null); }}
+                                spaceId={channel.spaceId}
+                                userId={modMenuAnchor.userId}
+                                username={modMenuAnchor.username}
+                                avatarUrl={modMenuAnchor.avatarUrl}
+                                myRole={userRole || "member"}
+                            />
+                        )}
+
                         <div ref={bottomRef} />
+
+                        {/* External Link Safety Dialog */}
+                        <Dialog
+                            open={Boolean(externalLink)}
+                            onClose={() => setExternalLink(null)}
+                            PaperProps={{
+                                sx: {
+                                    bgcolor: themeVar("backgroundAlt"),
+                                    color: themeVar("textLight"),
+                                    backgroundImage: "none",
+                                    border: `1px solid ${themeVar("border")}`,
+                                    borderRadius: 4,
+                                    minWidth: 400
+                                }
+                            }}
+                        >
+                            <DialogTitle sx={{ fontWeight: 900, display: "flex", alignItems: "center", gap: 1.5, color: themeVar("warning") }}>
+                                <AlertTriangle size={24} /> Security Warning
+                            </DialogTitle>
+                            <DialogContent>
+                                <Typography variant="body1" sx={{ color: themeVar("textLight"), mb: 2, fontWeight: 700 }}>
+                                    You are leaving the application.
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: themeVar("textSecondary"), mb: 3 }}>
+                                    This link is taking you to an external website. Always verify the destination URL is safe before proceeding.
+                                </Typography>
+
+                                <Box sx={{
+                                    p: 2,
+                                    bgcolor: "rgba(0,0,0,0.2)",
+                                    border: `1px solid ${themeVar("border")}`,
+                                    borderRadius: 2,
+                                    wordBreak: "break-all"
+                                }}>
+                                    <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", mb: 0.5, fontWeight: 700, textTransform: "uppercase" }}>
+                                        Destination URL
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: themeVar("primary"), fontFamily: "monospace" }}>
+                                        {externalLink?.url}
+                                    </Typography>
+                                </Box>
+                            </DialogContent>
+                            <DialogActions sx={{ p: 3, pt: 1 }}>
+                                <Button onClick={() => setExternalLink(null)} sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}>
+                                    Stay Here
+                                </Button>
+                                <Button
+                                    component="a"
+                                    href={externalLink?.url || ""}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={() => setExternalLink(null)}
+                                    variant="contained"
+                                    sx={{ fontWeight: 800, px: 3, textTransform: "none", borderRadius: 2 }}
+                                >
+                                    Visit Site <ExternalLink size={16} style={{ marginLeft: 8 }} />
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
                     </>
                 )}
             </Box>
@@ -523,7 +584,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                     ? "You are currently timed out and cannot send messages."
                                     : isReadOnlyForMe
                                         ? "You do not have permission to send messages in this channel."
-                                        : `Message #${channel.name}`
+                                        : `Message ${channel.name}`
                             }
                             value={input}
                             disabled={!me || isReadOnlyForMe}
@@ -664,5 +725,58 @@ function EmojiPickerPopover({
                 </Typography>
             </Box>
         </Popover>
+    );
+}
+
+function MarkdownText({ content, onLinkClick }: { content: string, onLinkClick?: (url: string, text: string) => void }) {
+    // Very simple markdown parser for bold, italic, and links
+    const parts = content.split(/(\*\*.*?\*\*|\*.*?\*|\[.*?\]\(.*?\))/g);
+
+    return (
+        <Typography variant="body2" sx={{ color: themeVar("textLight"), whiteSpace: "pre-wrap", wordBreak: "break-word", lineHeight: 1.5 }}>
+            {parts.map((part, i) => {
+                if (part.startsWith("**") && part.endsWith("**")) {
+                    return <Box component="span" key={i} sx={{ fontWeight: 800 }}>{part.slice(2, -2)}</Box>;
+                }
+                if (part.startsWith("*") && part.endsWith("*")) {
+                    return <Box component="span" key={i} sx={{ fontStyle: "italic" }}>{part.slice(1, -1)}</Box>;
+                }
+                if (part.startsWith("[") && part.includes("](")) {
+                    const match = part.match(/\[(.*?)\]\((.*?)\)/);
+                    if (match) {
+                        const text = match[1];
+                        const url = match[2];
+
+                        // Sanitize URL protocol
+                        const isSafe = url.startsWith("http://") || url.startsWith("https://");
+                        if (!isSafe) {
+                            return <Box component="span" key={i} sx={{ color: themeVar("textSecondary"), textDecoration: "line-through" }} title="Unsafe Link Blocked">{text}</Box>;
+                        }
+
+                        return (
+                            <Box
+                                component="span"
+                                key={i}
+                                onClick={(e: any) => {
+                                    if (onLinkClick) {
+                                        e.preventDefault();
+                                        onLinkClick(url, text);
+                                    }
+                                }}
+                                sx={{
+                                    color: themeVar("primary"),
+                                    textDecoration: "none",
+                                    cursor: "pointer",
+                                    "&:hover": { textDecoration: "underline" }
+                                }}
+                            >
+                                {text}
+                            </Box>
+                        );
+                    }
+                }
+                return part;
+            })}
+        </Typography>
     );
 }
