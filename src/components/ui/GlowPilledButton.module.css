@@ -1,0 +1,80 @@
+/* Converted to CSS Module */
+.glow-pilled-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  box-sizing: border-box;
+  font-size: 14px; /* lock size to avoid baseline-induced growth */
+  line-height: 1;  /* keep tight line height */
+  --glow-color: rgba(255, 255, 255, 0.2);
+  --glow-pos-x: 50%;
+  --glow-pos-y: 50%;
+}
+
+.glow-pilled-button:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 0 30px var(--glow-color);
+}
+
+/* Accent hover variant to match the New chat chip background */
+.accentHover:hover {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--secondary), transparent 80%),
+    color-mix(in oklab, var(--primary), transparent 80%)
+  ) !important;
+  border: 1px solid color-mix(in oklab, var(--border), transparent 20%) !important;
+  color: var(--text) !important;
+}
+
+.glow-pilled-button:active {
+  transform: translateY(0);
+}
+
+.glow-pilled-button::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 40px;
+  padding: 4px;
+  background: radial-gradient(
+    circle at var(--glow-pos-x) var(--glow-pos-y),
+    var(--glow-color) 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    transparent 80%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.2;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes glowPulse {
+  0% { opacity: 0.2; }
+  50% { opacity: 0.4; }
+  100% { opacity: 0.2; }
+}
+
+.glow-pilled-button::before { animation: glowPulse 3s infinite ease-in-out; }
+.glow-pilled-button:hover::before { opacity: 1; animation: none; }
+
+.button-content { display: flex; align-items: center; gap: 12px; }
+.button-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+/* ensure nested SVGs don't expand with global baselines */
+.button-icon :global(svg) { font-size: 18px; width: 18px; height: 18px; }
+.button-label { flex: 1; white-space: nowrap; }

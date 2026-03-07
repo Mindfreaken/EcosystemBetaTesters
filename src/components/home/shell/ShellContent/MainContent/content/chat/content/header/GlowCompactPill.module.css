@@ -1,0 +1,19 @@
+/* Compact variant specifically for the chat header Settings pill */
+.compactGlow {
+  height: 30px;             /* smaller than the default 34-36 */
+  padding: 0 10px;          /* tighter padding */
+  border-radius: 16px;      /* keep pill look proportionate */
+  font-size: 13px;          /* slightly smaller label */
+}
+
+/* Tweak the glow to feel less expansive in the taller header */
+.compactGlow::before {
+  inset: -2px;              /* slightly smaller halo */
+  padding: 3px;             /* thinner border glow */
+  opacity: 0.18;            /* a touch softer by default */
+}
+
+/* Optional: tone down on hover a bit for compact */
+.compactGlow:hover::before {
+  opacity: 0.9;             /* still vivid on hover but not overwhelming */
+}

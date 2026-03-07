@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="45" fill="#f0f0f0" stroke="#c0c0c0" stroke-width="2"/>
+  
+  <!-- User Group -->
+  <g transform="translate(15, 20)">
+    <!-- Center user -->
+    <circle cx="35" cy="25" r="10" fill="#64b5f6" stroke="#1976d2" stroke-width="1.5"/>
+    <path d="M35,35 L35,55 C25,55 15,50 15,40 L15,35 C15,35 25,35 35,35 Z" fill="#64b5f6" stroke="#1976d2" stroke-width="1.5"/>
+    
+    <!-- Left user -->
+    <circle cx="15" cy="20" r="8" fill="#81c784" stroke="#388e3c" stroke-width="1.5"/>
+    <path d="M15,28 L15,45 C7,45 0,40 0,32 L0,28 C0,28 7,28 15,28 Z" fill="#81c784" stroke="#388e3c" stroke-width="1.5"/>
+    
+    <!-- Right user -->
+    <circle cx="55" cy="20" r="8" fill="#ff8a65" stroke="#d84315" stroke-width="1.5"/>
+    <path d="M55,28 L55,45 C63,45 70,40 70,32 L70,28 C70,28 63,28 55,28 Z" fill="#ff8a65" stroke="#d84315" stroke-width="1.5"/>
+    
+    <!-- Community icon -->
+    <circle cx="35" cy="55" r="4" fill="#ffd54f" stroke="#f57f17" stroke-width="1"/>
+    <circle cx="15" cy="45" r="3" fill="#ffd54f" stroke="#f57f17" stroke-width="1"/>
+    <circle cx="55" cy="45" r="3" fill="#ffd54f" stroke="#f57f17" stroke-width="1"/>
+    
+    <!-- Connection lines -->
+    <line x1="35" y1="51" x2="15" y2="42" stroke="#8d6e63" stroke-width="1" stroke-dasharray="2,2"/>
+    <line x1="35" y1="51" x2="55" y2="42" stroke="#8d6e63" stroke-width="1" stroke-dasharray="2,2"/>
+  </g>
+</svg> 

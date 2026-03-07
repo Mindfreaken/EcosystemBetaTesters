@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="45" fill="#f0f0f0" stroke="#c0c0c0" stroke-width="2"/>
+  
+  <!-- Compass -->
+  <g transform="translate(20, 20)">
+    <!-- Compass outer ring -->
+    <circle cx="30" cy="30" r="25" fill="#ffffff" stroke="#5d5d5d" stroke-width="2"/>
+    
+    <!-- Compass inner circle -->
+    <circle cx="30" cy="30" r="22" fill="#f5f5f5" stroke="#8a8a8a" stroke-width="1"/>
+    
+    <!-- Compass cardinal marks -->
+    <text x="30" y="15" text-anchor="middle" font-size="8" font-weight="bold" fill="#5d5d5d">N</text>
+    <text x="30" y="49" text-anchor="middle" font-size="8" font-weight="bold" fill="#5d5d5d">S</text>
+    <text x="11" y="32" text-anchor="middle" font-size="8" font-weight="bold" fill="#5d5d5d">W</text>
+    <text x="49" y="32" text-anchor="middle" font-size="8" font-weight="bold" fill="#5d5d5d">E</text>
+    
+    <!-- Compass needle -->
+    <g transform="rotate(45, 30, 30)">
+      <path d="M30,12 L35,30 L30,48 L25,30 Z" fill="#ffffff" stroke="#5d5d5d" stroke-width="1"/>
+      <path d="M30,12 L35,30 L30,30 Z" fill="#ff4b4b" stroke="#d43a3a" stroke-width="1"/>
+      <path d="M30,48 L25,30 L30,30 Z" fill="#4582ec" stroke="#3a6abf" stroke-width="1"/>
+      <circle cx="30" cy="30" r="3" fill="#5d5d5d"/>
+    </g>
+    
+    <!-- Compass marks -->
+    <g stroke="#8a8a8a" stroke-width="1">
+      <line x1="30" y1="8" x2="30" y2="12" />
+      <line x1="30" y1="48" x2="30" y2="52" />
+      <line x1="8" y1="30" x2="12" y2="30" />
+      <line x1="48" y1="30" x2="52" y2="30" />
+      <line x1="15" y1="15" x2="18" y2="18" />
+      <line x1="42" y1="42" x2="45" y2="45" />
+      <line x1="15" y1="45" x2="18" y2="42" />
+      <line x1="42" y1="18" x2="45" y2="15" />
+    </g>
+  </g>
+</svg> 

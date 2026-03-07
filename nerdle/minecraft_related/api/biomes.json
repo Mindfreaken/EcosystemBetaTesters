@@ -1,0 +1,226 @@
+[
+  {
+    "id": 1001,
+    "displayName": "Badlands"
+  },
+  {
+    "id": 1002,
+    "displayName": "Bamboo Jungle"
+  },
+  {
+    "id": 1003,
+    "displayName": "Basalt Deltas"
+  },
+  {
+    "id": 1004,
+    "displayName": "Beach"
+  },
+  {
+    "id": 1005,
+    "displayName": "Birch Forest"
+  },
+  {
+    "id": 1006,
+    "displayName": "Cherry Grove"
+  },
+  {
+    "id": 1007,
+    "displayName": "Cold Ocean"
+  },
+  {
+    "id": 1008,
+    "displayName": "Crimson Forest"
+  },
+  {
+    "id": 1009,
+    "displayName": "Dark Forest"
+  },
+  {
+    "id": 1010,
+    "displayName": "Deep Dark"
+  },
+  {
+    "id": 1011,
+    "displayName": "Deep Ocean"
+  },
+  {
+    "id": 1012,
+    "displayName": "Desert"
+  },
+  {
+    "id": 1013,
+    "displayName": "Dripstone Caves"
+  },
+  {
+    "id": 1014,
+    "displayName": "End Barrens"
+  },
+  {
+    "id": 1015,
+    "displayName": "End Highlands"
+  },
+  {
+    "id": 1016,
+    "displayName": "End Midlands"
+  },
+  {
+    "id": 1017,
+    "displayName": "Eroded Badlands"
+  },
+  {
+    "id": 1018,
+    "displayName": "Flower Forest"
+  },
+  {
+    "id": 1019,
+    "displayName": "Forest"
+  },
+  {
+    "id": 1020,
+    "displayName": "Frozen Ocean"
+  },
+  {
+    "id": 1021,
+    "displayName": "Frozen Peaks"
+  },
+  {
+    "id": 1022,
+    "displayName": "Frozen River"
+  },
+  {
+    "id": 1023,
+    "displayName": "Grove"
+  },
+  {
+    "id": 1024,
+    "displayName": "Ice Spikes"
+  },
+  {
+    "id": 1025,
+    "displayName": "Jagged Peaks"
+  },
+  {
+    "id": 1026,
+    "displayName": "Jungle"
+  },
+  {
+    "id": 1027,
+    "displayName": "Lukewarm Ocean"
+  },
+  {
+    "id": 1028,
+    "displayName": "Lush Caves"
+  },
+  {
+    "id": 1029,
+    "displayName": "Mangrove Swamp"
+  },
+  {
+    "id": 1030,
+    "displayName": "Meadow"
+  },
+  {
+    "id": 1031,
+    "displayName": "Mushroom Fields"
+  },
+  {
+    "id": 1032,
+    "displayName": "Nether Wastes"
+  },
+  {
+    "id": 1033,
+    "displayName": "Ocean"
+  },
+  {
+    "id": 1034,
+    "displayName": "Pale Garden"
+  },
+  {
+    "id": 1035,
+    "displayName": "Plains"
+  },
+  {
+    "id": 1036,
+    "displayName": "River"
+  },
+  {
+    "id": 1037,
+    "displayName": "Savanna"
+  },
+  {
+    "id": 1038,
+    "displayName": "Savanna Plateau"
+  },
+  {
+    "id": 1039,
+    "displayName": "Snowy Beach"
+  },
+  {
+    "id": 1040,
+    "displayName": "Snowy Plains"
+  },
+  {
+    "id": 1041,
+    "displayName": "Snowy Slopes"
+  },
+  {
+    "id": 1042,
+    "displayName": "Snowy Taiga"
+  },
+  {
+    "id": 1043,
+    "displayName": "Sparse Jungle"
+  },
+  {
+    "id": 1044,
+    "displayName": "Stony Peaks"
+  },
+  {
+    "id": 1045,
+    "displayName": "Stony Shore"
+  },
+  {
+    "id": 1046,
+    "displayName": "Sunflower Plains"
+  },
+  {
+    "id": 1047,
+    "displayName": "Swamp"
+  },
+  {
+    "id": 1048,
+    "displayName": "Taiga"
+  },
+  {
+    "id": 1049,
+    "displayName": "The End"
+  },
+  {
+    "id": 1050,
+    "displayName": "The Void"
+  },
+  {
+    "id": 1051,
+    "displayName": "Warm Ocean"
+  },
+  {
+    "id": 1052,
+    "displayName": "Warped Forest"
+  },
+  {
+    "id": 1053,
+    "displayName": "Windswept Forest"
+  },
+  {
+    "id": 1054,
+    "displayName": "Windswept Hills"
+  },
+  {
+    "id": 1055,
+    "displayName": "Windswept Savanna"
+  },
+  {
+    "id": 1056,
+    "displayName": "Wooded Badlands"
+  }
+]

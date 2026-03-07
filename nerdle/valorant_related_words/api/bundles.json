@@ -1,0 +1,306 @@
+[
+  {
+    "displayName": "Altitude",
+    "id": 4001
+  },
+  {
+    "displayName": "Xenohunter",
+    "id": 4002
+  },
+  {
+    "displayName": "Intergrade",
+    "id": 4003
+  },
+  {
+    "displayName": "Divergence",
+    "id": 4004
+  },
+  {
+    "displayName": "Araxys",
+    "id": 4005
+  },
+  {
+    "displayName": "Araxys",
+    "id": 4006
+  },
+  {
+    "displayName": "Neptune",
+    "id": 4007
+  },
+  {
+    "displayName": "Endeavour",
+    "id": 4008
+  },
+  {
+    "displayName": "Spectrum",
+    "id": 4009
+  },
+  {
+    "displayName": "Avalanche",
+    "id": 4010
+  },
+  {
+    "displayName": "Bolt",
+    "id": 4011
+  },
+  {
+    "displayName": "Ignite",
+    "id": 4012
+  },
+  {
+    "displayName": "Aperture",
+    "id": 4013
+  },
+  {
+    "displayName": "Origin",
+    "id": 4014
+  },
+  {
+    "displayName": "Phaseguard",
+    "id": 4015
+  },
+  {
+    "displayName": "Nebula",
+    "id": 4016
+  },
+  {
+    "displayName": "Nocturnum",
+    "id": 4017
+  },
+  {
+    "displayName": "Doombringer",
+    "id": 4018
+  },
+  {
+    "displayName": "Glitchpop",
+    "id": 4019
+  },
+  {
+    "displayName": "ChronoVoid",
+    "id": 4020
+  },
+  {
+    "displayName": "Emberclad",
+    "id": 4021
+  },
+  {
+    "displayName": "Abyssal",
+    "id": 4022
+  },
+  {
+    "displayName": "Elderflame",
+    "id": 4023
+  },
+  {
+    "displayName": "Imperium",
+    "id": 4024
+  },
+  {
+    "displayName": "Singularity",
+    "id": 4025
+  },
+  {
+    "displayName": "Sarmad",
+    "id": 4026
+  },
+  {
+    "displayName": "Chromedek",
+    "id": 4027
+  },
+  {
+    "displayName": "Forsaken",
+    "id": 4028
+  },
+  {
+    "displayName": "Troublemaker",
+    "id": 4029
+  },
+  {
+    "displayName": "Soulstrife",
+    "id": 4030
+  },
+  {
+    "displayName": "Primordium",
+    "id": 4031
+  },
+  {
+    "displayName": "Infantry",
+    "id": 4032
+  },
+  {
+    "displayName": "Horizon",
+    "id": 4033
+  },
+  {
+    "displayName": "Prime",
+    "id": 4034
+  },
+  {
+    "displayName": "Prism",
+    "id": 4035
+  },
+  {
+    "displayName": "Ruination",
+    "id": 4036
+  },
+  {
+    "displayName": "Aemondir",
+    "id": 4037
+  },
+  {
+    "displayName": "Smite",
+    "id": 4038
+  },
+  {
+    "displayName": "Celestial",
+    "id": 4039
+  },
+  {
+    "displayName": "Luxe",
+    "id": 4040
+  },
+  {
+    "displayName": "Magepunk",
+    "id": 4041
+  },
+  {
+    "displayName": "Spline",
+    "id": 4042
+  },
+  {
+    "displayName": "Minima",
+    "id": 4043
+  },
+  {
+    "displayName": "Overdrive",
+    "id": 4044
+  },
+  {
+    "displayName": "Silvanus",
+    "id": 4045
+  },
+  {
+    "displayName": "Crimsonbeast",
+    "id": 4046
+  },
+  {
+    "displayName": "Kuronami",
+    "id": 4047
+  },
+  {
+    "displayName": "Ion",
+    "id": 4048
+  },
+  {
+    "displayName": "Oni",
+    "id": 4049
+  },
+  {
+    "displayName": "Switchback",
+    "id": 4050
+  },
+  {
+    "displayName": "Cryostasis",
+    "id": 4051
+  },
+  {
+    "displayName": "Pride",
+    "id": 4052
+  },
+  {
+    "displayName": "Luna",
+    "id": 4053
+  },
+  {
+    "displayName": "Sensation",
+    "id": 4054
+  },
+  {
+    "displayName": "Orion",
+    "id": 4055
+  },
+  {
+    "displayName": "Sakura",
+    "id": 4056
+  },
+  {
+    "displayName": "Rupture",
+    "id": 4057
+  },
+  {
+    "displayName": "Helix",
+    "id": 4058
+  },
+  {
+    "displayName": "Reaver",
+    "id": 4059
+  },
+  {
+    "displayName": "Sovereign",
+    "id": 4060
+  },
+  {
+    "displayName": "Recon",
+    "id": 4061
+  },
+  {
+    "displayName": "Titanmail",
+    "id": 4062
+  },
+  {
+    "displayName": "Mystbloom",
+    "id": 4063
+  },
+  {
+    "displayName": "Reverie",
+    "id": 4064
+  },
+  {
+    "displayName": "CYRAX",
+    "id": 4065
+  },
+  {
+    "displayName": "Wonderstallion",
+    "id": 4066
+  },
+  {
+    "displayName": "Ego",
+    "id": 4067
+  },
+  {
+    "displayName": "BlastX",
+    "id": 4068
+  },
+  {
+    "displayName": "Holomoku",
+    "id": 4069
+  },
+  {
+    "displayName": "Wasteland",
+    "id": 4070
+  },
+  {
+    "displayName": "SplashX",
+    "id": 4071
+  },
+  {
+    "displayName": "Winterwunderland",
+    "id": 4072
+  },
+  {
+    "displayName": "Arcane",
+    "id": 4073
+  },
+  {
+    "displayName": "Undercity",
+    "id": 4074
+  },
+  {
+    "displayName": "Snowfall",
+    "id": 4075
+  },
+  {
+    "displayName": "Tigris",
+    "id": 4076
+  }
+]

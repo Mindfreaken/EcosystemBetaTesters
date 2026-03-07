@@ -1,0 +1,78 @@
+:root {
+  /* Primary */
+  --primary: #ff2d55;
+  --primaryDark: #e60033;
+  --primaryLight: #ff5c7c;
+  --primaryHover: #ff2d5580;
+  --primaryActive: #d10030;
+
+  /* Secondary */
+  --secondary: #0096ff;
+  --secondaryDark: #0077cc;
+  --secondaryLight: #33abff;
+  --secondaryHover: #0096ff80;
+  --secondaryActive: #0066cc;
+
+  /* Background */
+  --background: #121212;
+  --backgroundAlt: #1e1e1e;
+  --backgroundLight: #2a2a2a;
+  --backgroundDark: #0a0a0a;
+
+  /* Card */
+  --card: #1e1e1e;
+  --cardHover: #2a2a2a;
+  --cardActive: #333333;
+
+  /* Border */
+  --border: #333333;
+  --borderLight: #444444;
+  --borderDark: #222222;
+
+  /* Text */
+  --text: #e6e6e6;
+  --textPrimary: #e6e6e6;
+  --textLight: #f2f2f2;
+  --textDark: #d9d9d9;
+  --textMuted: #9ca3af;
+  --textSecondary: #bdc3cf;
+
+  /* Success */
+  --success: #36d399;
+  --successDark: #2baf7c;
+  --successLight: #5ddcac;
+
+  /* Danger */
+  --danger: #ff2d55;
+  --dangerDark: #e60033;
+  --dangerLight: #ff5c7c;
+
+  /* Warning */
+  --warning: #ffb400;
+  --warningDark: #cc9000;
+  --warningLight: #ffc333;
+
+  /* Info */
+  --info: #0096ff;
+  --infoDark: #0077cc;
+  --infoLight: #33abff;
+
+  /* Link */
+  --link: #0096ff;
+  --linkHover: #0077cc;
+  --linkActive: #0066cc;
+
+  /* Button */
+  --buttonPrimary: #ff2d55;
+  --buttonPrimaryHover: #e60033;
+  --buttonPrimaryActive: #d10030;
+  --buttonSecondary: #0096ff;
+  --buttonSecondaryHover: #0077cc;
+  --buttonSecondaryActive: #0066cc;
+
+  /* Other */
+  --shadow: #00000080;
+  --highlight: #ffffff10;
+  --overlay: #121212cc;
+  --disabled: #4b5563;
+}

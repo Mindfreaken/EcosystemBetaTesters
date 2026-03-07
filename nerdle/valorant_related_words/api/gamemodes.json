@@ -1,0 +1,26 @@
+[
+  {
+    "displayName": "Standard",
+    "id": 5001
+  },
+  {
+    "displayName": "Deathmatch",
+    "id": 5002
+  },
+  {
+    "displayName": "Bot Match",
+    "id": 5003
+  },
+  {
+    "displayName": "Escalation",
+    "id": 5004
+  },
+  {
+    "displayName": "Replication",
+    "id": 5005
+  },
+  {
+    "displayName": "Swiftplay",
+    "id": 5006
+  }
+]

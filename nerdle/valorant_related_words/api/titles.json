@@ -1,0 +1,650 @@
+[
+  {
+    "displayName": "Fortune",
+    "id": 7001
+  },
+  {
+    "displayName": "Tiger",
+    "id": 7002
+  },
+  {
+    "displayName": "Game Changers Winner",
+    "id": 7003
+  },
+  {
+    "displayName": "Different",
+    "id": 7004
+  },
+  {
+    "displayName": "ZZZ",
+    "id": 7005
+  },
+  {
+    "displayName": "Queen",
+    "id": 7006
+  },
+  {
+    "displayName": "Ribbit",
+    "id": 7007
+  },
+  {
+    "displayName": "Duo",
+    "id": 7008
+  },
+  {
+    "displayName": "Cooked",
+    "id": 7009
+  },
+  {
+    "displayName": "Serpent",
+    "id": 7010
+  },
+  {
+    "displayName": "Catalyst",
+    "id": 7011
+  },
+  {
+    "displayName": "Chicken",
+    "id": 7012
+  },
+  {
+    "displayName": "Foxy",
+    "id": 7013
+  },
+  {
+    "displayName": "Bait",
+    "id": 7014
+  },
+  {
+    "displayName": "Pumped",
+    "id": 7015
+  },
+  {
+    "displayName": "Spicy",
+    "id": 7016
+  },
+  {
+    "displayName": "Primordial",
+    "id": 7017
+  },
+  {
+    "displayName": "Vibin'",
+    "id": 7018
+  },
+  {
+    "displayName": "Wired",
+    "id": 7019
+  },
+  {
+    "displayName": "Hermano",
+    "id": 7020
+  },
+  {
+    "displayName": "Lowrider",
+    "id": 7021
+  },
+  {
+    "displayName": "Flex",
+    "id": 7022
+  },
+  {
+    "displayName": "Charmer",
+    "id": 7023
+  },
+  {
+    "displayName": "Unrated",
+    "id": 7024
+  },
+  {
+    "displayName": "Boosted",
+    "id": 7025
+  },
+  {
+    "displayName": "Unlucky",
+    "id": 7026
+  },
+  {
+    "displayName": "Wraith",
+    "id": 7027
+  },
+  {
+    "displayName": "Bulldog",
+    "id": 7028
+  },
+  {
+    "displayName": "Sheriff",
+    "id": 7029
+  },
+  {
+    "displayName": "Chill",
+    "id": 7030
+  },
+  {
+    "displayName": "Lucky",
+    "id": 7031
+  },
+  {
+    "displayName": "Cracked",
+    "id": 7032
+  },
+  {
+    "displayName": "Salty",
+    "id": 7033
+  },
+  {
+    "displayName": "Aimbot",
+    "id": 7034
+  },
+  {
+    "displayName": "Cheap",
+    "id": 7035
+  },
+  {
+    "displayName": "Lurker",
+    "id": 7036
+  },
+  {
+    "displayName": "Hardstuck",
+    "id": 7037
+  },
+  {
+    "displayName": "Haunted",
+    "id": 7038
+  },
+  {
+    "displayName": "Unstoppable",
+    "id": 7039
+  },
+  {
+    "displayName": "Jinx",
+    "id": 7040
+  },
+  {
+    "displayName": "Arcane",
+    "id": 7041
+  },
+  {
+    "displayName": "Cupcake",
+    "id": 7042
+  },
+  {
+    "displayName": "Liar",
+    "id": 7043
+  },
+  {
+    "displayName": "Boomer",
+    "id": 7044
+  },
+  {
+    "displayName": "Cringe",
+    "id": 7045
+  },
+  {
+    "displayName": "Unrivaled",
+    "id": 7046
+  },
+  {
+    "displayName": "Wide",
+    "id": 7047
+  },
+  {
+    "displayName": "Habibi",
+    "id": 7048
+  },
+  {
+    "displayName": "Goinmul",
+    "id": 7049
+  },
+  {
+    "displayName": "Chalked",
+    "id": 7050
+  },
+  {
+    "displayName": "Finest",
+    "id": 7051
+  },
+  {
+    "displayName": "Clown",
+    "id": 7052
+  },
+  {
+    "displayName": "Guilty",
+    "id": 7053
+  },
+  {
+    "displayName": "Random",
+    "id": 7054
+  },
+  {
+    "displayName": "Dimensional",
+    "id": 7055
+  },
+  {
+    "displayName": "Clean",
+    "id": 7056
+  },
+  {
+    "displayName": "Extra",
+    "id": 7057
+  },
+  {
+    "displayName": "Mid",
+    "id": 7058
+  },
+  {
+    "displayName": "Gamer",
+    "id": 7059
+  },
+  {
+    "displayName": "Potato",
+    "id": 7060
+  },
+  {
+    "displayName": "Cursed",
+    "id": 7061
+  },
+  {
+    "displayName": "Icy",
+    "id": 7062
+  },
+  {
+    "displayName": "Dimension",
+    "id": 7063
+  },
+  {
+    "displayName": "Disruption",
+    "id": 7064
+  },
+  {
+    "displayName": "Ace",
+    "id": 7065
+  },
+  {
+    "displayName": "Big Brain",
+    "id": 7066
+  },
+  {
+    "displayName": "Slay",
+    "id": 7067
+  },
+  {
+    "displayName": "Gizem",
+    "id": 7068
+  },
+  {
+    "displayName": "UwU",
+    "id": 7069
+  },
+  {
+    "displayName": "Chef",
+    "id": 7070
+  },
+  {
+    "displayName": "Thirsty",
+    "id": 7071
+  },
+  {
+    "displayName": "Twisten",
+    "id": 7072
+  },
+  {
+    "displayName": "Default",
+    "id": 7073
+  },
+  {
+    "displayName": "OwO",
+    "id": 7074
+  },
+  {
+    "displayName": "Rawr",
+    "id": 7075
+  },
+  {
+    "displayName": "Bet",
+    "id": 7076
+  },
+  {
+    "displayName": "Rockets",
+    "id": 7077
+  },
+  {
+    "displayName": "Scattered",
+    "id": 7078
+  },
+  {
+    "displayName": "Real",
+    "id": 7079
+  },
+  {
+    "displayName": "Unserious",
+    "id": 7080
+  },
+  {
+    "displayName": "Fetch",
+    "id": 7081
+  },
+  {
+    "displayName": "Dream Team",
+    "id": 7082
+  },
+  {
+    "displayName": "Skill Issue",
+    "id": 7083
+  },
+  {
+    "displayName": "Supernova",
+    "id": 7084
+  },
+  {
+    "displayName": "Basic",
+    "id": 7085
+  },
+  {
+    "displayName": "Yapper",
+    "id": 7086
+  },
+  {
+    "displayName": "brat",
+    "id": 7087
+  },
+  {
+    "displayName": "Aura",
+    "id": 7088
+  },
+  {
+    "displayName": "Ghosted",
+    "id": 7089
+  },
+  {
+    "displayName": "Treat",
+    "id": 7090
+  },
+  {
+    "displayName": "Louder",
+    "id": 7091
+  },
+  {
+    "displayName": "Bot",
+    "id": 7092
+  },
+  {
+    "displayName": "United",
+    "id": 7093
+  },
+  {
+    "displayName": "Welcome",
+    "id": 7094
+  },
+  {
+    "displayName": "Gajeua",
+    "id": 7095
+  },
+  {
+    "displayName": "Soaked",
+    "id": 7096
+  },
+  {
+    "displayName": "Torrential",
+    "id": 7097
+  },
+  {
+    "displayName": "Crispy",
+    "id": 7098
+  },
+  {
+    "displayName": "Fam",
+    "id": 7099
+  },
+  {
+    "displayName": "Tempered",
+    "id": 7100
+  },
+  {
+    "displayName": "Metalweaver",
+    "id": 7101
+  },
+  {
+    "displayName": "Dauntless",
+    "id": 7102
+  },
+  {
+    "displayName": "Ballistic",
+    "id": 7103
+  },
+  {
+    "displayName": "Biohazard",
+    "id": 7104
+  },
+  {
+    "displayName": "Catastrophic",
+    "id": 7105
+  },
+  {
+    "displayName": "Coach",
+    "id": 7106
+  },
+  {
+    "displayName": "Concussive",
+    "id": 7107
+  },
+  {
+    "displayName": "Deadeye",
+    "id": 7108
+  },
+  {
+    "displayName": "Empress",
+    "id": 7109
+  },
+  {
+    "displayName": "Enlightened",
+    "id": 7110
+  },
+  {
+    "displayName": "First",
+    "id": 7111
+  },
+  {
+    "displayName": "Flashy",
+    "id": 7112
+  },
+  {
+    "displayName": "Gatecrasher",
+    "id": 7113
+  },
+  {
+    "displayName": "Genius",
+    "id": 7114
+  },
+  {
+    "displayName": "Harbinger",
+    "id": 7115
+  },
+  {
+    "displayName": "Hasty",
+    "id": 7116
+  },
+  {
+    "displayName": "Hotshot",
+    "id": 7117
+  },
+  {
+    "displayName": "Hunter",
+    "id": 7118
+  },
+  {
+    "displayName": "Hurricane",
+    "id": 7119
+  },
+  {
+    "displayName": "Infinite",
+    "id": 7120
+  },
+  {
+    "displayName": "Pioneer",
+    "id": 7121
+  },
+  {
+    "displayName": "Recruit",
+    "id": 7122
+  },
+  {
+    "displayName": "Revenant",
+    "id": 7123
+  },
+  {
+    "displayName": "Savage",
+    "id": 7124
+  },
+  {
+    "displayName": "Sharpshooter",
+    "id": 7125
+  },
+  {
+    "displayName": "Stellar",
+    "id": 7126
+  },
+  {
+    "displayName": "Swift",
+    "id": 7127
+  },
+  {
+    "displayName": "Techie",
+    "id": 7128
+  },
+  {
+    "displayName": "Toxic",
+    "id": 7129
+  },
+  {
+    "displayName": "Trailblazer",
+    "id": 7130
+  },
+  {
+    "displayName": "Unmasked",
+    "id": 7131
+  },
+  {
+    "displayName": "Warden",
+    "id": 7132
+  },
+  {
+    "displayName": "Warhead",
+    "id": 7133
+  },
+  {
+    "displayName": "Watchdog",
+    "id": 7134
+  },
+  {
+    "displayName": "Ally",
+    "id": 7135
+  },
+  {
+    "displayName": "Proud",
+    "id": 7136
+  },
+  {
+    "displayName": "Ate",
+    "id": 7137
+  },
+  {
+    "displayName": "Clutch",
+    "id": 7138
+  },
+  {
+    "displayName": "Fixer",
+    "id": 7139
+  },
+  {
+    "displayName": "Champion",
+    "id": 7140
+  },
+  {
+    "displayName": "Outlaw",
+    "id": 7141
+  },
+  {
+    "displayName": "Mischievous",
+    "id": 7142
+  },
+  {
+    "displayName": "Undying",
+    "id": 7143
+  },
+  {
+    "displayName": "SNEAKERHEAD",
+    "id": 7144
+  },
+  {
+    "displayName": "Electrifying",
+    "id": 7145
+  },
+  {
+    "displayName": "Zoomer",
+    "id": 7146
+  },
+  {
+    "displayName": "Prismatic",
+    "id": 7147
+  },
+  {
+    "displayName": "Iridescent",
+    "id": 7148
+  },
+  {
+    "displayName": "NPC",
+    "id": 7149
+  },
+  {
+    "displayName": "Pookie",
+    "id": 7150
+  },
+  {
+    "displayName": "Bestie",
+    "id": 7151
+  },
+  {
+    "displayName": "Delulu",
+    "id": 7152
+  },
+  {
+    "displayName": "Stylish",
+    "id": 7153
+  },
+  {
+    "displayName": "Family",
+    "id": 7154
+  },
+  {
+    "displayName": "Disciplined",
+    "id": 7155
+  },
+  {
+    "displayName": "Galactic",
+    "id": 7156
+  },
+  {
+    "displayName": "Sunkissed",
+    "id": 7157
+  },
+  {
+    "displayName": "Bonjour",
+    "id": 7158
+  },
+  {
+    "displayName": "Diehard",
+    "id": 7159
+  },
+  {
+    "displayName": "IGL",
+    "id": 7160
+  },
+  {
+    "displayName": "Unpredictable",
+    "id": 7161
+  },
+  {
+    "displayName": "Fire",
+    "id": 7162
+  }
+]

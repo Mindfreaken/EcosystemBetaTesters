@@ -1,0 +1,462 @@
+[
+  {
+    "date": "2027-07-01",
+    "id": 1140,
+    "displayName": "Blastx"
+  },
+  {
+    "date": "2027-07-02",
+    "id": 7072,
+    "displayName": "Twisten"
+  },
+  {
+    "date": "2027-07-03",
+    "id": 4038,
+    "displayName": "Smite"
+  },
+  {
+    "date": "2027-07-04",
+    "id": 1110,
+    "displayName": "Polyfox"
+  },
+  {
+    "date": "2027-07-05",
+    "id": 7002,
+    "displayName": "Tiger"
+  },
+  {
+    "date": "2027-07-06",
+    "id": 1090,
+    "displayName": "Wasteland"
+  },
+  {
+    "date": "2027-07-07",
+    "id": 7065,
+    "displayName": "Ace"
+  },
+  {
+    "date": "2027-07-08",
+    "id": 1139,
+    "displayName": "Tigris"
+  },
+  {
+    "date": "2027-07-09",
+    "id": 8023,
+    "displayName": "Short"
+  },
+  {
+    "date": "2027-07-10",
+    "id": 4010,
+    "displayName": "Avalanche"
+  },
+  {
+    "date": "2027-07-11",
+    "id": 1006,
+    "displayName": "Doombringer"
+  },
+  {
+    "date": "2027-07-12",
+    "id": 7034,
+    "displayName": "Aimbot"
+  },
+  {
+    "date": "2027-07-13",
+    "id": 7006,
+    "displayName": "Queen"
+  },
+  {
+    "date": "2027-07-14",
+    "id": 1169,
+    "displayName": "Cloudweaver"
+  },
+  {
+    "date": "2027-07-15",
+    "id": 4045,
+    "displayName": "Silvanus"
+  },
+  {
+    "date": "2027-07-16",
+    "id": 2016,
+    "displayName": "Astra"
+  },
+  {
+    "date": "2027-07-17",
+    "id": 2010,
+    "displayName": "Sova"
+  },
+  {
+    "date": "2027-07-18",
+    "id": 3014,
+    "displayName": "Boba"
+  },
+  {
+    "date": "2027-07-19",
+    "id": 1094,
+    "displayName": "Spectrum"
+  },
+  {
+    "date": "2027-07-20",
+    "id": 3063,
+    "displayName": "Celestial"
+  },
+  {
+    "date": "2027-07-21",
+    "id": 7010,
+    "displayName": "Serpent"
+  },
+  {
+    "date": "2027-07-22",
+    "id": 7051,
+    "displayName": "Finest"
+  },
+  {
+    "date": "2027-07-23",
+    "id": 7149,
+    "displayName": "NPC"
+  },
+  {
+    "date": "2027-07-24",
+    "id": 1036,
+    "displayName": "Yoonseul"
+  },
+  {
+    "date": "2027-07-25",
+    "id": 3083,
+    "displayName": "Salianite"
+  },
+  {
+    "date": "2027-07-26",
+    "id": 3067,
+    "displayName": "Perch"
+  },
+  {
+    "date": "2027-07-27",
+    "id": 7162,
+    "displayName": "Fire"
+  },
+  {
+    "date": "2027-07-28",
+    "id": 4052,
+    "displayName": "Pride"
+  },
+  {
+    "date": "2027-07-29",
+    "id": 1159,
+    "displayName": "Celestia"
+  },
+  {
+    "date": "2027-07-30",
+    "id": 1091,
+    "displayName": "Splashx"
+  },
+  {
+    "date": "2027-07-31",
+    "id": 7019,
+    "displayName": "Wired"
+  },
+  {
+    "date": "2027-08-01",
+    "id": 7159,
+    "displayName": "Diehard"
+  },
+  {
+    "date": "2027-08-02",
+    "id": 1002,
+    "displayName": "Xenohunter"
+  },
+  {
+    "date": "2027-08-03",
+    "id": 8002,
+    "displayName": "Ace"
+  },
+  {
+    "date": "2027-08-04",
+    "id": 3002,
+    "displayName": "Cruiser"
+  },
+  {
+    "date": "2027-08-05",
+    "id": 7048,
+    "displayName": "Habibi"
+  },
+  {
+    "date": "2027-08-06",
+    "id": 1095,
+    "displayName": "Aperture"
+  },
+  {
+    "date": "2027-08-07",
+    "id": 1083,
+    "displayName": "Cavalier"
+  },
+  {
+    "date": "2027-08-08",
+    "id": 1087,
+    "displayName": "Wonderstallion"
+  },
+  {
+    "date": "2027-08-09",
+    "id": 8045,
+    "displayName": "Lineup"
+  },
+  {
+    "date": "2027-08-10",
+    "id": 8058,
+    "displayName": "Stick"
+  },
+  {
+    "date": "2027-08-11",
+    "id": 1093,
+    "displayName": "Frequency"
+  },
+  {
+    "date": "2027-08-12",
+    "id": 3102,
+    "displayName": "Refractrix"
+  },
+  {
+    "date": "2027-08-13",
+    "id": 3077,
+    "displayName": "Paracord"
+  },
+  {
+    "date": "2027-08-14",
+    "id": 3120,
+    "displayName": "Convergence"
+  },
+  {
+    "date": "2027-08-15",
+    "id": 3033,
+    "displayName": "Elderflame"
+  },
+  {
+    "date": "2027-08-16",
+    "id": 3075,
+    "displayName": "Ion"
+  },
+  {
+    "date": "2027-08-17",
+    "id": 7044,
+    "displayName": "Boomer"
+  },
+  {
+    "date": "2027-08-18",
+    "id": 8033,
+    "displayName": "Counterstrafe"
+  },
+  {
+    "date": "2027-08-19",
+    "id": 6015,
+    "displayName": "Icebox"
+  },
+  {
+    "date": "2027-08-20",
+    "id": 1007,
+    "displayName": "Glitchpop"
+  },
+  {
+    "date": "2027-08-21",
+    "id": 4036,
+    "displayName": "Ruination"
+  },
+  {
+    "date": "2027-08-22",
+    "id": 7022,
+    "displayName": "Flex"
+  },
+  {
+    "date": "2027-08-23",
+    "id": 8003,
+    "displayName": "Armory"
+  },
+  {
+    "date": "2027-08-24",
+    "id": 5001,
+    "displayName": "Standard"
+  },
+  {
+    "date": "2027-08-25",
+    "id": 7081,
+    "displayName": "Fetch"
+  },
+  {
+    "date": "2027-08-26",
+    "id": 3106,
+    "displayName": "Potato Aim"
+  },
+  {
+    "date": "2027-08-27",
+    "id": 1135,
+    "displayName": "Helix"
+  },
+  {
+    "date": "2027-08-28",
+    "id": 7132,
+    "displayName": "Warden"
+  },
+  {
+    "date": "2027-08-29",
+    "id": 3078,
+    "displayName": "Pizza"
+  },
+  {
+    "date": "2027-08-30",
+    "id": 7060,
+    "displayName": "Potato"
+  },
+  {
+    "date": "2027-08-31",
+    "id": 7083,
+    "displayName": "Skill Issue"
+  },
+  {
+    "date": "2027-09-01",
+    "id": 3115,
+    "displayName": "Solarex"
+  },
+  {
+    "date": "2027-09-02",
+    "id": 3068,
+    "displayName": "Dallah"
+  },
+  {
+    "date": "2027-09-03",
+    "id": 1167,
+    "displayName": "Signature"
+  },
+  {
+    "date": "2027-09-04",
+    "id": 1152,
+    "displayName": "Resolution"
+  },
+  {
+    "date": "2027-09-05",
+    "id": 3041,
+    "displayName": "Spectrum"
+  },
+  {
+    "date": "2027-09-06",
+    "id": 7141,
+    "displayName": "Outlaw"
+  },
+  {
+    "date": "2027-09-07",
+    "id": 6017,
+    "displayName": "Corrode"
+  },
+  {
+    "date": "2027-09-08",
+    "id": 4011,
+    "displayName": "Bolt"
+  },
+  {
+    "date": "2027-09-09",
+    "id": 1170,
+    "displayName": "Sidekick"
+  },
+  {
+    "date": "2027-09-10",
+    "id": 8042,
+    "displayName": "Flick"
+  },
+  {
+    "date": "2027-09-11",
+    "id": 3026,
+    "displayName": "Crate"
+  },
+  {
+    "date": "2027-09-12",
+    "id": 3071,
+    "displayName": "Genesis"
+  },
+  {
+    "date": "2027-09-13",
+    "id": 1079,
+    "displayName": "Luna"
+  },
+  {
+    "date": "2027-09-14",
+    "id": 3090,
+    "displayName": "Shellspire"
+  },
+  {
+    "date": "2027-09-15",
+    "id": 8051,
+    "displayName": "Retake"
+  },
+  {
+    "date": "2027-09-16",
+    "id": 1021,
+    "displayName": "Freehand"
+  },
+  {
+    "date": "2027-09-17",
+    "id": 1142,
+    "displayName": "Space Piercer"
+  },
+  {
+    "date": "2027-09-18",
+    "id": 1039,
+    "displayName": "Magepunk"
+  },
+  {
+    "date": "2027-09-19",
+    "id": 4041,
+    "displayName": "Magepunk"
+  },
+  {
+    "date": "2027-09-20",
+    "id": 3060,
+    "displayName": "Lionhearted"
+  },
+  {
+    "date": "2027-09-21",
+    "id": 7153,
+    "displayName": "Stylish"
+  },
+  {
+    "date": "2027-09-22",
+    "id": 8014,
+    "displayName": "Cubby"
+  },
+  {
+    "date": "2027-09-23",
+    "id": 7129,
+    "displayName": "Toxic"
+  },
+  {
+    "date": "2027-09-24",
+    "id": 6002,
+    "displayName": "Split"
+  },
+  {
+    "date": "2027-09-25",
+    "id": 7041,
+    "displayName": "Arcane"
+  },
+  {
+    "date": "2027-09-26",
+    "id": 1101,
+    "displayName": "Chromedek"
+  },
+  {
+    "date": "2027-09-27",
+    "id": 1118,
+    "displayName": "Composite"
+  },
+  {
+    "date": "2027-09-28",
+    "id": 7064,
+    "displayName": "Disruption"
+  },
+  {
+    "date": "2027-09-29",
+    "id": 3105,
+    "displayName": "CYRAX"
+  },
+  {
+    "date": "2027-09-30",
+    "id": 4062,
+    "displayName": "Titanmail"
+  }
+]

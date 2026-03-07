@@ -1,0 +1,107 @@
+/* Converted to CSS Module */
+.glow-circular-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  /* Default glow color, can be overridden by data-glow-color or inline style */
+  --glow-color: rgba(255, 255, 255, 0.2);
+  --glow-pos-x: 50%;
+  --glow-pos-y: 50%;
+}
+
+/* Remove default focus outline */
+.glow-circular-button:focus {
+  outline: none;
+}
+
+.glow-circular-button:focus-visible {
+  /* Custom focus style that's less intrusive */
+  box-shadow: 0 0 0 2px var(--glow-color);
+  outline: none;
+}
+
+.glow-circular-button:hover {
+  transform: translateY(-1px);
+}
+
+.glow-circular-button:active {
+  transform: translateY(0);
+}
+
+/* Dynamic glow effect */
+.glow-circular-button::before {
+  content: "";
+  position: absolute;
+  inset: -3px; /* Slightly larger border */
+  border-radius: 75%; /* Adjusted for larger inset */
+  padding: 4px; /* Thicker glow border */
+  background: radial-gradient(
+    circle at var(--glow-pos-x) var(--glow-pos-y),
+    var(--glow-color) 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    transparent 80%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.2; /* Base glow always visible */
+  transition: opacity 0.3s ease;
+}
+
+/* Subtle pulsing animation */
+@keyframes glowPulse {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+
+.glow-circular-button::before {
+  animation: glowPulse 3s infinite ease-in-out;
+}
+
+.glow-circular-button:hover::before {
+  opacity: 1; /* Full glow on hover */
+  animation: none; /* Stop pulsing on hover */
+}
+
+.glow-circular-button:hover {
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 0 20px var(--glow-color); /* Larger glow radius */
+}
+
+/* Notification badge style - can be used inside the button */
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}

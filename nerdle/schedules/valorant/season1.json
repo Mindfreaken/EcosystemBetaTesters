@@ -1,0 +1,452 @@
+[
+  {
+    "date": "2027-01-01",
+    "id": 7076,
+    "displayName": "Bet"
+  },
+  {
+    "date": "2027-01-02",
+    "id": 7035,
+    "displayName": "Cheap"
+  },
+  {
+    "date": "2027-01-03",
+    "id": 8056,
+    "displayName": "Saving"
+  },
+  {
+    "date": "2027-01-04",
+    "id": 2021,
+    "displayName": "Yoru"
+  },
+  {
+    "date": "2027-01-05",
+    "id": 1155,
+    "displayName": "Finesse"
+  },
+  {
+    "date": "2027-01-06",
+    "id": 2022,
+    "displayName": "Waylay"
+  },
+  {
+    "date": "2027-01-07",
+    "id": 4015,
+    "displayName": "Phaseguard"
+  },
+  {
+    "date": "2027-01-08",
+    "id": 4008,
+    "displayName": "Endeavour"
+  },
+  {
+    "date": "2027-01-09",
+    "id": 7054,
+    "displayName": "Random"
+  },
+  {
+    "date": "2027-01-10",
+    "id": 1031,
+    "displayName": "Infantry"
+  },
+  {
+    "date": "2027-01-11",
+    "id": 4020,
+    "displayName": "ChronoVoid"
+  },
+  {
+    "date": "2027-01-12",
+    "id": 7119,
+    "displayName": "Hurricane"
+  },
+  {
+    "date": "2027-01-13",
+    "id": 7077,
+    "displayName": "Rockets"
+  },
+  {
+    "date": "2027-01-14",
+    "id": 3088,
+    "displayName": "Silhouette"
+  },
+  {
+    "date": "2027-01-15",
+    "id": 3019,
+    "displayName": "Overlay"
+  },
+  {
+    "date": "2027-01-16",
+    "id": 4014,
+    "displayName": "Origin"
+  },
+  {
+    "date": "2027-01-17",
+    "id": 7015,
+    "displayName": "Pumped"
+  },
+  {
+    "date": "2027-01-18",
+    "id": 7088,
+    "displayName": "Aura"
+  },
+  {
+    "date": "2027-01-19",
+    "id": 3102,
+    "displayName": "Refractrix"
+  },
+  {
+    "date": "2027-01-20",
+    "id": 3096,
+    "displayName": "Snowfall"
+  },
+  {
+    "date": "2027-01-21",
+    "id": 7145,
+    "displayName": "Electrifying"
+  },
+  {
+    "date": "2027-01-22",
+    "id": 1112,
+    "displayName": "Infinity"
+  },
+  {
+    "date": "2027-01-23",
+    "id": 3047,
+    "displayName": "Hawko"
+  },
+  {
+    "date": "2027-01-24",
+    "id": 3099,
+    "displayName": "Mystbloom"
+  },
+  {
+    "date": "2027-01-25",
+    "id": 1178,
+    "displayName": "Caeruleus"
+  },
+  {
+    "date": "2027-01-26",
+    "id": 3001,
+    "displayName": "Beckoner"
+  },
+  {
+    "date": "2027-01-27",
+    "id": 3048,
+    "displayName": "Primordium"
+  },
+  {
+    "date": "2027-01-28",
+    "id": 4067,
+    "displayName": "Ego"
+  },
+  {
+    "date": "2027-01-29",
+    "id": 4050,
+    "displayName": "Switchback"
+  },
+  {
+    "date": "2027-01-30",
+    "id": 1106,
+    "displayName": "Couture"
+  },
+  {
+    "date": "2027-01-31",
+    "id": 3078,
+    "displayName": "Pizza"
+  },
+  {
+    "date": "2027-02-01",
+    "id": 1103,
+    "displayName": "Shimmer"
+  },
+  {
+    "date": "2027-02-02",
+    "id": 1124,
+    "displayName": "Serenity"
+  },
+  {
+    "date": "2027-02-03",
+    "id": 4056,
+    "displayName": "Sakura"
+  },
+  {
+    "date": "2027-02-04",
+    "id": 1141,
+    "displayName": "Convergence"
+  },
+  {
+    "date": "2027-02-05",
+    "id": 3015,
+    "displayName": "Bolt"
+  },
+  {
+    "date": "2027-02-06",
+    "id": 4038,
+    "displayName": "Smite"
+  },
+  {
+    "date": "2027-02-07",
+    "id": 4041,
+    "displayName": "Magepunk"
+  },
+  {
+    "date": "2027-02-08",
+    "id": 2025,
+    "displayName": "Omen"
+  },
+  {
+    "date": "2027-02-09",
+    "id": 8048,
+    "displayName": "Molly"
+  },
+  {
+    "date": "2027-02-10",
+    "id": 1014,
+    "displayName": "Lightwave"
+  },
+  {
+    "date": "2027-02-11",
+    "id": 1126,
+    "displayName": "Kingdom"
+  },
+  {
+    "date": "2027-02-12",
+    "id": 8032,
+    "displayName": "Clone"
+  },
+  {
+    "date": "2027-02-13",
+    "id": 1030,
+    "displayName": "Hieroscape"
+  },
+  {
+    "date": "2027-02-14",
+    "id": 1102,
+    "displayName": "Velocity"
+  },
+  {
+    "date": "2027-02-15",
+    "id": 2005,
+    "displayName": "Tejo"
+  },
+  {
+    "date": "2027-02-16",
+    "id": 3003,
+    "displayName": "Altitude"
+  },
+  {
+    "date": "2027-02-17",
+    "id": 7047,
+    "displayName": "Wide"
+  },
+  {
+    "date": "2027-02-18",
+    "id": 7030,
+    "displayName": "Chill"
+  },
+  {
+    "date": "2027-02-19",
+    "id": 3065,
+    "displayName": "Spline"
+  },
+  {
+    "date": "2027-02-20",
+    "id": 8052,
+    "displayName": "Roomba"
+  },
+  {
+    "date": "2027-02-21",
+    "id": 7070,
+    "displayName": "Chef"
+  },
+  {
+    "date": "2027-02-22",
+    "id": 3111,
+    "displayName": "Toaster"
+  },
+  {
+    "date": "2027-02-23",
+    "id": 3056,
+    "displayName": "Bot"
+  },
+  {
+    "date": "2027-02-24",
+    "id": 3013,
+    "displayName": "Blueberry"
+  },
+  {
+    "date": "2027-02-25",
+    "id": 1015,
+    "displayName": "Sensation"
+  },
+  {
+    "date": "2027-02-26",
+    "id": 3040,
+    "displayName": "Topotek"
+  },
+  {
+    "date": "2027-02-27",
+    "id": 2003,
+    "displayName": "Breach"
+  },
+  {
+    "date": "2027-02-28",
+    "id": 7099,
+    "displayName": "Fam"
+  },
+  {
+    "date": "2027-03-01",
+    "id": 1069,
+    "displayName": "Guardrail"
+  },
+  {
+    "date": "2027-03-02",
+    "id": 7065,
+    "displayName": "Ace"
+  },
+  {
+    "date": "2027-03-03",
+    "id": 3009,
+    "displayName": "Celestia"
+  },
+  {
+    "date": "2027-03-04",
+    "id": 3036,
+    "displayName": "Songsteel"
+  },
+  {
+    "date": "2027-03-05",
+    "id": 1169,
+    "displayName": "Cloudweaver"
+  },
+  {
+    "date": "2027-03-06",
+    "id": 7045,
+    "displayName": "Cringe"
+  },
+  {
+    "date": "2027-03-07",
+    "id": 3071,
+    "displayName": "Genesis"
+  },
+  {
+    "date": "2027-03-08",
+    "id": 7050,
+    "displayName": "Chalked"
+  },
+  {
+    "date": "2027-03-09",
+    "id": 2017,
+    "displayName": "Brimstone"
+  },
+  {
+    "date": "2027-03-10",
+    "id": 1114,
+    "displayName": "Tilde"
+  },
+  {
+    "date": "2027-03-11",
+    "id": 3023,
+    "displayName": "Phaseguard"
+  },
+  {
+    "date": "2027-03-12",
+    "id": 7122,
+    "displayName": "Recruit"
+  },
+  {
+    "date": "2027-03-13",
+    "id": 7131,
+    "displayName": "Unmasked"
+  },
+  {
+    "date": "2027-03-14",
+    "id": 1153,
+    "displayName": "Intergrade"
+  },
+  {
+    "date": "2027-03-15",
+    "id": 4024,
+    "displayName": "Imperium"
+  },
+  {
+    "date": "2027-03-16",
+    "id": 4002,
+    "displayName": "Xenohunter"
+  },
+  {
+    "date": "2027-03-17",
+    "id": 1043,
+    "displayName": "Polyfrog"
+  },
+  {
+    "date": "2027-03-18",
+    "id": 3108,
+    "displayName": "Teleporter"
+  },
+  {
+    "date": "2027-03-19",
+    "id": 7126,
+    "displayName": "Stellar"
+  },
+  {
+    "date": "2027-03-20",
+    "id": 3027,
+    "displayName": "Slurp"
+  },
+  {
+    "date": "2027-03-21",
+    "id": 1151,
+    "displayName": "Moondash"
+  },
+  {
+    "date": "2027-03-22",
+    "id": 7069,
+    "displayName": "UwU"
+  },
+  {
+    "date": "2027-03-23",
+    "id": 7060,
+    "displayName": "Potato"
+  },
+  {
+    "date": "2027-03-24",
+    "id": 2026,
+    "displayName": "Jett"
+  },
+  {
+    "date": "2027-03-25",
+    "id": 4058,
+    "displayName": "Helix"
+  },
+  {
+    "date": "2027-03-26",
+    "id": 7155,
+    "displayName": "Disciplined"
+  },
+  {
+    "date": "2027-03-27",
+    "id": 3007,
+    "displayName": "Araxys"
+  },
+  {
+    "date": "2027-03-28",
+    "id": 1118,
+    "displayName": "Composite"
+  },
+  {
+    "date": "2027-03-29",
+    "id": 3020,
+    "displayName": "Misilito"
+  },
+  {
+    "date": "2027-03-30",
+    "id": 1008,
+    "displayName": "Nitro"
+  },
+  {
+    "date": "2027-03-31",
+    "id": 1062,
+    "displayName": "Forsaken"
+  }
+]

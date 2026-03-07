@@ -1,0 +1,93 @@
+/* Reusable custom sidebar styles using tokens from src/app/globals.css */
+
+.sidebar {
+  --sb-width: 280px;
+  width: var(--sb-width);
+  background: color-mix(in oklab, var(--background), black 5%);
+  border-right: 1px solid color-mix(in oklab, var(--text), transparent 90%);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  overflow: auto;
+}
+
+.sidebar--inset {
+  margin: 12px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in oklab, var(--text), transparent 92%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--background), transparent 0%),
+    color-mix(in oklab, var(--background), transparent 10%)
+  );
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 12px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.sidebar__sectionTitle {
+  margin: 10px 6px 6px;
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--text), transparent 40%);
+}
+
+.sidebar__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: var(--text);
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.sidebar__item:hover {
+  background: color-mix(in oklab, var(--primary), var(--background) 92%);
+  border-color: color-mix(in oklab, var(--primary), transparent 80%);
+}
+
+.sidebar__item--active {
+  background: color-mix(in oklab, var(--primary), var(--background) 88%);
+  border-color: color-mix(in oklab, var(--primary), transparent 60%);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary), transparent 80%);
+}
+
+.sidebar__footer {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px dashed color-mix(in oklab, var(--text), transparent 90%);
+  color: color-mix(in oklab, var(--text), transparent 35%);
+  font-size: 12px;
+}
+
+/* Optional: tighter scrollbar inside the sidebar */
+.sidebar {
+  scrollbar-width: thin;
+}
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--primary), var(--background) 20%);
+  border: 2px solid transparent;
+  border-radius: 10px;
+}

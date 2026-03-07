@@ -1,0 +1,457 @@
+[
+  {
+    "date": "2027-04-01",
+    "id": 1019,
+    "displayName": "Sovereign"
+  },
+  {
+    "date": "2027-04-02",
+    "id": 3084,
+    "displayName": "Panoramic"
+  },
+  {
+    "date": "2027-04-03",
+    "id": 3086,
+    "displayName": "Stardust"
+  },
+  {
+    "date": "2027-04-04",
+    "id": 4071,
+    "displayName": "SplashX"
+  },
+  {
+    "date": "2027-04-05",
+    "id": 7044,
+    "displayName": "Boomer"
+  },
+  {
+    "date": "2027-04-06",
+    "id": 6014,
+    "displayName": "Pearl"
+  },
+  {
+    "date": "2027-04-07",
+    "id": 1083,
+    "displayName": "Cavalier"
+  },
+  {
+    "date": "2027-04-08",
+    "id": 2012,
+    "displayName": "Harbor"
+  },
+  {
+    "date": "2027-04-09",
+    "id": 3114,
+    "displayName": "Ego"
+  },
+  {
+    "date": "2027-04-10",
+    "id": 8026,
+    "displayName": "Anchor"
+  },
+  {
+    "date": "2027-04-11",
+    "id": 1045,
+    "displayName": "Sakura"
+  },
+  {
+    "date": "2027-04-12",
+    "id": 1183,
+    "displayName": "Prosperity"
+  },
+  {
+    "date": "2027-04-13",
+    "id": 7029,
+    "displayName": "Sheriff"
+  },
+  {
+    "date": "2027-04-14",
+    "id": 1167,
+    "displayName": "Signature"
+  },
+  {
+    "date": "2027-04-15",
+    "id": 7125,
+    "displayName": "Sharpshooter"
+  },
+  {
+    "date": "2027-04-16",
+    "id": 1182,
+    "displayName": "Relic"
+  },
+  {
+    "date": "2027-04-17",
+    "id": 4031,
+    "displayName": "Primordium"
+  },
+  {
+    "date": "2027-04-18",
+    "id": 3120,
+    "displayName": "Convergence"
+  },
+  {
+    "date": "2027-04-19",
+    "id": 1040,
+    "displayName": "Minima"
+  },
+  {
+    "date": "2027-04-20",
+    "id": 7081,
+    "displayName": "Fetch"
+  },
+  {
+    "date": "2027-04-21",
+    "id": 4005,
+    "displayName": "Araxys"
+  },
+  {
+    "date": "2027-04-22",
+    "id": 1092,
+    "displayName": "Winterwunderland"
+  },
+  {
+    "date": "2027-04-23",
+    "id": 7161,
+    "displayName": "Unpredictable"
+  },
+  {
+    "date": "2027-04-24",
+    "id": 7061,
+    "displayName": "Cursed"
+  },
+  {
+    "date": "2027-04-25",
+    "id": 8042,
+    "displayName": "Flick"
+  },
+  {
+    "date": "2027-04-26",
+    "id": 7159,
+    "displayName": "Diehard"
+  },
+  {
+    "date": "2027-04-27",
+    "id": 8039,
+    "displayName": "Eco"
+  },
+  {
+    "date": "2027-04-28",
+    "id": 3058,
+    "displayName": "Lotus"
+  },
+  {
+    "date": "2027-04-29",
+    "id": 2014,
+    "displayName": "Viper"
+  },
+  {
+    "date": "2027-04-30",
+    "id": 1049,
+    "displayName": "Haloform"
+  },
+  {
+    "date": "2027-05-01",
+    "id": 7063,
+    "displayName": "Dimension"
+  },
+  {
+    "date": "2027-05-02",
+    "id": 1067,
+    "displayName": "Prime"
+  },
+  {
+    "date": "2027-05-03",
+    "id": 1119,
+    "displayName": "Bolt"
+  },
+  {
+    "date": "2027-05-04",
+    "id": 7039,
+    "displayName": "Unstoppable"
+  },
+  {
+    "date": "2027-05-05",
+    "id": 7011,
+    "displayName": "Catalyst"
+  },
+  {
+    "date": "2027-05-06",
+    "id": 3080,
+    "displayName": "Brimsicle"
+  },
+  {
+    "date": "2027-05-07",
+    "id": 7021,
+    "displayName": "Lowrider"
+  },
+  {
+    "date": "2027-05-08",
+    "id": 1048,
+    "displayName": "Titanmail"
+  },
+  {
+    "date": "2027-05-09",
+    "id": 6001,
+    "displayName": "Ascent"
+  },
+  {
+    "date": "2027-05-10",
+    "id": 7158,
+    "displayName": "Bonjour"
+  },
+  {
+    "date": "2027-05-11",
+    "id": 1122,
+    "displayName": "Interhelm"
+  },
+  {
+    "date": "2027-05-12",
+    "id": 8038,
+    "displayName": "Dog"
+  },
+  {
+    "date": "2027-05-13",
+    "id": 1126,
+    "displayName": "Kingdom"
+  },
+  {
+    "date": "2027-05-14",
+    "id": 7087,
+    "displayName": "brat"
+  },
+  {
+    "date": "2027-05-15",
+    "id": 3117,
+    "displayName": "SplashX"
+  },
+  {
+    "date": "2027-05-16",
+    "id": 7056,
+    "displayName": "Clean"
+  },
+  {
+    "date": "2027-05-17",
+    "id": 3060,
+    "displayName": "Lionhearted"
+  },
+  {
+    "date": "2027-05-18",
+    "id": 1072,
+    "displayName": "Arcane"
+  },
+  {
+    "date": "2027-05-19",
+    "id": 8065,
+    "displayName": "Whiffing"
+  },
+  {
+    "date": "2027-05-20",
+    "id": 4041,
+    "displayName": "Magepunk"
+  },
+  {
+    "date": "2027-05-21",
+    "id": 1028,
+    "displayName": "Spitfire"
+  },
+  {
+    "date": "2027-05-22",
+    "id": 8044,
+    "displayName": "Instalock"
+  },
+  {
+    "date": "2027-05-23",
+    "id": 7017,
+    "displayName": "Primordial"
+  },
+  {
+    "date": "2027-05-24",
+    "id": 1026,
+    "displayName": "Rush"
+  },
+  {
+    "date": "2027-05-25",
+    "id": 3116,
+    "displayName": "Holomoku"
+  },
+  {
+    "date": "2027-05-26",
+    "id": 7082,
+    "displayName": "Dream Team"
+  },
+  {
+    "date": "2027-05-27",
+    "id": 7136,
+    "displayName": "Proud"
+  },
+  {
+    "date": "2027-05-28",
+    "id": 7102,
+    "displayName": "Dauntless"
+  },
+  {
+    "date": "2027-05-29",
+    "id": 3076,
+    "displayName": "Oni"
+  },
+  {
+    "date": "2027-05-30",
+    "id": 3051,
+    "displayName": "Hydrodip"
+  },
+  {
+    "date": "2027-05-31",
+    "id": 4018,
+    "displayName": "Doombringer"
+  },
+  {
+    "date": "2027-06-01",
+    "id": 4019,
+    "displayName": "Glitchpop"
+  },
+  {
+    "date": "2027-06-02",
+    "id": 3040,
+    "displayName": "Topotek"
+  },
+  {
+    "date": "2027-06-03",
+    "id": 8020,
+    "displayName": "Long"
+  },
+  {
+    "date": "2027-06-04",
+    "id": 1082,
+    "displayName": "Torque"
+  },
+  {
+    "date": "2027-06-05",
+    "id": 1103,
+    "displayName": "Shimmer"
+  },
+  {
+    "date": "2027-06-06",
+    "id": 8005,
+    "displayName": "Flawless"
+  },
+  {
+    "date": "2027-06-07",
+    "id": 3026,
+    "displayName": "Crate"
+  },
+  {
+    "date": "2027-06-08",
+    "id": 4054,
+    "displayName": "Sensation"
+  },
+  {
+    "date": "2027-06-09",
+    "id": 4035,
+    "displayName": "Prism"
+  },
+  {
+    "date": "2027-06-10",
+    "id": 7023,
+    "displayName": "Charmer"
+  },
+  {
+    "date": "2027-06-11",
+    "id": 7049,
+    "displayName": "Goinmul"
+  },
+  {
+    "date": "2027-06-12",
+    "id": 4021,
+    "displayName": "Emberclad"
+  },
+  {
+    "date": "2027-06-13",
+    "id": 1039,
+    "displayName": "Magepunk"
+  },
+  {
+    "date": "2027-06-14",
+    "id": 1098,
+    "displayName": "Nocturnum"
+  },
+  {
+    "date": "2027-06-15",
+    "id": 7070,
+    "displayName": "Chef"
+  },
+  {
+    "date": "2027-06-16",
+    "id": 1123,
+    "displayName": "Soulstrife"
+  },
+  {
+    "date": "2027-06-17",
+    "id": 7118,
+    "displayName": "Hunter"
+  },
+  {
+    "date": "2027-06-18",
+    "id": 3099,
+    "displayName": "Mystbloom"
+  },
+  {
+    "date": "2027-06-19",
+    "id": 7079,
+    "displayName": "Real"
+  },
+  {
+    "date": "2027-06-20",
+    "id": 4029,
+    "displayName": "Troublemaker"
+  },
+  {
+    "date": "2027-06-21",
+    "id": 3109,
+    "displayName": "Prism"
+  },
+  {
+    "date": "2027-06-22",
+    "id": 3053,
+    "displayName": "Bound"
+  },
+  {
+    "date": "2027-06-23",
+    "id": 1063,
+    "displayName": "Ruin"
+  },
+  {
+    "date": "2027-06-24",
+    "id": 3055,
+    "displayName": "Yoonseul"
+  },
+  {
+    "date": "2027-06-25",
+    "id": 6008,
+    "displayName": "Drift"
+  },
+  {
+    "date": "2027-06-26",
+    "id": 4028,
+    "displayName": "Forsaken"
+  },
+  {
+    "date": "2027-06-27",
+    "id": 8060,
+    "displayName": "Tap"
+  },
+  {
+    "date": "2027-06-28",
+    "id": 4069,
+    "displayName": "Holomoku"
+  },
+  {
+    "date": "2027-06-29",
+    "id": 7027,
+    "displayName": "Wraith"
+  },
+  {
+    "date": "2027-06-30",
+    "id": 7015,
+    "displayName": "Pumped"
+  }
+]

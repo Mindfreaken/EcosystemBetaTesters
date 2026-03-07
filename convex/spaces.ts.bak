@@ -1,0 +1,2085 @@
+import { v } from "convex/values";
+import { query, mutation } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
+import { ensureUserActive } from "./auth/helpers";
+
+/**
+ * Get the number of spaces owned by the current user.
+ */
+export const getUserOwnedSpacesCount = query({
+    args: {},
+    handler: async (ctx) => {
+        const user = await ensureUserActive(ctx).catch(() => null);
+        if (!user) return 0;
+
+        const ownedSpaces = await ctx.db
+            .query("spaces")
+            .withIndex("by_owner", (q) => q.eq("ownerId", user._id))
+            .collect();
+
+        return ownedSpaces.length;
+    },
+});
+
+/**
+ * Get the list of spaces the current user is a member of.
+ */
+export const getUserSpaces = query({
+    args: {},
+    handler: async (ctx) => {
+        const user = await ensureUserActive(ctx).catch(() => null);
+        if (!user) return [];
+
+        const memberships = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_user", (q) => q.eq("userId", user._id))
+            .collect();
+
+        const spaces = await Promise.all(
+            memberships.map((m) => ctx.db.get(m.spaceId))
+        );
+
+        return spaces.filter((s) => s !== null);
+    },
+});
+
+/**
+ * Get a single space by its ID.
+ */
+export const getSpace = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        return await ctx.db.get(args.spaceId);
+    },
+});
+/**
+ * Create a new space and assign the current user as the owner.
+ */
+export const createSpace = mutation({
+    args: {
+        name: v.string(),
+        description: v.optional(v.string()),
+        isPublic: v.boolean(),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+
+        // Enforce limit: max 5 owned spaces
+        const ownedCount = await ctx.db
+            .query("spaces")
+            .withIndex("by_owner", (q) => q.eq("ownerId", user._id))
+            .collect();
+
+        if (ownedCount.length >= 5) {
+            throw new Error("You have reached the maximum limit of 5 owned spaces.");
+        }
+
+        const now = Date.now();
+        const spaceId = await ctx.db.insert("spaces", {
+            name: args.name,
+            description: args.description,
+            ownerId: user._id,
+            createdAt: now,
+            updatedAt: now,
+            isPublic: args.isPublic,
+        });
+
+        // Add the creator as a member with "owner" role
+        await ctx.db.insert("spaceMembers", {
+            spaceId,
+            userId: user._id,
+            role: "owner",
+            joinedAt: now,
+        });
+
+        const defaultChannelId = await ctx.db.insert("spaceChannels", {
+            spaceId,
+            name: "general",
+            type: "text",
+            description: "The default discussion channel for everyone.",
+            channelOrder: 0,
+            createdAt: now,
+        });
+
+        // Add welcome message
+        await ctx.db.insert("spaceChannelMessages", {
+            channelId: defaultChannelId,
+            senderId: user._id,
+            content: `Welcome to the ${args.name} space!`,
+            createdAt: now,
+        });
+
+        return spaceId;
+    },
+});
+
+/**
+ * Get the current user's role in a space.
+ */
+export const getMyRole = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx).catch(() => null);
+        if (!user) return null;
+
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        return membership?.role ?? null;
+    },
+});
+
+/**
+ * Update space metadata (name, avatar, cover).
+ */
+export const updateSpaceMetadata = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        name: v.optional(v.string()),
+        avatarUrl: v.optional(v.string()),
+        coverUrl: v.optional(v.string()),
+        description: v.optional(v.string()),
+        livekitUrl: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!membership || membership.role !== "owner") {
+            throw new Error("Unauthorized: Only the owner can update space metadata.");
+        }
+
+        const updates: any = { updatedAt: Date.now() };
+        if (args.name !== undefined) updates.name = args.name;
+        if (args.avatarUrl !== undefined) updates.avatarUrl = args.avatarUrl;
+        if (args.coverUrl !== undefined) updates.coverUrl = args.coverUrl;
+        if (args.description !== undefined) updates.description = args.description;
+        if (args.livekitUrl !== undefined) updates.livekitUrl = args.livekitUrl;
+
+        await ctx.db.patch(args.spaceId, updates);
+
+        // Log the action
+        let details = "Updated space metadata";
+        if (args.name) details = `Updated space name to "${args.name}"`;
+        else if (args.description) details = `Updated space description`;
+        else if (args.avatarUrl) details = `Updated space avatar`;
+        else if (args.coverUrl) details = `Updated space cover photo`;
+        else if (args.livekitUrl !== undefined) details = `Updated LiveKit configuration`;
+
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "update_metadata",
+            details,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Get the list of all members for a space.
+ */
+export const getSpaceMembers = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const members = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
+
+        return await Promise.all(
+            members.map(async (m) => {
+                const user = await ctx.db.get(m.userId);
+                return { ...m, user };
+            })
+        );
+    },
+});
+
+/**
+ * Get a specific member of a space.
+ */
+export const getSpaceMember = query({
+    args: {
+        spaceId: v.id("spaces"),
+        userId: v.id("users"),
+    },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", args.userId))
+            .unique();
+    },
+});
+
+/**
+ * Get the list of admins for a space.
+ */
+export const getSpaceAdmins = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const admins = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .filter((q) => q.or(
+                q.eq(q.field("role"), "admin"),
+                q.eq(q.field("role"), "owner"),
+                q.eq(q.field("role"), "moderator")
+            ))
+            .collect();
+
+        return await Promise.all(
+            admins.map(async (a) => {
+                const user = await ctx.db.get(a.userId);
+                return { ...a, user };
+            })
+        );
+    },
+});
+
+/**
+ * Toggle a user's role between admin and member.
+ */
+export const setMemberRole = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        userId: v.id("users"),
+        role: v.string(), // "admin" | "member"
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const requesterMembership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!requesterMembership) throw new Error("Unauthorized");
+
+        const isOwner = requesterMembership.role === "owner";
+        const isAdmin = requesterMembership.role === "admin";
+
+        if (!isOwner && !isAdmin) {
+            throw new Error("Unauthorized: Only owners and admins can manage roles.");
+        }
+
+        // Admins can only set moderator/member roles
+        if (isAdmin && (args.role === "admin" || args.role === "owner")) {
+            throw new Error("Unauthorized: Admins cannot promote users to Admin or Owner.");
+        }
+
+        const targetMembership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", args.userId))
+            .unique();
+
+        if (!targetMembership) {
+            throw new Error("User is not a member of this space.");
+        }
+
+        if (targetMembership.role === "owner") {
+            throw new Error("Cannot change the role of the owner.");
+        }
+
+        await ctx.db.patch(targetMembership._id, { role: args.role });
+
+        const targetUser = await ctx.db.get(args.userId);
+        const targetName = targetUser?.displayName || args.userId;
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "update_role",
+            details: `Changed role of ${targetName} to ${args.role}`,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Track a user's view of a space.
+ */
+export const trackSpaceView = mutation({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx).catch(() => null);
+        if (!user) return;
+
+        const now = Date.now();
+        const date = new Date(now);
+        const day = date.toISOString().split("T")[0]; // YYYY-MM-DD
+        const month = day.substring(0, 7); // YYYY-MM
+
+        // Daily
+        const existingDaily = await ctx.db
+            .query("spaceDailyActive")
+            .withIndex("by_day_user", (q) => q.eq("spaceId", args.spaceId).eq("day", day).eq("userId", user._id))
+            .unique();
+        if (!existingDaily) {
+            await ctx.db.insert("spaceDailyActive", {
+                spaceId: args.spaceId,
+                userId: user._id,
+                day,
+                createdAt: now,
+            });
+        }
+
+        // Monthly
+        const existingMonthly = await ctx.db
+            .query("spaceMonthlyActive")
+            .withIndex("by_month_user", (q) => q.eq("spaceId", args.spaceId).eq("month", month).eq("userId", user._id))
+            .unique();
+        if (!existingMonthly) {
+            await ctx.db.insert("spaceMonthlyActive", {
+                spaceId: args.spaceId,
+                userId: user._id,
+                month,
+                createdAt: now,
+            });
+        }
+    },
+});
+
+/**
+ * Get space analytics (DAU/MAU).
+ */
+export const getSpaceStats = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const now = Date.now();
+        const date = new Date(now);
+        const day = date.toISOString().split("T")[0];
+        const month = day.substring(0, 7);
+
+        const dailyCount = await ctx.db
+            .query("spaceDailyActive")
+            .withIndex("by_day", (q) => q.eq("spaceId", args.spaceId).eq("day", day))
+            .collect();
+
+        const monthlyCount = await ctx.db
+            .query("spaceMonthlyActive")
+            .withIndex("by_month", (q) => q.eq("spaceId", args.spaceId).eq("month", month))
+            .collect();
+
+        return {
+            dailyActive: dailyCount.length,
+            monthlyActive: monthlyCount.length,
+        };
+    },
+});
+
+/**
+ * Get the feed of all admin actions for a space.
+ */
+export const getAdminActions = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const actions = await ctx.db
+            .query("spaceAdminActions")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .order("desc")
+            .take(50);
+
+        return await Promise.all(
+            actions.map(async (a) => {
+                const admin = await ctx.db.get(a.adminId);
+                return { ...a, admin };
+            })
+        );
+    },
+});
+
+/**
+ * Get total action counts per admin for a space.
+ */
+export const getAdminActionStats = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const actions = await ctx.db
+            .query("spaceAdminActions")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
+
+        const stats: Record<string, { total: number; admin: any }> = {};
+        for (const action of actions) {
+            const adminId = action.adminId.toString();
+            if (!stats[adminId]) {
+                const admin = await ctx.db.get(action.adminId);
+                stats[adminId] = { total: 0, admin };
+            }
+            stats[adminId].total++;
+        }
+
+        return Object.values(stats).sort((a, b) => b.total - a.total);
+    },
+});
+
+/**
+ * Get actions taken by a specific admin in a space.
+ */
+export const getActionsByAdmin = query({
+    args: { spaceId: v.id("spaces"), adminId: v.id("users") },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("spaceAdminActions")
+            .withIndex("by_space_admin", (q) => q.eq("spaceId", args.spaceId).eq("adminId", args.adminId))
+            .order("desc")
+            .collect();
+    },
+});
+
+/**
+ * Create a new invite code for a space.
+ */
+export const createInvite = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        maxUses: v.optional(v.number()),
+        expiresInHours: v.optional(v.number()),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole || (myRole.role !== "owner" && myRole.role !== "admin" && myRole.role !== "moderator")) {
+            throw new Error("Unauthorized: Only staff can create invites.");
+        }
+
+        const now = Date.now();
+        const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+        const inviteId = await ctx.db.insert("spaceInvites", {
+            spaceId: args.spaceId,
+            invitedBy: user._id,
+            code,
+            maxUses: args.maxUses,
+            uses: 0,
+            expiresAt: args.expiresInHours ? now + args.expiresInHours * 3600000 : undefined,
+            isRevoked: false,
+            createdAt: now,
+        });
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "create_invite",
+            details: `Created new invite code: ${code}`,
+            timestamp: now,
+        });
+
+        return code;
+    },
+});
+
+/**
+ * Handle voice presence heartbeat.
+ * Called continuously by the client when connected to a voice channel.
+ */
+export const heartbeatVoicePresence = mutation({
+    args: {
+        channelId: v.id("spaceChannels"),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const channel = await ctx.db.get(args.channelId);
+        if (!channel) return;
+
+        const now = Date.now();
+
+        // Check if existing presence
+        const existing = await ctx.db
+            .query("spaceVoicePresence")
+            .withIndex("by_user_channel", (q) =>
+                q.eq("userId", user._id).eq("channelId", args.channelId)
+            )
+            .unique();
+
+        if (!existing) {
+            await ctx.db.insert("spaceVoicePresence", {
+                spaceId: channel.spaceId,
+                channelId: args.channelId,
+                userId: user._id,
+                joinedAt: now,
+                lastSeen: now,
+            });
+        } else {
+            await ctx.db.patch(existing._id, { lastSeen: now });
+        }
+    },
+});
+
+/**
+ * Cleanup voice presence (when proactively leaving)
+ */
+export const leaveVoicePresence = mutation({
+    args: {
+        channelId: v.id("spaceChannels"),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const existing = await ctx.db
+            .query("spaceVoicePresence")
+            .withIndex("by_user_channel", (q) =>
+                q.eq("userId", user._id).eq("channelId", args.channelId)
+            )
+            .unique();
+
+        if (existing) {
+            await ctx.db.delete(existing._id);
+        }
+    },
+});
+
+/**
+ * Get active voice presence for a space
+ * Filters out ghost connections older than 30s.
+ */
+export const getVoicePresence = query({
+    args: {
+        spaceId: v.id("spaces"),
+    },
+    handler: async (ctx, args) => {
+        const presences = await ctx.db
+            .query("spaceVoicePresence")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
+
+        // Filter out ghosts (> 30s ago)
+        const now = Date.now();
+        const active = presences.filter(p => now - p.lastSeen < 30000);
+
+        // Fetch their associated user data
+        return await Promise.all(
+            active.map(async (p) => {
+                const user = await ctx.db.get(p.userId);
+                return {
+                    ...p,
+                    user: user ? {
+                        _id: user._id,
+                        displayName: user.displayName,
+                        avatarUrl: user.avatarUrl,
+                        username: user.username,
+                    } : null
+                };
+            })
+        );
+    },
+});
+
+/**
+ * Revoke an active invite code.
+ */
+export const revokeInvite = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        inviteId: v.id("spaceInvites"),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole || (myRole.role !== "owner" && myRole.role !== "admin" && myRole.role !== "moderator")) {
+            throw new Error("Unauthorized: Only staff can revoke invites.");
+        }
+
+        const invite = await ctx.db.get(args.inviteId);
+        if (!invite) throw new Error("Invite not found.");
+
+        await ctx.db.patch(args.inviteId, { isRevoked: true });
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "revoke_invite",
+            details: `Revoked invite code: ${invite.code}`,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Toggle whether new members can join via invites.
+ */
+export const toggleInvites = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        allowInvites: v.boolean(),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const space = await ctx.db.get(args.spaceId);
+        if (!space || space.ownerId !== user._id) {
+            throw new Error("Unauthorized: Only the owner can toggle invite settings.");
+        }
+
+        await ctx.db.patch(args.spaceId, { allowInvites: args.allowInvites });
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "toggle_invites",
+            details: `${args.allowInvites ? "Enabled" : "Disabled"} invites for the space.`,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Join a space using an invite code.
+ */
+export const joinSpaceByCode = mutation({
+    args: { code: v.string() },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const invite = await ctx.db
+            .query("spaceInvites")
+            .withIndex("by_code", (q) => q.eq("code", args.code.toUpperCase()))
+            .unique();
+
+        if (!invite || invite.isRevoked) {
+            throw new Error("Invalid or revoked invite code.");
+        }
+
+        const space = await ctx.db.get(invite.spaceId);
+        if (!space) throw new Error("Space not found.");
+
+        if (space.allowInvites === false) {
+            throw new Error("Invites are currently disabled for this space.");
+        }
+
+        if (invite.expiresAt && invite.expiresAt < Date.now()) {
+            throw new Error("This invite code has expired.");
+        }
+
+        if (invite.maxUses && invite.uses >= invite.maxUses) {
+            throw new Error("This invite code has reached its maximum usage limit.");
+        }
+
+        // Check if user is banned
+        const existingBan = await ctx.db
+            .query("spaceBans")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", invite.spaceId).eq("userId", user._id))
+            .unique();
+        if (existingBan) {
+            throw new Error("You are banned from this space.");
+        }
+
+        // Check if already a member
+        const existingMember = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", invite.spaceId).eq("userId", user._id))
+            .unique();
+        if (existingMember) {
+            return invite.spaceId;
+        }
+
+        // Increment usage
+        await ctx.db.patch(invite._id, { uses: invite.uses + 1 });
+
+        // Join space
+        await ctx.db.insert("spaceMembers", {
+            spaceId: invite.spaceId,
+            userId: user._id,
+            role: "member",
+            joinedAt: Date.now(),
+            invitedBy: invite.invitedBy,
+        });
+
+        return invite.spaceId;
+    },
+});
+
+export const timeoutUser = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        userId: v.id("users"),
+        timeoutUntil: v.number(), // timestamp or 0 to clear
+    },
+    handler: async (ctx, args) => {
+        const adminUser = await ensureUserActive(ctx);
+        const adminMembership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", adminUser._id))
+            .unique();
+
+        if (!adminMembership || !["owner", "admin", "moderator"].includes(adminMembership.role)) {
+            throw new Error("Unauthorized to timeout users.");
+        }
+
+        const targetMembership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", args.userId))
+            .unique();
+
+        if (!targetMembership) throw new Error("User not found in space.");
+
+        // Hierarchy check
+        if (targetMembership.role === "owner") throw new Error("Cannot timeout the owner.");
+        if (targetMembership.role === "admin" && adminMembership.role !== "owner") throw new Error("Only owners can timeout admins.");
+        if (targetMembership.role === "moderator" && !["owner", "admin"].includes(adminMembership.role)) throw new Error("Only owners or admins can timeout moderators.");
+
+        await ctx.db.patch(targetMembership._id, {
+            timeoutUntil: args.timeoutUntil > 0 ? args.timeoutUntil : undefined,
+        });
+
+        // Log the action
+        const targetUser = await ctx.db.get(args.userId);
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: adminUser._id,
+            actionType: "timeout_user",
+            details: args.timeoutUntil > 0
+                ? `Timed out user ${targetUser?.displayName || "Unknown"} until ${new Date(args.timeoutUntil).toLocaleString()}`
+                : `Removed timeout for user ${targetUser?.displayName || "Unknown"}`,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+export const banUser = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        userId: v.id("users"),
+    },
+    handler: async (ctx, args) => {
+        const adminUser = await ensureUserActive(ctx);
+        const adminMembership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", adminUser._id))
+            .unique();
+
+        if (!adminMembership || !["owner", "admin", "moderator"].includes(adminMembership.role)) {
+            throw new Error("Unauthorized to ban users.");
+        }
+
+        const targetMembership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", args.userId))
+            .unique();
+
+        if (targetMembership) {
+            // Hierarchy check
+            if (targetMembership.role === "owner") throw new Error("Cannot ban the owner.");
+            if (targetMembership.role === "admin" && adminMembership.role !== "owner") throw new Error("Only owners can ban admins.");
+            if (targetMembership.role === "moderator" && !["owner", "admin"].includes(adminMembership.role)) throw new Error("Only owners or admins can ban moderators.");
+
+            // Remove member
+            await ctx.db.delete(targetMembership._id);
+        }
+
+        // Check if already banned to prevent duplicates
+        const existingBan = await ctx.db
+            .query("spaceBans")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", args.userId))
+            .unique();
+
+        if (!existingBan) {
+            await ctx.db.insert("spaceBans", {
+                spaceId: args.spaceId,
+                userId: args.userId,
+                bannedBy: adminUser._id,
+                createdAt: Date.now(),
+            });
+
+            // Log the action
+            const targetUser = await ctx.db.get(args.userId);
+            await ctx.db.insert("spaceAdminActions", {
+                spaceId: args.spaceId,
+                adminId: adminUser._id,
+                actionType: "ban_user",
+                details: `Banned user ${targetUser?.displayName || "Unknown"} from the space.`,
+                timestamp: Date.now(),
+            });
+        }
+    },
+});
+
+/**
+ * Bulk delete messages from a specific user.
+ */
+export const bulkDeleteUserMessages = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        userId: v.id("users"),
+        channelId: v.optional(v.id("spaceChannels")),
+        limit: v.optional(v.number()), // null or undefined for all
+    },
+    handler: async (ctx, args) => {
+        const adminUser = await ensureUserActive(ctx);
+        const adminMembership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", adminUser._id))
+            .unique();
+
+        if (!adminMembership || !["owner", "admin", "moderator"].includes(adminMembership.role)) {
+            throw new Error("Unauthorized to bulk delete messages.");
+        }
+
+        let messagesQuery = ctx.db
+            .query("spaceChannelMessages")
+            .filter((q) => q.eq(q.field("senderId"), args.userId));
+
+        const messages = await messagesQuery.collect();
+
+        // Filter by channel if provided
+        let filtered = messages;
+        if (args.channelId) {
+            filtered = messages.filter(m => m.channelId === args.channelId);
+        }
+
+        // Sort by time descending (most recent first)
+        filtered.sort((a, b) => b.createdAt - a.createdAt);
+
+        // Apply limit
+        const toDelete = args.limit ? filtered.slice(0, args.limit) : filtered;
+
+        const targetUser = await ctx.db.get(args.userId);
+        const channel = args.channelId ? await ctx.db.get(args.channelId) : null;
+
+        for (const msg of toDelete) {
+            await ctx.db.delete(msg._id);
+        }
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: adminUser._id,
+            actionType: "bulk_delete",
+            details: `Bulk deleted ${toDelete.length} messages from user ${targetUser?.displayName || "Unknown"}${channel ? ` in #${channel.name}` : " across the space"}.`,
+            timestamp: Date.now(),
+        });
+
+        return toDelete.length;
+    },
+});
+
+export const unbanUser = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        userId: v.id("users"),
+    },
+    handler: async (ctx, args) => {
+        const adminUser = await ensureUserActive(ctx);
+        const adminMembership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", adminUser._id))
+            .unique();
+
+        if (!adminMembership || !["owner", "admin", "moderator"].includes(adminMembership.role)) {
+            throw new Error("Unauthorized to unban users.");
+        }
+
+        const existingBan = await ctx.db
+            .query("spaceBans")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", args.userId))
+            .unique();
+
+        if (existingBan) {
+            await ctx.db.delete(existingBan._id);
+        }
+    },
+});
+
+export const getSpaceBans = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!membership || !["owner", "admin", "moderator"].includes(membership.role)) {
+            throw new Error("Unauthorized");
+        }
+
+        const bans = await ctx.db
+            .query("spaceBans")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
+
+        return Promise.all(
+            bans.map(async (ban) => {
+                const bannedUser = await ctx.db.get(ban.userId);
+                const bannedBy = await ctx.db.get(ban.bannedBy);
+                return {
+                    ...ban,
+                    user: bannedUser ? { name: bannedUser.displayName, id: bannedUser._id, email: bannedUser.email } : null,
+                    bannedBy: bannedBy ? { name: bannedBy.displayName, id: bannedBy._id } : null,
+                };
+            })
+        );
+    },
+});
+
+export const getSpaceTimeouts = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!membership || !["owner", "admin", "moderator"].includes(membership.role)) {
+            throw new Error("Unauthorized");
+        }
+
+        const now = Date.now();
+        const timedOutMembers = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .filter((q) => q.gt(q.field("timeoutUntil"), now))
+            .collect();
+
+        return Promise.all(
+            timedOutMembers.map(async (m) => {
+                const memberUser = await ctx.db.get(m.userId);
+                return {
+                    ...m,
+                    user: memberUser ? {
+                        name: memberUser.displayName,
+                        id: memberUser._id,
+                        email: memberUser.email,
+                        avatarUrl: memberUser.avatarUrl,
+                    } : null,
+                };
+            })
+        );
+    },
+});
+
+/**
+ * Get active invites for a space.
+ */
+export const getSpaceInvites = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx).catch(() => null);
+        if (!user) return [];
+
+        // Check if owner or admin
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole || (myRole.role !== "owner" && myRole.role !== "admin")) {
+            return [];
+        }
+
+        const invites = await ctx.db
+            .query("spaceInvites")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .filter((q) => q.eq(q.field("isRevoked"), false))
+            .collect();
+
+        return await Promise.all(invites.map(async i => {
+            const creator = await ctx.db.get(i.invitedBy);
+            return {
+                ...i,
+                creatorDisplayName: creator?.displayName || "Unknown",
+                creatorAvatarUrl: creator?.avatarUrl
+            };
+        }));
+    },
+});
+
+/**
+ * Get the invite leaderboard for a space.
+ */
+export const getInviteLeaderboard = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const members = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
+
+        const inviteCounts: Record<string, number> = {};
+        for (const member of members) {
+            if (member.invitedBy) {
+                const inviterId = member.invitedBy.toString();
+                inviteCounts[inviterId] = (inviteCounts[inviterId] || 0) + 1;
+            }
+        }
+
+        const leaderboard = await Promise.all(
+            Object.entries(inviteCounts).map(async ([userId, count]) => {
+                const user = await ctx.db.get(userId as Id<"users">);
+                return {
+                    userId,
+                    displayName: (user as any)?.displayName || "Unknown",
+                    avatarUrl: (user as any)?.avatarUrl,
+                    count
+                };
+            })
+        );
+
+        return leaderboard.sort((a, b) => b.count - a.count);
+    },
+});
+
+/**
+ * Get members invited by a specific user in a space.
+ */
+export const getInvitedMembersByUser = query({
+    args: { spaceId: v.id("spaces"), inviterId: v.id("users") },
+    handler: async (ctx, args) => {
+        const members = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .filter((q) => q.eq(q.field("invitedBy"), args.inviterId))
+            .collect();
+
+        return await Promise.all(
+            members.map(async (m) => {
+                const user = await ctx.db.get(m.userId);
+                return {
+                    ...m,
+                    displayName: user?.displayName || "Unknown",
+                    avatarUrl: user?.avatarUrl,
+                };
+            })
+        );
+    },
+});
+
+/**
+ * Remove a member from a space.
+ */
+export const kickMember = mutation({
+    args: { spaceId: v.id("spaces"), targetUserId: v.id("users"), reason: v.optional(v.string()) },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole || (myRole.role !== "owner" && myRole.role !== "admin" && myRole.role !== "moderator")) {
+            throw new Error("Unauthorized: Only staff can kick members.");
+        }
+
+        const targetMembership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", args.targetUserId))
+            .unique();
+
+        if (!targetMembership) throw new Error("Member not found in this space.");
+        if (targetMembership.role === "owner") throw new Error("Owner cannot be kicked.");
+
+        // Admin protection
+        if (myRole.role === "admin" && targetMembership.role === "admin") {
+            throw new Error("Admins cannot kick other admins.");
+        }
+
+        // Moderator protection
+        if (myRole.role === "moderator" && (targetMembership.role === "admin" || targetMembership.role === "moderator")) {
+            throw new Error("Moderators can only kick regular members.");
+        }
+
+        await ctx.db.delete(targetMembership._id);
+
+        const targetUser = await ctx.db.get(args.targetUserId);
+        const targetName = targetUser?.displayName || args.targetUserId;
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "kick_member",
+            details: `Kicked ${targetName}${args.reason ? ` Reason: ${args.reason}` : ""}`,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Leave a space.
+ */
+export const leaveSpace = mutation({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!membership) throw new Error("You are not a member of this space.");
+        if (membership.role === "owner") throw new Error("Owners cannot leave. Delete the space or transfer ownership first.");
+
+        await ctx.db.delete(membership._id);
+    },
+});
+
+/**
+ * Delete a space.
+ */
+export const deleteSpace = mutation({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const space = await ctx.db.get(args.spaceId);
+        if (!space) throw new Error("Space not found.");
+        if (space.ownerId !== user._id) throw new Error("Unauthorized: Only the owner can delete the space.");
+
+        // Delete all members, invites, actions, and stats
+        const members = await ctx.db.query("spaceMembers").withIndex("by_space", (q) => q.eq("spaceId", args.spaceId)).collect();
+        const invites = await ctx.db.query("spaceInvites").withIndex("by_space", (q) => q.eq("spaceId", args.spaceId)).collect();
+        const actions = await ctx.db.query("spaceAdminActions").withIndex("by_space", (q) => q.eq("spaceId", args.spaceId)).collect();
+        const categories = await ctx.db.query("spaceCategories").withIndex("by_space", (q) => q.eq("spaceId", args.spaceId)).collect();
+
+        await Promise.all(members.map((m) => ctx.db.delete(m._id)));
+        await Promise.all(invites.map((i) => ctx.db.delete(i._id)));
+        await Promise.all(actions.map((a) => ctx.db.delete(a._id)));
+        await Promise.all(categories.map((c) => ctx.db.delete(c._id)));
+
+        await ctx.db.delete(args.spaceId);
+    },
+});
+
+/**
+ * Update channel management permissions for a space.
+ */
+export const updateChannelPermissions = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        adminCanEdit: v.optional(v.boolean()),
+        modCanEdit: v.optional(v.boolean()),
+        adminCanPostInReadOnly: v.optional(v.boolean()),
+        modCanPostInReadOnly: v.optional(v.boolean()),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const space = await ctx.db.get(args.spaceId);
+        if (!space) throw new Error("Space not found.");
+        if (space.ownerId !== user._id) throw new Error("Unauthorized: Only the owner can change channel permissions.");
+
+        const patches: any = {};
+        if (args.adminCanEdit !== undefined) patches.adminCanEditChannels = args.adminCanEdit;
+        if (args.modCanEdit !== undefined) patches.modCanEditChannels = args.modCanEdit;
+        if (args.adminCanPostInReadOnly !== undefined) patches.adminCanPostInReadOnly = args.adminCanPostInReadOnly;
+        if (args.modCanPostInReadOnly !== undefined) patches.modCanPostInReadOnly = args.modCanPostInReadOnly;
+
+        await ctx.db.patch(args.spaceId, patches);
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "update_channel_permissions",
+            details: "Updated channel management permissions.",
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Toggle space privacy status.
+ */
+export const updateSpacePrivacy = mutation({
+    args: { spaceId: v.id("spaces"), isPublic: v.boolean() },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const space = await ctx.db.get(args.spaceId);
+        if (!space) throw new Error("Space not found.");
+        if (space.ownerId !== user._id) throw new Error("Unauthorized: Only the owner can change privacy.");
+
+        await ctx.db.patch(args.spaceId, { isPublic: args.isPublic });
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "update_privacy",
+            details: `Changed space privacy to ${args.isPublic ? "Public" : "Private"}`,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Get current active user profile (display name, avatar, etc.)
+ */
+export const getMe = query({
+    args: {},
+    handler: async (ctx) => {
+        const user = await ensureUserActive(ctx).catch(() => null);
+        if (!user) return null;
+        return {
+            _id: user._id,
+            displayName: user.displayName,
+            username: user.username,
+            avatarUrl: user.avatarUrl,
+        };
+    },
+});
+
+/**
+ * Get all channels for a space.
+ */
+export const getChannels = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("spaceChannels")
+            .withIndex("by_order", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
+    },
+});
+
+/**
+ * Get all categories for a space.
+ */
+export const getCategories = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        return await ctx.db
+            .query("spaceCategories")
+            .withIndex("by_order", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
+    },
+});
+
+/**
+ * Create a new category in a space.
+ */
+export const createCategory = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        name: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const space = await ctx.db.get(args.spaceId);
+        if (!space) throw new Error("Space not found.");
+
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
+
+        const isOwner = myRole.role === "owner";
+        const isAdmin = myRole.role === "admin";
+        const isMod = myRole.role === "moderator";
+
+        const canEdit = isOwner ||
+            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isMod && (space.modCanEditChannels ?? false));
+
+        if (!canEdit) {
+            throw new Error("Unauthorized: You do not have permission to manage categories.");
+        }
+
+        // Get count for ordering
+        const existingCategories = await ctx.db
+            .query("spaceCategories")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
+
+        const categoryId = await ctx.db.insert("spaceCategories", {
+            spaceId: args.spaceId,
+            name: args.name,
+            order: existingCategories.length,
+            createdAt: Date.now(),
+        });
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "create_category",
+            details: `Created category: ${args.name}`,
+            timestamp: Date.now(),
+        });
+
+        return categoryId;
+    },
+});
+
+/**
+ * Update a category's metadata.
+ */
+export const updateCategory = mutation({
+    args: {
+        categoryId: v.id("spaceCategories"),
+        name: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const category = await ctx.db.get(args.categoryId);
+        if (!category) throw new Error("Category not found.");
+
+        const space = await ctx.db.get(category.spaceId);
+        if (!space) throw new Error("Space not found.");
+
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", category.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
+
+        const isOwner = myRole.role === "owner";
+        const isAdmin = myRole.role === "admin";
+        const isMod = myRole.role === "moderator";
+
+        const canEdit = isOwner ||
+            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isMod && (space.modCanEditChannels ?? false));
+
+        if (!canEdit) {
+            throw new Error("Unauthorized: You do not have permission to manage categories.");
+        }
+
+        const patches: any = {};
+        if (args.name) patches.name = args.name;
+
+        await ctx.db.patch(args.categoryId, patches);
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: category.spaceId,
+            adminId: user._id,
+            actionType: "update_category",
+            details: `Updated category name.`,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Delete a category. Unlinks its channels.
+ */
+export const deleteCategory = mutation({
+    args: { categoryId: v.id("spaceCategories") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const category = await ctx.db.get(args.categoryId);
+        if (!category) throw new Error("Category not found.");
+
+        const space = await ctx.db.get(category.spaceId);
+        if (!space) throw new Error("Space not found.");
+
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", category.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
+
+        const isOwner = myRole.role === "owner";
+        const isAdmin = myRole.role === "admin";
+        const isMod = myRole.role === "moderator";
+
+        const canEdit = isOwner ||
+            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isMod && (space.modCanEditChannels ?? false));
+
+        if (!canEdit) {
+            throw new Error("Unauthorized: You do not have permission to manage categories.");
+        }
+
+        // Unlink channels associated with this category
+        const channels = await ctx.db
+            .query("spaceChannels")
+            .withIndex("by_space", (q) => q.eq("spaceId", category.spaceId))
+            .filter((q) => q.eq(q.field("categoryId"), args.categoryId))
+            .collect();
+
+        for (const channel of channels) {
+            await ctx.db.patch(channel._id, { categoryId: undefined });
+        }
+
+        await ctx.db.delete(args.categoryId);
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: category.spaceId,
+            adminId: user._id,
+            actionType: "delete_category",
+            details: `Deleted category: ${category.name}`,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Create a new channel in a space.
+ */
+export const createChannel = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        categoryId: v.optional(v.id("spaceCategories")),
+        name: v.string(),
+        type: v.string(),
+        description: v.optional(v.string()),
+        isReadOnly: v.optional(v.boolean()),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const space = await ctx.db.get(args.spaceId);
+        if (!space) throw new Error("Space not found.");
+
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
+
+        const isOwner = myRole.role === "owner";
+        const isAdmin = myRole.role === "admin";
+        const isMod = myRole.role === "moderator";
+
+        const canEdit = isOwner ||
+            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isMod && (space.modCanEditChannels ?? false));
+
+        if (!canEdit) {
+            throw new Error("Unauthorized: You do not have permission to manage channels.");
+        }
+
+        // Get count for ordering
+        const existingChannels = await ctx.db
+            .query("spaceChannels")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
+
+        const channelId = await ctx.db.insert("spaceChannels", {
+            spaceId: args.spaceId,
+            categoryId: args.categoryId,
+            name: args.name.toLowerCase().replace(/\s+/g, "-"),
+            type: args.type,
+            description: args.description,
+            isReadOnly: args.isReadOnly,
+            channelOrder: existingChannels.length,
+            createdAt: Date.now(),
+        });
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "create_channel",
+            details: `Created channel: #${args.name}`,
+            timestamp: Date.now(),
+        });
+
+        return channelId;
+    },
+});
+
+/**
+ * Update a channel's metadata.
+ */
+export const updateChannel = mutation({
+    args: {
+        channelId: v.id("spaceChannels"),
+        categoryId: v.optional(v.optional(v.id("spaceCategories"))),
+        name: v.optional(v.string()),
+        description: v.optional(v.string()),
+        isReadOnly: v.optional(v.boolean()),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const channel = await ctx.db.get(args.channelId);
+        if (!channel) throw new Error("Channel not found.");
+
+        const space = await ctx.db.get(channel.spaceId);
+        if (!space) throw new Error("Space not found.");
+
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
+
+        const isOwner = myRole.role === "owner";
+        const isAdmin = myRole.role === "admin";
+        const isMod = myRole.role === "moderator";
+
+        const canEdit = isOwner ||
+            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isMod && (space.modCanEditChannels ?? false));
+
+        if (!canEdit) {
+            throw new Error("Unauthorized: You do not have permission to manage channels.");
+        }
+
+        const patches: any = {};
+        if (args.name) patches.name = args.name.toLowerCase().replace(/\s+/g, "-");
+        if (args.description !== undefined) patches.description = args.description;
+        if (args.categoryId !== undefined) patches.categoryId = args.categoryId;
+        if (args.isReadOnly !== undefined) patches.isReadOnly = args.isReadOnly;
+
+        await ctx.db.patch(args.channelId, patches);
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: channel.spaceId,
+            adminId: user._id,
+            actionType: "update_channel",
+            details: `Updated channel: #${channel.name}`,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Delete a channel.
+ */
+export const deleteChannel = mutation({
+    args: { channelId: v.id("spaceChannels") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const channel = await ctx.db.get(args.channelId);
+        if (!channel) throw new Error("Channel not found.");
+
+        const space = await ctx.db.get(channel.spaceId);
+        if (!space) throw new Error("Space not found.");
+
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
+
+        const isOwner = myRole.role === "owner";
+        const isAdmin = myRole.role === "admin";
+        const isMod = myRole.role === "moderator";
+
+        const canEdit = isOwner ||
+            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isMod && (space.modCanEditChannels ?? false));
+
+        if (!canEdit) {
+            throw new Error("Unauthorized: You do not have permission to manage channels.");
+        }
+
+        await ctx.db.delete(args.channelId);
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: channel.spaceId,
+            adminId: user._id,
+            actionType: "delete_channel",
+            details: `Deleted channel: #${channel.name}`,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Get messages for a space channel.
+ */
+export const getChannelMessages = query({
+    args: { channelId: v.id("spaceChannels") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const channel = await ctx.db.get(args.channelId);
+        if (!channel) throw new Error("Channel not found.");
+
+        // Check if user is a member of the space
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!membership) throw new Error("Unauthorized: You are not a member of this space.");
+
+        const messages = await ctx.db
+            .query("spaceChannelMessages")
+            .withIndex("by_channel_time", (q) => q.eq("channelId", args.channelId))
+            .order("asc")
+            .collect();
+
+        // Enrich messages with sender and reactions
+        const enriched = await Promise.all(
+            messages.map(async (m) => {
+                const sender = await ctx.db.get(m.senderId);
+                const reactions = await ctx.db
+                    .query("spaceChannelMessageReactions")
+                    .withIndex("by_message", (q) => q.eq("messageId", m._id))
+                    .collect();
+
+                const senderMembership = await ctx.db
+                    .query("spaceMembers")
+                    .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", m.senderId))
+                    .unique();
+
+                return {
+                    ...m,
+                    sender: sender ? {
+                        displayName: sender.displayName,
+                        username: sender.username,
+                        avatarUrl: sender.avatarUrl,
+                        timeoutUntil: senderMembership?.timeoutUntil,
+                    } : null,
+                    reactions: reactions.map(r => ({
+                        userId: r.userId,
+                        reaction: r.reaction,
+                    }))
+                };
+            })
+        );
+
+        return enriched;
+    },
+});
+
+/**
+ * Send a message to a space channel.
+ */
+export const sendChannelMessage = mutation({
+    args: {
+        channelId: v.id("spaceChannels"),
+        content: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const channel = await ctx.db.get(args.channelId);
+        if (!channel) throw new Error("Channel not found.");
+
+        // Check membership
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!membership) throw new Error("Unauthorized: You are not a member of this space.");
+
+        if (membership.timeoutUntil && membership.timeoutUntil > Date.now()) {
+            throw new Error("You are currently timed out and cannot send messages.");
+        }
+
+        if (channel.isReadOnly && membership.role === "member") {
+            throw new Error("Unauthorized: This channel is read-only. Only space staff can send messages here.");
+        }
+
+        const messageId = await ctx.db.insert("spaceChannelMessages", {
+            channelId: args.channelId,
+            senderId: user._id,
+            content: args.content,
+            createdAt: Date.now(),
+        });
+
+        return messageId;
+    },
+});
+
+/**
+ * Delete a channel message.
+ */
+export const deleteChannelMessage = mutation({
+    args: { messageId: v.id("spaceChannelMessages") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const message = await ctx.db.get(args.messageId);
+        if (!message) throw new Error("Message not found.");
+
+        const channel = await ctx.db.get(message.channelId);
+        if (!channel) throw new Error("Channel not found.");
+
+        // If it's their own message, they can delete it
+        if (message.senderId === user._id) {
+            await ctx.db.delete(args.messageId);
+            return;
+        }
+
+        // Otherwise check if they are owner/admin/mod
+        const member = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!member || !["owner", "admin", "moderator"].includes(member.role)) {
+            throw new Error("Unauthorized to delete this message.");
+        }
+
+        await ctx.db.delete(args.messageId);
+    },
+});
+
+/**
+ * Toggle a reaction on a channel message.
+ */
+export const toggleChannelMessageReaction = mutation({
+    args: {
+        messageId: v.id("spaceChannelMessages"),
+        reaction: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const message = await ctx.db.get(args.messageId);
+        if (!message) throw new Error("Message not found.");
+
+        const channel = await ctx.db.get(message.channelId);
+        if (!channel) throw new Error("Channel not found.");
+
+        // Check membership
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!membership) throw new Error("Unauthorized: You are not a member of this space.");
+
+        const existing = await ctx.db
+            .query("spaceChannelMessageReactions")
+            .withIndex("by_message_user_reaction", (q) =>
+                q.eq("messageId", args.messageId)
+                    .eq("userId", user._id)
+                    .eq("reaction", args.reaction)
+            )
+            .unique();
+
+        if (existing) {
+            await ctx.db.delete(existing._id);
+        } else {
+            await ctx.db.insert("spaceChannelMessageReactions", {
+                messageId: args.messageId,
+                userId: user._id,
+                reaction: args.reaction,
+                createdAt: Date.now(),
+            });
+        }
+    },
+});
+
+/**
+ * Generate an upload URL for custom emojis.
+ */
+export const generateEmojiUploadUrl = mutation({
+    args: {},
+    handler: async (ctx) => {
+        await ensureUserActive(ctx);
+        return await ctx.storage.generateUploadUrl();
+    },
+});
+
+/**
+ * Save a custom emoji for a space.
+ */
+export const saveCustomEmoji = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        name: v.string(),
+        storageId: v.id("_storage"),
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+
+        // Check if user is admin or owner
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!membership || (membership.role !== "owner" && membership.role !== "admin")) {
+            throw new Error("Unauthorized: Only admins can upload emojis.");
+        }
+
+        const name = args.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (name.length > 20) throw new Error("Emoji name must be 20 characters or less.");
+
+        // Check for duplicate name in space
+        const existing = await ctx.db
+            .query("spaceCustomEmojis")
+            .withIndex("by_space_name", (q) => q.eq("spaceId", args.spaceId).eq("name", name))
+            .unique();
+
+        if (existing) throw new Error("An emoji with this name already exists in this space.");
+
+        // Check tier limits
+        const space = await ctx.db.get(args.spaceId);
+        if (!space) throw new Error("Space not found.");
+
+        const tier = space.tier || "free";
+        if (tier === "free") {
+            const count = (await ctx.db
+                .query("spaceCustomEmojis")
+                .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+                .collect()).length;
+
+            if (count >= 75) {
+                throw new Error("Free tier limit reached: You can only have 75 custom emojis. Upgrade to Premium for more!");
+            }
+        }
+
+        const emojiId = await ctx.db.insert("spaceCustomEmojis", {
+            spaceId: args.spaceId,
+            name,
+            storageId: args.storageId,
+            createdBy: user._id,
+            createdAt: Date.now(),
+        });
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "add_emoji",
+            details: `Uploaded custom emoji :${name}:`,
+            timestamp: Date.now(),
+        });
+
+        return emojiId;
+    },
+});
+
+export const deleteCustomEmoji = mutation({
+    args: { emojiId: v.id("spaceCustomEmojis") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const emoji = await ctx.db.get(args.emojiId);
+        if (!emoji) throw new Error("Emoji not found.");
+
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", emoji.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!membership || (membership.role !== "owner" && membership.role !== "admin")) {
+            throw new Error("Unauthorized: Only admins can delete emojis.");
+        }
+
+        await ctx.storage.delete(emoji.storageId);
+        await ctx.db.delete(args.emojiId);
+
+        // Log the action
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: emoji.spaceId,
+            adminId: user._id,
+            actionType: "delete_emoji",
+            details: `Deleted custom emoji :${emoji.name}:`,
+            timestamp: Date.now(),
+        });
+    },
+});
+
+/**
+ * Get custom emojis for a space.
+ */
+export const getSpaceCustomEmojis = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const emojis = await ctx.db
+            .query("spaceCustomEmojis")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .collect();
+
+        return await Promise.all(
+            emojis.map(async (e) => ({
+                ...e,
+                url: await ctx.storage.getUrl(e.storageId),
+            }))
+        );
+    },
+});
+
+/**
+ * Setup a generic welcome category with rules and announcements.
+ */
+export const setupWelcomeCategory = mutation({
+    args: {
+        spaceId: v.id("spaces"),
+        announcementText: v.optional(v.string()),
+        rulesItems: v.optional(v.array(v.object({
+            id: v.string(),
+            title: v.string(),
+            description: v.string()
+        })))
+    },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx);
+        const space = await ctx.db.get(args.spaceId);
+        if (!space) throw new Error("Space not found.");
+
+        const myRole = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        if (!myRole || (myRole.role !== "owner" && myRole.role !== "admin" && myRole.role !== "moderator")) {
+            throw new Error("Unauthorized: Only staff can setup Welcome categories.");
+        }
+
+        const existingWelcomeCategory = await ctx.db
+            .query("spaceCategories")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .filter(q => q.eq(q.field("name"), "welcome"))
+            .first();
+
+        let categoryId: Id<"spaceCategories">;
+        let rulesChannelId: Id<"spaceChannels"> | undefined;
+        let announcementsChannelId: Id<"spaceChannels"> | undefined;
+
+        if (existingWelcomeCategory) {
+            categoryId = existingWelcomeCategory._id;
+
+            // Find existing channels
+            const channels = await ctx.db
+                .query("spaceChannels")
+                .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+                .filter(q => q.eq(q.field("categoryId"), categoryId))
+                .collect();
+
+            const rulesChannel = channels.find(c => c.name === "rules");
+            if (rulesChannel) rulesChannelId = rulesChannel._id;
+
+            const announcementsChannel = channels.find(c => c.name === "announcements");
+            if (announcementsChannel) announcementsChannelId = announcementsChannel._id;
+
+        } else {
+            const existingCategories = await ctx.db
+                .query("spaceCategories")
+                .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+                .collect();
+
+            // Shift existing categories down by 1
+            for (const cat of existingCategories) {
+                if (cat.name !== "welcome") {
+                    await ctx.db.patch(cat._id, { order: cat.order + 1 });
+                }
+            }
+
+            categoryId = await ctx.db.insert("spaceCategories", {
+                spaceId: args.spaceId,
+                name: "welcome",
+                order: 0,
+                createdAt: Date.now(),
+            });
+        }
+
+        // Insert channels if they don't exist
+        if (!rulesChannelId) {
+            rulesChannelId = await ctx.db.insert("spaceChannels", {
+                spaceId: args.spaceId,
+                categoryId,
+                name: "rules",
+                type: "text",
+                description: "Space rules and guidelines.",
+                channelOrder: 0,
+                isReadOnly: true,
+                createdAt: Date.now(),
+            });
+        }
+
+        if (!announcementsChannelId) {
+            announcementsChannelId = await ctx.db.insert("spaceChannels", {
+                spaceId: args.spaceId,
+                categoryId,
+                name: "announcements",
+                type: "text",
+                description: "Important updates and announcements.",
+                channelOrder: 1,
+                isReadOnly: true,
+                createdAt: Date.now(),
+            });
+        }
+
+        const now = Date.now();
+
+        // Clear existing messages
+        const rulesMessages = await ctx.db
+            .query("spaceChannelMessages")
+            .withIndex("by_channel_time", q => q.eq("channelId", rulesChannelId!))
+            .collect();
+        for (const msg of rulesMessages) await ctx.db.delete(msg._id);
+
+
+
+        // Send initial messages
+        if (args.rulesItems && args.rulesItems.length > 0) {
+            const content = "=== SERVER RULES ===\n\n" + args.rulesItems.map(rule => {
+                const depth = Math.max(0, rule.id.split('.').length - 1);
+                const indent = "    ".repeat(depth);
+                return `${indent}${rule.id}. ${rule.title}\n${indent}${rule.description}`;
+            }).join("\n\n");
+            await ctx.db.insert("spaceChannelMessages", {
+                channelId: rulesChannelId,
+                senderId: user._id,
+                content,
+                createdAt: now,
+            });
+        }
+
+        // Only insert an announcement if it's explicitly provided (usually only on first creation, or if they want to post a new one via setup)
+        if (args.announcementText && args.announcementText.trim() !== "") {
+            await ctx.db.insert("spaceChannelMessages", {
+                channelId: announcementsChannelId,
+                senderId: user._id,
+                content: args.announcementText,
+                createdAt: now,
+            });
+        }
+
+        await ctx.db.insert("spaceAdminActions", {
+            spaceId: args.spaceId,
+            adminId: user._id,
+            actionType: "setup_welcome",
+            details: existingWelcomeCategory ? "Updated Welcome category rules and announcements." : "Set up Welcome category with rules and announcements.",
+            timestamp: now,
+        });
+
+        return categoryId;
+    }
+});
+
+/**
+ * Fetch existing Welcome category content to pre-fill the edit form.
+ */
+export const getWelcomeContent = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const category = await ctx.db
+            .query("spaceCategories")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .filter(q => q.eq(q.field("name"), "welcome"))
+            .first();
+
+        if (!category) return null;
+
+        const channels = await ctx.db
+            .query("spaceChannels")
+            .withIndex("by_space", (q) => q.eq("spaceId", args.spaceId))
+            .filter(q => q.eq(q.field("categoryId"), category._id))
+            .collect();
+
+        const rulesChannel = channels.find(c => c.name === "rules");
+        const announcementsChannel = channels.find(c => c.name === "announcements");
+
+        let rulesText = "";
+
+        if (rulesChannel) {
+            const rulesMsg = await ctx.db
+                .query("spaceChannelMessages")
+                .withIndex("by_channel_time", q => q.eq("channelId", rulesChannel._id))
+                .first();
+            if (rulesMsg) rulesText = rulesMsg.content;
+        }
+
+        return { rulesText };
+    }
+});

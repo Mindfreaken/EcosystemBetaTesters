@@ -1,0 +1,154 @@
+[
+  {
+    "id": 3001,
+    "displayName": "Speed"
+  },
+  {
+    "id": 3002,
+    "displayName": "Slowness"
+  },
+  {
+    "id": 3003,
+    "displayName": "Haste"
+  },
+  {
+    "id": 3004,
+    "displayName": "Mining Fatigue"
+  },
+  {
+    "id": 3005,
+    "displayName": "Strength"
+  },
+  {
+    "id": 3006,
+    "displayName": "Instant Health"
+  },
+  {
+    "id": 3007,
+    "displayName": "Instant Damage"
+  },
+  {
+    "id": 3008,
+    "displayName": "Jump Boost"
+  },
+  {
+    "id": 3009,
+    "displayName": "Nausea"
+  },
+  {
+    "id": 3010,
+    "displayName": "Regeneration"
+  },
+  {
+    "id": 3011,
+    "displayName": "Resistance"
+  },
+  {
+    "id": 3012,
+    "displayName": "Fire Resistance"
+  },
+  {
+    "id": 3013,
+    "displayName": "Water Breathing"
+  },
+  {
+    "id": 3014,
+    "displayName": "Invisibility"
+  },
+  {
+    "id": 3015,
+    "displayName": "Blindness"
+  },
+  {
+    "id": 3016,
+    "displayName": "Night Vision"
+  },
+  {
+    "id": 3017,
+    "displayName": "Hunger"
+  },
+  {
+    "id": 3018,
+    "displayName": "Weakness"
+  },
+  {
+    "id": 3019,
+    "displayName": "Poison"
+  },
+  {
+    "id": 3020,
+    "displayName": "Wither"
+  },
+  {
+    "id": 3021,
+    "displayName": "Health Boost"
+  },
+  {
+    "id": 3022,
+    "displayName": "Absorption"
+  },
+  {
+    "id": 3023,
+    "displayName": "Saturation"
+  },
+  {
+    "id": 3024,
+    "displayName": "Glowing"
+  },
+  {
+    "id": 3025,
+    "displayName": "Levitation"
+  },
+  {
+    "id": 3026,
+    "displayName": "Luck"
+  },
+  {
+    "id": 3027,
+    "displayName": "Bad Luck"
+  },
+  {
+    "id": 3028,
+    "displayName": "Slow Falling"
+  },
+  {
+    "id": 3029,
+    "displayName": "Conduit Power"
+  },
+  {
+    "id": 3030,
+    "displayName": "Dolphin's Grace"
+  },
+  {
+    "id": 3031,
+    "displayName": "Bad Omen"
+  },
+  {
+    "id": 3032,
+    "displayName": "Darkness"
+  },
+  {
+    "id": 3033,
+    "displayName": "Trial Omen"
+  },
+  {
+    "id": 3034,
+    "displayName": "Raid Omen"
+  },
+  {
+    "id": 3035,
+    "displayName": "Wind Charged"
+  },
+  {
+    "id": 3036,
+    "displayName": "Weaving"
+  },
+  {
+    "id": 3037,
+    "displayName": "Oozing"
+  },
+  {
+    "id": 3038,
+    "displayName": "Infested"
+  }
+]

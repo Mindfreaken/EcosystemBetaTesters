@@ -1,0 +1,327 @@
+[
+  {
+    "definition": "An umbrella term for cosmetic types that covers player cards, sprays, buddies, and player titles.",
+    "displayName": "Accessories",
+    "id": 8001
+  },
+  {
+    "definition": "A type of round outcome where one player on the winning team killed each enemy player at least once. Often synonymous with a pentakill. If the enemy Sage ults, the player can still get an ace with 5 kills as long as each enemy player was killed once. All five kills must occur prior to the spike's detonation.",
+    "displayName": "Ace",
+    "id": 8002
+  },
+  {
+    "definition": "The menu where players buy their guns, abilities, and shields",
+    "displayName": "Armory",
+    "id": 8003
+  },
+  {
+    "definition": "A type of round outcome where the round was won by the last player alive on the team.",
+    "displayName": "Clutch",
+    "id": 8004
+  },
+  {
+    "definition": "A type of round outcome where no one on the winning team died.",
+    "displayName": "Flawless",
+    "id": 8005
+  },
+  {
+    "definition": "Spherical objects that can be picked up after a short channel time to charge a point in your Ultimate ability in standard gameplay or equip the player with a buff in Spike Rush.",
+    "displayName": "Orbs",
+    "id": 8006
+  },
+  {
+    "definition": "A surrender due to unfair circumstances towards the team with disconnected or missing player(s) on Round 1. Automatically initiates when the missing player does not return in round 2. Prior to patch v10.06, the team (excluding parties of five) can initiate a remake by typing /remake in chat on Round 2 to vote. This does not affect any MMR gains or losses for affected players in the lobby.",
+    "displayName": "Remake",
+    "id": 8007
+  },
+  {
+    "definition": "Protective items that absorb a percentage of incoming damage",
+    "displayName": "Shields",
+    "id": 8008
+  },
+  {
+    "definition": "Initate a vote system to end the game early on a loss on applicable game modes.",
+    "displayName": "Surrender",
+    "id": 8009
+  },
+  {
+    "definition": "A bomb like device that agents plant/defuse in order to win rounds.",
+    "displayName": "Spike",
+    "id": 8010
+  },
+  {
+    "definition": "A type of round outcome where the winning team won while possessing loadouts of at least an average of 2,500 less credit value than the enemy team's.",
+    "displayName": "Thrifty",
+    "id": 8011
+  },
+  {
+    "definition": "Shorthand for Ultimate ability.",
+    "displayName": "Ult",
+    "id": 8012
+  },
+  {
+    "definition": "The parts of a spike site that are closest to Defender Spawn or the furthest parts of a site from an attacker's perspective.",
+    "displayName": "Back site",
+    "id": 8013
+  },
+  {
+    "definition": "A deep corner or recessed section of a passageway that players can hide in and peek from.",
+    "displayName": "Cubby",
+    "id": 8014
+  },
+  {
+    "definition": "A tight location on a map that contains two or three 90 degree angles.",
+    "displayName": "Elbow",
+    "id": 8015
+  },
+  {
+    "definition": "A high location from which snipers and other long ranged weapons are usually used.",
+    "displayName": "Heaven",
+    "id": 8016
+  },
+  {
+    "definition": "A low location underneath another part of the map, usually below places regarded as \"Heaven\".",
+    "displayName": "Hell",
+    "id": 8017
+  },
+  {
+    "definition": "A short passageway that serves as a connector between two large sections of the map, such as 'Mid to B Defender Side' or 'B Site to C Site'.",
+    "displayName": "Link",
+    "id": 8018
+  },
+  {
+    "definition": "A generic quadrilateral area close to the Attacker Spawn, often used when the area doesn't have distinguishable features to give it a more specific callout.",
+    "displayName": "Lobby",
+    "id": 8019
+  },
+  {
+    "definition": "A long passageway/pathway or the longer of two pathways leading from the attacker side of the map to the site.",
+    "displayName": "Long",
+    "id": 8020
+  },
+  {
+    "definition": "A section of neutral ground situated between a spike site and Attacker Spawn, kept out of bounds behind the barriers before a round starts.",
+    "displayName": "Main",
+    "id": 8021
+  },
+  {
+    "definition": "The middle section of the map.",
+    "displayName": "Mid",
+    "id": 8022
+  },
+  {
+    "definition": "A short passageway/pathway or the shorter of two pathways leading from the attacker side of the map to the site.",
+    "displayName": "Short",
+    "id": 8023
+  },
+  {
+    "definition": "Refers to the starting location where players spawn at the beginning of a round.",
+    "displayName": "Spawn",
+    "id": 8024
+  },
+  {
+    "definition": "Meaning \"Aiming Down Sights\", referring to when you use Alternate Fire on a weapon to directly look down the gun's sights. This zooms in slightly and can reduce spread and recoil, though often at the cost of reduced fire rate.",
+    "displayName": "ADS",
+    "id": 8025
+  },
+  {
+    "definition": "To play on a site as a defender so as to stall a push by the attackers, to buy time to allow teammates to rotate to the site to help defend.",
+    "displayName": "Anchor",
+    "id": 8026
+  },
+  {
+    "definition": "A corner of the map where a player who wants to move past has to risk putting themselves in danger in case an enemy is around the corner and waiting to get a kill before the player can stop moving and fire back.",
+    "displayName": "Angles",
+    "id": 8027
+  },
+  {
+    "definition": "Allowing a teammate to enter a entry frag without the intent to trade for them in the event that they are killed by an opponent. This usually wastes the entry fragger's utility and info gained as the opponent can reposition/ recover without being punished/refragged/traded, thus leaving the team at a disadvantage.",
+    "displayName": "Baiting",
+    "id": 8028
+  },
+  {
+    "definition": "An advanced technique that allows you to mix up your movement and move slightly faster than sprinting by timing your jumps and air strafing.",
+    "displayName": "Bunnyhop",
+    "id": 8029
+  },
+  {
+    "definition": "Refers to indicating a place on a map by a particular name, such as “Heaven”, or “Elbow”.",
+    "displayName": "Callout",
+    "id": 8030
+  },
+  {
+    "definition": "To defensively hold an area, usually a close angle, for a long time for an enemy to move past rather than seeking them out.",
+    "displayName": "Camp",
+    "id": 8031
+  },
+  {
+    "definition": "Usually referred to Yoru's Fakeout.",
+    "displayName": "Clone",
+    "id": 8032
+  },
+  {
+    "definition": "An movement technique that allows you to shoot accurately if you simultaneously fire when you strafe in the opposite direction. This is achieved by firing at the moment the player has decelerated to a standstill before their movement switches to the opposite direction.",
+    "displayName": "Counterstrafe",
+    "id": 8033
+  },
+  {
+    "definition": "Killing more than one enemy with a single bullet. Mostly associated with high damage semi automatic weapons e.g Sheriff, Operator.",
+    "displayName": "Collateral",
+    "id": 8034
+  },
+  {
+    "definition": "When two teammates position and fire so they are on opposite sides of an enemy between them.",
+    "displayName": "Crossfire",
+    "id": 8035
+  },
+  {
+    "definition": "When you're on the attacking side and your team plays a neutral/non committal strategy to gain information and/or look for picks.",
+    "displayName": "Default",
+    "id": 8036
+  },
+  {
+    "definition": "Refers to a headshot that doesn't kill an enemy, usually used to indicate that the target is close to dying.",
+    "displayName": "Dink",
+    "id": 8037
+  },
+  {
+    "definition": "Usually referred to Skye's Trailblazer or Fade's Prowler (despite the fact that both of their abilities belong in the cat category).",
+    "displayName": "Dog",
+    "id": 8038
+  },
+  {
+    "definition": "When a team chooses to save credits in order to have the ability to full buy during the following round and to destabilize the opponents' economy.",
+    "displayName": "Eco",
+    "id": 8039
+  },
+  {
+    "definition": "Pretending to attack a site in order to force defenders to rotate away from other sites allowing attackers to easily take the undefended site.",
+    "displayName": "Faking",
+    "id": 8040
+  },
+  {
+    "definition": "When a player sneaks around to attack the enemy team from behind.",
+    "displayName": "Flank",
+    "id": 8041
+  },
+  {
+    "definition": "To quickly move your crosshair and shoot, usually made in instant response to spotting an enemy who's position isn't currently that close to where your crosshair is positioned.",
+    "displayName": "Flick",
+    "id": 8042
+  },
+  {
+    "definition": "Alternative term for a kill.",
+    "displayName": "Frag",
+    "id": 8043
+  },
+  {
+    "definition": "When an ally immediately selects and locks in their agent choice when they enter agent select. Often associated with players who pick Duelists due to their popularity.",
+    "displayName": "Instalock",
+    "id": 8044
+  },
+  {
+    "definition": "A particular positioning set up to guarantee that your ability lands in a certain way, mostly used for abilities with an arcing projectile such as Sova's Recon, Brimstone's Incendiary and Shock bolts or Viper's Snake Bite. These work by aligning the player's HUD elements, such as the crosshair or ability icons, with specific features on the map.",
+    "displayName": "Lineup",
+    "id": 8045
+  },
+  {
+    "definition": "Often used to describe when an enemy has taken a lot of damage and is close to dying.",
+    "displayName": "Lit",
+    "id": 8046
+  },
+  {
+    "definition": "To position and look out to catch flankers.",
+    "displayName": "Lurk",
+    "id": 8047
+  },
+  {
+    "definition": "Usually referred to Brimstone's Incendiary, or as shorthand for any other molotov ability that causes area denial.",
+    "displayName": "Molly",
+    "id": 8048
+  },
+  {
+    "definition": "To poke out of cover to look for enemies.",
+    "displayName": "Peek",
+    "id": 8049
+  },
+  {
+    "definition": "To safely get a kill on an isolated enemy.",
+    "displayName": "Pick",
+    "id": 8050
+  },
+  {
+    "definition": "When the defenders concede a site to the attackers in order to regroup and coordinate to regain control of the site.",
+    "displayName": "Retake",
+    "id": 8051
+  },
+  {
+    "definition": "Alternative name for Raze's Boom Bot.",
+    "displayName": "Roomba",
+    "id": 8052
+  },
+  {
+    "definition": "When a player or team commits to traveling to another location on the map, usually to another site.",
+    "displayName": "Rotate",
+    "id": 8053
+  },
+  {
+    "definition": "Might imply that the player is playing too passively, hiding more than engaging in fights, or using tactics deemed \"cheap\" or \"unfair\" by the accusing player. Or it means that the player is being clever or unpredictable.",
+    "displayName": "Rat",
+    "id": 8054
+  },
+  {
+    "definition": "When the attackers try to overwhelm the defenders with speed and superior numbers by quickly running onto site before the defenders can react or send help.",
+    "displayName": "Rush",
+    "id": 8055
+  },
+  {
+    "definition": "When the opponent team's victory is guaranteed for a round, and remaining teammates choose to run and hide in order to avoid losing their weapons by dying to opponents.",
+    "displayName": "Saving",
+    "id": 8056
+  },
+  {
+    "definition": "To have many team members attack a site or defend an area.",
+    "displayName": "Stack",
+    "id": 8057
+  },
+  {
+    "definition": "When a player commits to defusing a spike rather than tapping it to fake out an enemy.",
+    "displayName": "Stick",
+    "id": 8058
+  },
+  {
+    "definition": "When you peek quickly and at a wider angle to catch an enemy holding the expected angle by surprise.",
+    "displayName": "Swing",
+    "id": 8059
+  },
+  {
+    "definition": "Pretending to defuse the spike in order to force the attackers to peek to attempt to defend the spike from being defused.",
+    "displayName": "Tap",
+    "id": 8060
+  },
+  {
+    "definition": "Crosshair control about keeping your crosshair on a target for an extended period of time, usually when either they or you are on the move.",
+    "displayName": "Tracking",
+    "id": 8061
+  },
+  {
+    "definition": "When a player dies but their teammate immediately kills the enemy that killed them.",
+    "displayName": "Trade",
+    "id": 8062
+  },
+  {
+    "definition": "A general term used to refer to abilities. Or \"Util\" for short.",
+    "displayName": "Utility",
+    "id": 8063
+  },
+  {
+    "definition": "Getting a kill by shooting through a wall or terrain.",
+    "displayName": "Wallbang",
+    "id": 8064
+  },
+  {
+    "definition": "Missing a shot",
+    "displayName": "Whiffing",
+    "id": 8065
+  }
+]

@@ -1,0 +1,28 @@
+/* Themed scrollbar using app CSS variables from src/app/globals.css */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--background-light);
+}
+
+/* WebKit */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--background-light);
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--primary);
+  border-radius: 10px;
+  border: 2px solid var(--background-light);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  /* Slightly brighten the primary on hover */
+  background-color: color-mix(in oklab, var(--primary), white 15%);
+}

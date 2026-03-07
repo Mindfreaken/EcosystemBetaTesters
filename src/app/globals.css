@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  /* App theme tokens */
+  --text: #111213;
+  --text-secondary: #525a64;
+  --primary: #6c47ff;
+  --secondary: #2da1ff;
+  --card: #ffffff;
+  --card-border: rgba(0,0,0,0.08);
+  --input: rgba(0,0,0,0.04);
+  --input-border: rgba(0,0,0,0.12);
+  --background-light: #f7f7f8;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --text: #eaeaea;
+    --text-secondary: #9ca3af;
+    --primary: #6c47ff;
+    --secondary: #2da1ff;
+    --card: rgba(24,24,27,0.9);
+    --card-border: rgba(255,255,255,0.08);
+    --input: rgba(255,255,255,0.06);
+    --input-border: rgba(255,255,255,0.14);
+    --background-light: #0f0f0f;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* ===== Clerk OTP (verification code) input squares ===== */
+/* Scope to Clerk components only and adjust just the input boxes */
+.cl-card .cl-otpCodeFieldInput,
+.cl-otpCodeFieldInput {
+  background-color: var(--background-light, #0f0f0f) !important;
+  color: var(--text, #e5e7eb) !important;
+  border: 1px solid color-mix(in oklab, var(--text, #e5e7eb), transparent 70%) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--text, #e5e7eb), transparent 70%) !important;
+}
+
+.cl-card .cl-otpCodeFieldInput:focus,
+.cl-otpCodeFieldInput:focus {
+  outline: 0 !important;
+  border-color: var(--primary, #6c47ff) !important;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary, #6c47ff), transparent 30%) !important;
+  background-color: color-mix(in oklab, var(--primary, #6c47ff), var(--background-light, #0f0f0f) 85%) !important;
+}
+
+/* ===== Generic themed input using app tokens ===== */
+.themed-input {
+  background-color: var(--input);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  outline: none;
+  transition: box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
+}
+.themed-input::placeholder {
+  color: color-mix(in oklab, var(--text), transparent 60%);
+}
+.themed-input:focus {
+  border-color: color-mix(in oklab, var(--primary), transparent 40%);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary), transparent 70%);
+}
+.themed-input:-webkit-autofill,
+.themed-input:-webkit-autofill:hover,
+.themed-input:-webkit-autofill:focus,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text) !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: var(--text);
+  box-shadow: 0 0 0px 1000px var(--input) inset !important; /* force dark bg */
+  border: 1px solid var(--input-border) !important;
+}
+
+/* Ensure UA renders controls in dark surfaces properly */
+input, textarea, select {
+  color-scheme: dark;
+}

@@ -1,0 +1,742 @@
+[
+  {
+    "id": 1001,
+    "displayName": "Altitude"
+  },
+  {
+    "id": 1002,
+    "displayName": "Xenohunter"
+  },
+  {
+    "id": 1003,
+    "displayName": "Neptune"
+  },
+  {
+    "id": 1004,
+    "displayName": "Tactiplay"
+  },
+  {
+    "id": 1005,
+    "displayName": "Comet"
+  },
+  {
+    "id": 1006,
+    "displayName": "Doombringer"
+  },
+  {
+    "id": 1007,
+    "displayName": "Glitchpop"
+  },
+  {
+    "id": 1008,
+    "displayName": "Nitro"
+  },
+  {
+    "id": 1009,
+    "displayName": "Topotek"
+  },
+  {
+    "id": 1010,
+    "displayName": "Nanobreak"
+  },
+  {
+    "id": 1011,
+    "displayName": "EXE"
+  },
+  {
+    "id": 1012,
+    "displayName": "Neo Frontier"
+  },
+  {
+    "id": 1013,
+    "displayName": "Smite"
+  },
+  {
+    "id": 1014,
+    "displayName": "Lightwave"
+  },
+  {
+    "id": 1015,
+    "displayName": "Sensation"
+  },
+  {
+    "id": 1016,
+    "displayName": "Orion"
+  },
+  {
+    "id": 1017,
+    "displayName": "Schema"
+  },
+  {
+    "id": 1018,
+    "displayName": "Reaver"
+  },
+  {
+    "id": 1019,
+    "displayName": "Sovereign"
+  },
+  {
+    "id": 1020,
+    "displayName": "Standard"
+  },
+  {
+    "id": 1021,
+    "displayName": "Freehand"
+  },
+  {
+    "id": 1022,
+    "displayName": "Aerosol"
+  },
+  {
+    "id": 1023,
+    "displayName": "Solarex"
+  },
+  {
+    "id": 1024,
+    "displayName": "Nebula"
+  },
+  {
+    "id": 1025,
+    "displayName": "Singularity"
+  },
+  {
+    "id": 1026,
+    "displayName": "Rush"
+  },
+  {
+    "id": 1027,
+    "displayName": "Hivemind"
+  },
+  {
+    "id": 1028,
+    "displayName": "Spitfire"
+  },
+  {
+    "id": 1029,
+    "displayName": "Digihex"
+  },
+  {
+    "id": 1030,
+    "displayName": "Hieroscape"
+  },
+  {
+    "id": 1031,
+    "displayName": "Infantry"
+  },
+  {
+    "id": 1032,
+    "displayName": "Goldwing"
+  },
+  {
+    "id": 1033,
+    "displayName": "Outpost"
+  },
+  {
+    "id": 1034,
+    "displayName": "Prism"
+  },
+  {
+    "id": 1035,
+    "displayName": "Aquatica"
+  },
+  {
+    "id": 1036,
+    "displayName": "Yoonseul"
+  },
+  {
+    "id": 1037,
+    "displayName": "Monstrocity"
+  },
+  {
+    "id": 1038,
+    "displayName": "Celestial"
+  },
+  {
+    "id": 1039,
+    "displayName": "Magepunk"
+  },
+  {
+    "id": 1040,
+    "displayName": "Minima"
+  },
+  {
+    "id": 1041,
+    "displayName": "Ion"
+  },
+  {
+    "id": 1042,
+    "displayName": "Oni"
+  },
+  {
+    "id": 1043,
+    "displayName": "Polyfrog"
+  },
+  {
+    "id": 1044,
+    "displayName": "Jigsaw"
+  },
+  {
+    "id": 1045,
+    "displayName": "Sakura"
+  },
+  {
+    "id": 1046,
+    "displayName": "Silhouette"
+  },
+  {
+    "id": 1047,
+    "displayName": "Snowfall"
+  },
+  {
+    "id": 1048,
+    "displayName": "Titanmail"
+  },
+  {
+    "id": 1049,
+    "displayName": "Haloform"
+  },
+  {
+    "id": 1050,
+    "displayName": "Divergence"
+  },
+  {
+    "id": 1051,
+    "displayName": "Araxys"
+  },
+  {
+    "id": 1052,
+    "displayName": "Aristocrat"
+  },
+  {
+    "id": 1053,
+    "displayName": "Endeavour"
+  },
+  {
+    "id": 1054,
+    "displayName": "Champions"
+  },
+  {
+    "id": 1055,
+    "displayName": "Origin"
+  },
+  {
+    "id": 1056,
+    "displayName": "Phaseguard"
+  },
+  {
+    "id": 1057,
+    "displayName": "Chronovoid"
+  },
+  {
+    "id": 1058,
+    "displayName": "Elderflame"
+  },
+  {
+    "id": 1059,
+    "displayName": "Imperium"
+  },
+  {
+    "id": 1060,
+    "displayName": "Sarmad"
+  },
+  {
+    "id": 1061,
+    "displayName": "Venturi"
+  },
+  {
+    "id": 1062,
+    "displayName": "Forsaken"
+  },
+  {
+    "id": 1063,
+    "displayName": "Ruin"
+  },
+  {
+    "id": 1064,
+    "displayName": "SYS"
+  },
+  {
+    "id": 1065,
+    "displayName": "Primordium"
+  },
+  {
+    "id": 1066,
+    "displayName": "Horizon"
+  },
+  {
+    "id": 1067,
+    "displayName": "Prime"
+  },
+  {
+    "id": 1068,
+    "displayName": "Avalanche"
+  },
+  {
+    "id": 1069,
+    "displayName": "Guardrail"
+  },
+  {
+    "id": 1070,
+    "displayName": "Aemondir"
+  },
+  {
+    "id": 1071,
+    "displayName": "Luxe"
+  },
+  {
+    "id": 1072,
+    "displayName": "Arcane"
+  },
+  {
+    "id": 1073,
+    "displayName": "Overdrive"
+  },
+  {
+    "id": 1074,
+    "displayName": "Silvanus"
+  },
+  {
+    "id": 1075,
+    "displayName": "Crimsonbeast"
+  },
+  {
+    "id": 1076,
+    "displayName": "Kuronami"
+  },
+  {
+    "id": 1077,
+    "displayName": "Belaflaire"
+  },
+  {
+    "id": 1078,
+    "displayName": "Cryostasis"
+  },
+  {
+    "id": 1079,
+    "displayName": "Luna"
+  },
+  {
+    "id": 1080,
+    "displayName": "Transition"
+  },
+  {
+    "id": 1081,
+    "displayName": "Byteshift"
+  },
+  {
+    "id": 1082,
+    "displayName": "Torque"
+  },
+  {
+    "id": 1083,
+    "displayName": "Cavalier"
+  },
+  {
+    "id": 1084,
+    "displayName": "CYRAX"
+  },
+  {
+    "id": 1085,
+    "displayName": "Sandswept"
+  },
+  {
+    "id": 1086,
+    "displayName": "Depths"
+  },
+  {
+    "id": 1087,
+    "displayName": "Wonderstallion"
+  },
+  {
+    "id": 1088,
+    "displayName": "Ego"
+  },
+  {
+    "id": 1089,
+    "displayName": "Holomoku"
+  },
+  {
+    "id": 1090,
+    "displayName": "Wasteland"
+  },
+  {
+    "id": 1091,
+    "displayName": "Splashx"
+  },
+  {
+    "id": 1092,
+    "displayName": "Winterwunderland"
+  },
+  {
+    "id": 1093,
+    "displayName": "Frequency"
+  },
+  {
+    "id": 1094,
+    "displayName": "Spectrum"
+  },
+  {
+    "id": 1095,
+    "displayName": "Aperture"
+  },
+  {
+    "id": 1096,
+    "displayName": "Striker"
+  },
+  {
+    "id": 1097,
+    "displayName": "Bulletbox"
+  },
+  {
+    "id": 1098,
+    "displayName": "Nocturnum"
+  },
+  {
+    "id": 1099,
+    "displayName": "Undercity"
+  },
+  {
+    "id": 1100,
+    "displayName": "Emberclad"
+  },
+  {
+    "id": 1101,
+    "displayName": "Chromedek"
+  },
+  {
+    "id": 1102,
+    "displayName": "Velocity"
+  },
+  {
+    "id": 1103,
+    "displayName": "Shimmer"
+  },
+  {
+    "id": 1104,
+    "displayName": "Bound"
+  },
+  {
+    "id": 1105,
+    "displayName": "Retrowave"
+  },
+  {
+    "id": 1106,
+    "displayName": "Couture"
+  },
+  {
+    "id": 1107,
+    "displayName": "Perch"
+  },
+  {
+    "id": 1108,
+    "displayName": "Genesis"
+  },
+  {
+    "id": 1109,
+    "displayName": "Libretto"
+  },
+  {
+    "id": 1110,
+    "displayName": "Polyfox"
+  },
+  {
+    "id": 1111,
+    "displayName": "Rupture"
+  },
+  {
+    "id": 1112,
+    "displayName": "Infinity"
+  },
+  {
+    "id": 1113,
+    "displayName": "Spellbound"
+  },
+  {
+    "id": 1114,
+    "displayName": "Tilde"
+  },
+  {
+    "id": 1115,
+    "displayName": "Gridcrash"
+  },
+  {
+    "id": 1116,
+    "displayName": "Convex"
+  },
+  {
+    "id": 1117,
+    "displayName": "Varnish"
+  },
+  {
+    "id": 1118,
+    "displayName": "Composite"
+  },
+  {
+    "id": 1119,
+    "displayName": "Bolt"
+  },
+  {
+    "id": 1120,
+    "displayName": "Overlay"
+  },
+  {
+    "id": 1121,
+    "displayName": "Abyssal"
+  },
+  {
+    "id": 1122,
+    "displayName": "Interhelm"
+  },
+  {
+    "id": 1123,
+    "displayName": "Soulstrife"
+  },
+  {
+    "id": 1124,
+    "displayName": "Serenity"
+  },
+  {
+    "id": 1125,
+    "displayName": "Ruination"
+  },
+  {
+    "id": 1126,
+    "displayName": "Kingdom"
+  },
+  {
+    "id": 1127,
+    "displayName": "Daydreams"
+  },
+  {
+    "id": 1128,
+    "displayName": "RDVR"
+  },
+  {
+    "id": 1129,
+    "displayName": "Spline"
+  },
+  {
+    "id": 1130,
+    "displayName": "Galleria"
+  },
+  {
+    "id": 1131,
+    "displayName": "Switchback"
+  },
+  {
+    "id": 1132,
+    "displayName": "Aero"
+  },
+  {
+    "id": 1133,
+    "displayName": "Artisan"
+  },
+  {
+    "id": 1134,
+    "displayName": "Shellspire"
+  },
+  {
+    "id": 1135,
+    "displayName": "Helix"
+  },
+  {
+    "id": 1136,
+    "displayName": "Recon"
+  },
+  {
+    "id": 1137,
+    "displayName": "Mystbloom"
+  },
+  {
+    "id": 1138,
+    "displayName": "Reverie"
+  },
+  {
+    "id": 1139,
+    "displayName": "Tigris"
+  },
+  {
+    "id": 1140,
+    "displayName": "Blastx"
+  },
+  {
+    "id": 1141,
+    "displayName": "Convergence"
+  },
+  {
+    "id": 1142,
+    "displayName": "Space Piercer"
+  },
+  {
+    "id": 1143,
+    "displayName": "Hydrodip"
+  },
+  {
+    "id": 1144,
+    "displayName": "Surge"
+  },
+  {
+    "id": 1145,
+    "displayName": "Monarch"
+  },
+  {
+    "id": 1146,
+    "displayName": "Panoramic"
+  },
+  {
+    "id": 1147,
+    "displayName": "Kaleidoscope"
+  },
+  {
+    "id": 1148,
+    "displayName": "Ragnarocker"
+  },
+  {
+    "id": 1149,
+    "displayName": "Swooping"
+  },
+  {
+    "id": 1150,
+    "displayName": "Blush"
+  },
+  {
+    "id": 1151,
+    "displayName": "Moondash"
+  },
+  {
+    "id": 1152,
+    "displayName": "Resolution"
+  },
+  {
+    "id": 1153,
+    "displayName": "Intergrade"
+  },
+  {
+    "id": 1154,
+    "displayName": "Pistolinha"
+  },
+  {
+    "id": 1155,
+    "displayName": "Finesse"
+  },
+  {
+    "id": 1156,
+    "displayName": "Songsteel"
+  },
+  {
+    "id": 1157,
+    "displayName": "Refractrix"
+  },
+  {
+    "id": 1158,
+    "displayName": "Flutter"
+  },
+  {
+    "id": 1159,
+    "displayName": "Celestia"
+  },
+  {
+    "id": 1160,
+    "displayName": "Hush"
+  },
+  {
+    "id": 1161,
+    "displayName": "Eclipse"
+  },
+  {
+    "id": 1162,
+    "displayName": "Vendetta"
+  },
+  {
+    "id": 1163,
+    "displayName": "Wayfarer"
+  },
+  {
+    "id": 1164,
+    "displayName": "Mythmaker"
+  },
+  {
+    "id": 1165,
+    "displayName": "Immortalized"
+  },
+  {
+    "id": 1166,
+    "displayName": "Protektor"
+  },
+  {
+    "id": 1167,
+    "displayName": "Signature"
+  },
+  {
+    "id": 1168,
+    "displayName": "Peacekeeper"
+  },
+  {
+    "id": 1169,
+    "displayName": "Cloudweaver"
+  },
+  {
+    "id": 1170,
+    "displayName": "Sidekick"
+  },
+  {
+    "id": 1171,
+    "displayName": "Karabasan"
+  },
+  {
+    "id": 1172,
+    "displayName": "Wunderkind"
+  },
+  {
+    "id": 1173,
+    "displayName": "Snakebite"
+  },
+  {
+    "id": 1174,
+    "displayName": "Wayfinder"
+  },
+  {
+    "id": 1175,
+    "displayName": "Waveform"
+  },
+  {
+    "id": 1176,
+    "displayName": "Obsidiana"
+  },
+  {
+    "id": 1177,
+    "displayName": "Hack"
+  },
+  {
+    "id": 1178,
+    "displayName": "Caeruleus"
+  },
+  {
+    "id": 1179,
+    "displayName": "Equilibrium"
+  },
+  {
+    "id": 1180,
+    "displayName": "Catrina"
+  },
+  {
+    "id": 1181,
+    "displayName": "Ruyi"
+  },
+  {
+    "id": 1182,
+    "displayName": "Relic"
+  },
+  {
+    "id": 1183,
+    "displayName": "Prosperity"
+  },
+  {
+    "id": 1184,
+    "displayName": "Kaimana"
+  },
+  {
+    "id": 1185,
+    "displayName": "Ignite"
+  }
+]
