@@ -3,7 +3,7 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import React from "react";
-import { useClerk } from "@clerk/nextjs";
+import { useClerk } from "@clerk/clerk-react";
 import { useRouter } from "next/navigation";
 import GlowPilledButton from "@/components/ui/GlowPilledButton";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -39,9 +39,9 @@ export default function FooterContent() {
           style={btnStyle}
         />
 
-        
 
-        
+
+
 
         {/* Notes */}
         <GlowPilledButton

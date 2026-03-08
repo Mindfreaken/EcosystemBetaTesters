@@ -6,7 +6,7 @@ import { api } from "convex/_generated/api";
 import { UiButton } from "@/components/ui/UiButton";
 import { MuiCard } from "@/components/ui/MuiCard";
 import { Lock, LogOut, Clock } from "lucide-react";
-import { useClerk } from "@clerk/nextjs";
+import { useClerk } from "@clerk/clerk-react";
 
 interface BannedScreenProps {
     status: string;

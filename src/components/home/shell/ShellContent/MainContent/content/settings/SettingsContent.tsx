@@ -9,7 +9,7 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import ContentTemplate from "../_shared/ContentTemplate";
 import { useShellView } from "../../../viewContext";
-import { UserProfile } from "@clerk/nextjs";
+import { UserProfile } from "@clerk/clerk-react";
 import UiButton from "@/components/ui/UiButton";
 import { MuiCard } from "@/components/ui/MuiCard";
 import { useMediaDeviceSelect } from "@livekit/components-react";
