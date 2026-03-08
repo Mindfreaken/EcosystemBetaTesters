@@ -38,6 +38,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Ym9sZC1idWxsLTQ4LmNsZXJrLmFjY291bnRzLmRldiQ // Placeholder to satisfy build
+          CLERK_ENFORCE_KEYS: 'true'
         with:
           tagName: v__VERSION__
           releaseName: 'EcoSystem Testers Beta v__VERSION__'
