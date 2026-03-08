@@ -7,7 +7,7 @@ import { useSignIn, useSignUp, useClerk } from "@clerk/nextjs";
 
 export const SignInForm: React.FC<{ redirectUrl?: string }> = ({ redirectUrl = "/home" }) => {
   const router = useRouter();
-  const { signIn, isLoaded, setActive } = useSignIn();
+  const { signIn, isLoaded, setActive } = useSignIn() as any;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +75,7 @@ export const SignUpForm: React.FC<{
   signInRedirectUrl?: string;
 }> = ({ redirectUrl = "/onboarding" }) => {
   const router = useRouter();
-  const { signUp, isLoaded, setActive } = useSignUp();
+  const { signUp, isLoaded, setActive } = useSignUp() as any;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");

@@ -1,13 +1,12 @@
-import path from "path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: process.env.VERCEL ? undefined : "export",
+  output: "export",
   images: {
     unoptimized: true,
   },
   turbopack: {
-    root: path.resolve(__dirname, "."),
+    root: ".",
   },
   webpack: (config) => {
     // Remove existing SVG handling (so we can define ours)

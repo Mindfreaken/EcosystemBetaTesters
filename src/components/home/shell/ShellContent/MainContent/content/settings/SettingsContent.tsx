@@ -178,7 +178,7 @@ export default function SettingsContent() {
               }}
             >
               <UserProfile
-                routing="virtual"
+                routing="hash"
                 appearance={{
                   elements: {
                     rootBox: { background: "transparent" },

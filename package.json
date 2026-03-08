@@ -4,10 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "concurrently -n WEB -c blue \"next dev --webpack\" ",
-    "build": "next build --webpack",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "riot:ingest:local": "tsx scripts/ingestLolMatchLocal.ts",
@@ -31,8 +30,8 @@
     "valorant:add-acceptable": "tsx nerdle/valorant_related_words/scripts/addAcceptableVariants.ts"
   },
   "dependencies": {
-    "@clerk/elements": "^0.22.1",
-    "@clerk/nextjs": "^6.31.6",
+    "@clerk/elements": "^0.24.13",
+    "@clerk/nextjs": "^7.0.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@hello-pangea/dnd": "^18.0.1",
@@ -84,9 +83,5 @@
     "tailwindcss": "^4",
     "tsx": "^4.20.4",
     "typescript": "^5"
-  },
-  "overrides": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
   }
 }

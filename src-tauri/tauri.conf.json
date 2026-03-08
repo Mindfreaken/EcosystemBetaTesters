@@ -1,13 +1,13 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Ecosystem",
-  "version": "0.2.0-beta.6",
+  "version": "0.1.0",
   "identifier": "com.ecosystem.app",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "next build --webpack"
+    "beforeBuildCommand": "npm run build"
   },
   "app": {
     "windows": [

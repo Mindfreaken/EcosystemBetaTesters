@@ -86,7 +86,8 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
             </p>
 
             <div
-              className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 items-center"
+              className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6"
+              style={{ flexDirection: "row" }}
             >
               <button
                 className="px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-medium transition-all duration-300 border-2 neon-button-outline"
@@ -100,19 +101,6 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
                 onClick={() => openAuth("signIn")}
               >
                 Login
-              </button>
-
-              <button
-                className="px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-medium transition-all duration-300 neon-button-primary"
-                style={{
-                  backgroundColor: 'var(--primary)',
-                  color: 'var(--background)',
-                }}
-                onMouseOver={handlePrimaryMouseOver}
-                onMouseLeave={handlePrimaryMouseLeave}
-                onClick={() => openAuth("signUp")}
-              >
-                Get Started
               </button>
 
               <button
@@ -139,6 +127,19 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
                 onClick={() => window.open("https://github.com/Mindfreaken/ecotesters/releases/latest", "_blank")}
               >
                 Download
+              </button>
+
+              <button
+                className="px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-medium transition-all duration-300 neon-button-primary"
+                style={{
+                  backgroundColor: 'var(--primary)',
+                  color: 'var(--background)',
+                }}
+                onMouseOver={handlePrimaryMouseOver}
+                onMouseLeave={handlePrimaryMouseLeave}
+                onClick={() => openAuth("signUp")}
+              >
+                Get Started
               </button>
             </div>
           </div>
