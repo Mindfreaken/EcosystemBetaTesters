@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently -n WEB -c blue \"next dev --webpack\" ",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
     "tauri:dev": "tauri dev",
