@@ -83,5 +83,9 @@
     "tailwindcss": "^4",
     "tsx": "^4.20.4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   }
 }
