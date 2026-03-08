@@ -1,3 +1,4 @@
+import path from "path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -6,7 +7,7 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   turbopack: {
-    root: ".",
+    root: path.resolve(__dirname, "."),
   },
   webpack: (config) => {
     // Remove existing SVG handling (so we can define ours)
