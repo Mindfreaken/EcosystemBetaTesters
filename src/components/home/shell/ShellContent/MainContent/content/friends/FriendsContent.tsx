@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/clerk-react";
 import { Id } from "convex/_generated/dataModel";
 import { useGetFriends } from "@/convex/friends/getFriends";
 import { useGetFriendRequests } from "@/convex/friends/getFriendRequests";
@@ -196,7 +196,7 @@ const FriendsContent: React.FC = () => {
           onMessage={handleMessage}
           onViewProfileCard={handleViewProfileCard}
           onMoreActions={handleMoreActions}
-          onLoadMore={() => {}}
+          onLoadMore={() => { }}
           onAcceptRequest={handleAcceptRequest}
           onRejectRequest={handleRejectRequest}
           onFriendUpdated={handleFriendUpdated}

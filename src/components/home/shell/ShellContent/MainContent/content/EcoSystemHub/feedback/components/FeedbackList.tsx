@@ -8,7 +8,7 @@ import Chip from "@mui/material/Chip";
 import { ThumbsUp } from "lucide-react";
 import { useFeedback } from "../hooks/useFeedback";
 import { TOPICS, FeedbackTopic } from "../config/topics";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/clerk-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import { UiButton } from "@/components/ui/UiButton";

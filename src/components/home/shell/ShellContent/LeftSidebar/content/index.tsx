@@ -205,15 +205,23 @@ export default function LeftSidebarContent({ state, onClose }: LeftSidebarConten
               mb: 2,
             }}
           >
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: 500,
-                color: "var(--textSecondary)",
-              }}
-            >
-              Left Panel
-            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <img
+                src="/achievements/early_adopter_sticker.png"
+                alt="Ecosystem Logo"
+                style={{ width: 20, height: 20, borderRadius: '4px' }}
+              />
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 700,
+                  color: "var(--text)",
+                  letterSpacing: "0.02em"
+                }}
+              >
+                EcoSystem Testers Beta
+              </Typography>
+            </Box>
             <IconButton size="small" onClick={onClose} sx={{ p: 0.5 }}>
               <X size={12} />
             </IconButton>
