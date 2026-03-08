@@ -1,22 +1,22 @@
 diff --git a/node_modules/@clerk/nextjs/dist/cjs/app-router/keyless-actions.js b/node_modules/@clerk/nextjs/dist/cjs/app-router/keyless-actions.js
-index c882df4..0bcf12d 100644
+index c882df4..95af211 100644
 --- a/node_modules/@clerk/nextjs/dist/cjs/app-router/keyless-actions.js
 +++ b/node_modules/@clerk/nextjs/dist/cjs/app-router/keyless-actions.js
 @@ -1,5 +1,5 @@
  "use strict";
 -"use server";
-+// "use server";
++// Stripped
  var __create = Object.create;
  var __defProp = Object.defineProperty;
  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 diff --git a/node_modules/@clerk/nextjs/dist/cjs/app-router/server-actions.js b/node_modules/@clerk/nextjs/dist/cjs/app-router/server-actions.js
-index 9e73e81..edf4582 100644
+index 9e73e81..2c0407c 100644
 --- a/node_modules/@clerk/nextjs/dist/cjs/app-router/server-actions.js
 +++ b/node_modules/@clerk/nextjs/dist/cjs/app-router/server-actions.js
 @@ -1,5 +1,5 @@
  "use strict";
 -"use server";
-+// "use server";
++// Stripped
  var __defProp = Object.defineProperty;
  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
  var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -34,22 +34,22 @@ index 760a475..8a4219a 100644
    if (metadata.nodeVersion) {
      headers2.set("Clerk-Node-Version", metadata.nodeVersion);
 diff --git a/node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js b/node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js
-index f1f73b6..796870a 100644
+index f1f73b6..ca5eabf 100644
 --- a/node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js
 +++ b/node_modules/@clerk/nextjs/dist/esm/app-router/keyless-actions.js
 @@ -1,4 +1,4 @@
 -"use server";
-+// "use server";
++// Stripped
  import { cookies, headers } from "next/headers";
  import { redirect, RedirectType } from "next/navigation";
  import { errorThrower } from "../server/errorThrower";
 diff --git a/node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js b/node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js
-index 8fbdeea..aee806f 100644
+index 8fbdeea..1ab8b86 100644
 --- a/node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js
 +++ b/node_modules/@clerk/nextjs/dist/esm/app-router/server-actions.js
 @@ -1,4 +1,4 @@
 -"use server";
-+// "use server";
++// Stripped
  import { cookies } from "next/headers";
  async function invalidateCacheAction() {
    void (await cookies()).delete(`__clerk_invalidate_cache_cookie_${Date.now()}`);
