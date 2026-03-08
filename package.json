@@ -10,6 +10,7 @@
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
     "tauri:BUILD": "npm run tauri:build",
+    "tauri": "tauri",
     "riot:ingest:local": "tsx scripts/ingestLolMatchLocal.ts",
     "download:league-assets": "tsx scripts/downloadLeagueAssets.ts",
     "gutenberg:extract": "tsx english_word/scripts/extractGutenbergWords.ts",
