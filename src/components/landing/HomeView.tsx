@@ -86,8 +86,7 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
             </p>
 
             <div
-              className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6"
-              style={{ flexDirection: "row" }}
+              className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 items-center"
             >
               <button
                 className="px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-medium transition-all duration-300 border-2 neon-button-outline"
@@ -114,6 +113,32 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
                 onClick={() => openAuth("signUp")}
               >
                 Get Started
+              </button>
+
+              <button
+                className="px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-medium transition-all duration-300 border-2 neon-button-outline"
+                style={{
+                  borderColor: 'var(--secondary)',
+                  color: 'var(--text)',
+                  backgroundColor: "transparent",
+                }}
+                onMouseOver={(e) => {
+                  const target = e.currentTarget;
+                  target.style.backgroundColor = 'var(--secondary)';
+                  target.style.boxShadow = `0 0 20px color-mix(in oklab, var(--secondary), transparent 50%), 0 0 10px color-mix(in oklab, var(--secondary), transparent 75%) inset`;
+                  target.style.textShadow = `0 0 8px var(--text)`;
+                  target.style.color = 'var(--background)';
+                }}
+                onMouseLeave={(e) => {
+                  const target = e.currentTarget;
+                  target.style.backgroundColor = "transparent";
+                  target.style.boxShadow = "none";
+                  target.style.textShadow = "none";
+                  target.style.color = 'var(--text)';
+                }}
+                onClick={() => window.open("https://github.com/Mindfreaken/ecotesters/releases/latest", "_blank")}
+              >
+                Download
               </button>
             </div>
           </div>
