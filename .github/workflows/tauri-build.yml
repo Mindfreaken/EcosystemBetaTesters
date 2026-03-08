@@ -17,6 +17,8 @@ jobs:
             args: ''
 
     runs-on: ${{ matrix.settings.platform }}
+    env:
+      IS_TAURI_BUILD: 'true'
     steps:
       - uses: actions/checkout@v4
 
