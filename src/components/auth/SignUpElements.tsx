@@ -315,9 +315,11 @@ export default function SignUpElements({
                   cursor: (acceptedTerms && !usernameTaken && !displayNameTaken && !checkingAvailability && username && displayName && passwordInput) ? 'pointer' : 'not-allowed'
                 }}
               >
-                <SignUp.Loading>
-                  {(is: any) => is ? <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : "Create Account"}
-                </SignUp.Loading>
+                {performingAction ? (
+                  <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                ) : (
+                  "Create Account"
+                )}
               </SignUp.Action>
 
               <div className="flex items-center justify-center gap-2 pt-2">
@@ -371,9 +373,11 @@ export default function SignUpElements({
                     color: '#0a0a0a'
                   }}
                 >
-                  <SignUp.Loading>
-                    {(is: any) => is ? <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin mx-auto" /> : "Verify & Continue"}
-                  </SignUp.Loading>
+                  {performingAction ? (
+                    <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin mx-auto" />
+                  ) : (
+                    "Verify & Continue"
+                  )}
                 </SignUp.Action>
 
                 <div className="text-center">

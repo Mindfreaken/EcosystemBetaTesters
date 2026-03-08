@@ -108,7 +108,7 @@ export default function SignInElements({
 
   const resetStrength = getPasswordStrength(newPassword);
 
-  const handleStartForgot = () => {
+  const handleForgotPassword = () => {
     setResetEmail(identifierEntered || "");
     setResetCode("");
     setNewPassword("");
