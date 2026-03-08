@@ -209,7 +209,7 @@ export default function LeftSidebarContent({ state, onClose }: LeftSidebarConten
               variant="body2"
               sx={{
                 fontWeight: 500,
-                color: "color-mix(in oklab, var(--foreground), transparent 20%)",
+                color: "var(--textSecondary)",
               }}
             >
               Left Panel
@@ -234,15 +234,15 @@ export default function LeftSidebarContent({ state, onClose }: LeftSidebarConten
                   position: "relative",
                   overflow: "hidden",
                   cursor: "pointer",
-                  color: "color-mix(in oklab, var(--foreground), transparent 30%)",
+                  color: "var(--textSecondary)",
                   borderLeft: "3px solid transparent",
                   transition: "transform .2s ease, box-shadow .2s ease, background-color .2s ease",
                   backgroundColor: "color-mix(in oklab, var(--card), transparent 92%)",
                   "&:hover": {
                     transform: "translateX(4px) scale(1.01)",
                     backgroundColor: "color-mix(in oklab, var(--primary), transparent 92%)",
-                    boxShadow: "0 4px 8px color-mix(in oklab, var(--foreground), transparent 95%)",
-                    color: "var(--textPrimary)",
+                    boxShadow: "0 4px 8px var(--shadow)",
+                    color: "var(--text)",
                     borderLeftColor: "var(--primary)",
                   },
                   "&::before": {
@@ -319,11 +319,11 @@ export default function LeftSidebarContent({ state, onClose }: LeftSidebarConten
       )}
 
       {state === "collapsed" && (
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", "& .MuiIconButton-root": { color: "var(--textSecondary)", transition: "color 0.2s", "&:hover": { color: "var(--primary)" } } }}>
           <Box sx={{ display: "grid", gap: 1.5, mt: 1 }}>
             <IconButton
               size="small"
-              sx={{ backgroundColor: "color-mix(in oklab, var(--primary), transparent 85%)" }}
+              sx={{ backgroundColor: "color-mix(in oklab, var(--primary), transparent 85%)", color: "var(--primary) !important" }}
               onClick={navigateHome}
             >
               <Home size={16} />

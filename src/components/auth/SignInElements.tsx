@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef } from "react";
-import * as Clerk from '@clerk/elements/common'
-import * as SignIn from '@clerk/elements/sign-in'
+import * as ClerkElements from '@clerk/elements/common'
+import * as SignInPrimitive from '@clerk/elements/sign-in'
 import { useRouter } from 'next/navigation'
 import { useAuth, useUser, useSignIn } from '@clerk/nextjs'
 import Image from 'next/image'
@@ -20,7 +20,7 @@ export default function SignInElements({
   const router = useRouter();
   const { isSignedIn, isLoaded: isAuthLoaded, getToken } = useAuth();
   const { user } = useUser();
-  const { isLoaded: isSignInLoaded, signIn, setActive } = useSignIn();
+  const { isLoaded: isSignInLoaded, signIn, setActive } = useSignIn() as any;
   const convex = useConvex();
   const hasOnboardedRef = useRef(false);
   const [identifierEntered, setIdentifierEntered] = React.useState("");
@@ -86,9 +86,9 @@ export default function SignInElements({
   }, [isSignedIn, isAuthLoaded, getToken, user, convex, redirectUrl, router]);
   const colors = useMemo(() => ({
     background: 'var(--background, #0a0a0a)',
-    backgroundDark: 'var(--background-dark, #000000)',
+    backgroundDark: 'var(--backgroundDark, #000000)',
     text: 'var(--text, #eaeaea)',
-    textSecondary: 'var(--text-secondary, #9ca3af)',
+    textSecondary: 'var(--textSecondary, #9ca3af)',
     primary: 'var(--primary, #6c47ff)',
     secondary: 'var(--secondary, #ff2d55)'
   }), []);
@@ -123,8 +123,8 @@ export default function SignInElements({
     setResetError(null);
     setResetLoading(true);
     try {
-      const attempt = await signIn.create({
-        strategy: "reset_password_email_code",
+      const attempt = await (signIn as any).create({
+        strategy: "reset_password_email_code" as any,
         identifier: resetEmail,
       });
 
@@ -149,8 +149,8 @@ export default function SignInElements({
     setResetError(null);
     setResetLoading(true);
     try {
-      const attempt = await signIn.attemptFirstFactor({
-        strategy: "reset_password_email_code",
+      const attempt = await (signIn as any).attemptFirstFactor({
+        strategy: "reset_password_email_code" as any,
         code: resetCode,
         password: newPassword,
       });
@@ -182,7 +182,7 @@ export default function SignInElements({
       <div className={className} style={{ color: colors.text }}>
         <div
           className="w-[380px] rounded-2xl border shadow-2xl px-6 py-6"
-          style={{ backgroundColor: 'var(--background-light, #0f0f0f)', borderColor: 'var(--card-border)' }}
+          style={{ backgroundColor: 'var(--backgroundLight, #0f0f0f)', borderColor: 'var(--card-border)' }}
         >
           <div className="mb-5 text-left">
             <div className="relative mb-3 h-11 w-11">
@@ -200,7 +200,7 @@ export default function SignInElements({
                   backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
                 }}
               >
-                <div className="h-full w-full rounded-full p-[2px]" style={{ backgroundColor: 'var(--background-light, #0f0f0f)' }}>
+                <div className="h-full w-full rounded-full p-[2px]" style={{ backgroundColor: 'var(--backgroundLight, #0f0f0f)' }}>
                   <Image
                     src="/achievements/early_adopter_sticker.png"
                     alt="App badge"
@@ -369,7 +369,7 @@ export default function SignInElements({
     <div className={className} style={{ color: colors.text }}>
       <div
         className="w-[380px] rounded-2xl border shadow-2xl px-6 py-6"
-        style={{ backgroundColor: 'var(--background-light, #0f0f0f)', borderColor: 'var(--card-border)' }}
+        style={{ backgroundColor: 'var(--backgroundLight, #0f0f0f)', borderColor: 'var(--card-border)' }}
       >
         <div className="mb-5 text-left">
           <div className="relative mb-3 h-11 w-11">
@@ -387,7 +387,7 @@ export default function SignInElements({
                 backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
               }}
             >
-              <div className="h-full w-full rounded-full p-[2px]" style={{ backgroundColor: 'var(--background-light, #0f0f0f)' }}>
+              <div className="h-full w-full rounded-full p-[2px]" style={{ backgroundColor: 'var(--backgroundLight, #0f0f0f)' }}>
                 <Image
                   src="/achievements/early_adopter_sticker.png"
                   alt="App badge"
@@ -404,31 +404,31 @@ export default function SignInElements({
             Sign in to continue
           </p>
         </div>
-        <SignIn.Root routing="hash">
+        <SignInPrimitive.Root routing="hash">
           {/* Start step: identifier + password */}
-          <SignIn.Step name="start">
+          <SignInPrimitive.Step name="start">
             <div className="space-y-4 w-[320px]">
-              <Clerk.Field name="identifier">
-                <Clerk.Label className="block text-sm">Email</Clerk.Label>
-                <Clerk.Input
+              <ClerkElements.Field name="identifier">
+                <ClerkElements.Label className="block text-sm">Email</ClerkElements.Label>
+                <ClerkElements.Input
                   type="email"
                   className={inputClass}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdentifierEntered(e.target.value)}
                   autoComplete="email"
                 />
-                <Clerk.FieldError className="text-sm text-red-400" />
-              </Clerk.Field>
+                <ClerkElements.FieldError className="text-sm text-red-400" />
+              </ClerkElements.Field>
 
-              <Clerk.Field name="password">
-                <Clerk.Label className="block text-sm">Password</Clerk.Label>
-                <Clerk.Input type="password" className={inputClass} />
-                <Clerk.FieldError className="text-sm text-red-400" />
-              </Clerk.Field>
+              <ClerkElements.Field name="password">
+                <ClerkElements.Label className="block text-sm">Password</ClerkElements.Label>
+                <ClerkElements.Input type="password" className={inputClass} />
+                <ClerkElements.FieldError className="text-sm text-red-400" />
+              </ClerkElements.Field>
 
               {/* Hidden placeholder for Clerk Smart CAPTCHA (prevents fallback warning). */}
               <div id="clerk-captcha" aria-hidden className="sr-only" />
 
-              <SignIn.Action
+              <SignInPrimitive.Action
                 submit
                 className={primaryBtnClass}
                 disabled={!identifierEntered}
@@ -438,7 +438,7 @@ export default function SignInElements({
                 }}
               >
                 Sign in
-              </SignIn.Action>
+              </SignInPrimitive.Action>
               <button
                 type="button"
                 onClick={handleStartForgot}
@@ -448,22 +448,22 @@ export default function SignInElements({
                 Forgot password?
               </button>
             </div>
-          </SignIn.Step>
+          </SignInPrimitive.Step>
 
           {/* Verification step: email code (if required) */}
-          <SignIn.Step name="verifications">
-            <SignIn.Strategy name="email_code">
+          <SignInPrimitive.Step name="verifications">
+            <SignInPrimitive.Strategy name="email_code">
               <div className="space-y-4 w-[320px]">
                 <p className="text-xs" style={{ color: colors.textSecondary }}>
                   Verification code sent to {identifierEntered || 'your email'}
                 </p>
-                <Clerk.Field name="code">
-                  <Clerk.Label className="block text-sm">Verification code</Clerk.Label>
-                  <Clerk.Input className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 tracking-widest text-center text-white outline-none focus:border-white/20 focus:ring-2 focus:ring-indigo-500/60" />
-                  <Clerk.FieldError className="text-sm text-red-400" />
-                </Clerk.Field>
+                <ClerkElements.Field name="code">
+                  <ClerkElements.Label className="block text-sm">Verification code</ClerkElements.Label>
+                  <ClerkElements.Input className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 tracking-widest text-center text-white outline-none focus:border-white/20 focus:ring-2 focus:ring-indigo-500/60" />
+                  <ClerkElements.FieldError className="text-sm text-red-400" />
+                </ClerkElements.Field>
 
-                <SignIn.Action
+                <SignInPrimitive.Action
                   submit
                   className={primaryBtnClass}
                   style={{
@@ -472,9 +472,9 @@ export default function SignInElements({
                   }}
                 >
                   Verify & Continue
-                </SignIn.Action>
+                </SignInPrimitive.Action>
 
-                <SignIn.Action
+                <SignInPrimitive.Action
                   resend
                   className="block text-sm"
                   style={{ color: 'var(--primary, #6c47ff)' }}
@@ -485,11 +485,11 @@ export default function SignInElements({
                   )}
                 >
                   Resend code
-                </SignIn.Action>
+                </SignInPrimitive.Action>
               </div>
-            </SignIn.Strategy>
-          </SignIn.Step>
-        </SignIn.Root>
+            </SignInPrimitive.Strategy>
+          </SignInPrimitive.Step>
+        </SignInPrimitive.Root>
       </div>
     </div>
   );

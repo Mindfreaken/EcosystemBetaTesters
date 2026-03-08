@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { LiveKitRoom } from "@livekit/components-react";
-import { useQuery } from "convex/react";
+import { useQuery, useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 
 interface VoiceContextType {
@@ -39,6 +39,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
 
     // Pre-load user data globally
     const me = useQuery(api.spaces.core.getMe);
+    const generateToken = useAction(api.spaces.voiceToken.generate);
 
     const joinRoom = React.useCallback((newRoom: string, newChannelName: string, newSpaceId: string, newToken: string) => {
         setRoomName(newRoom);
@@ -57,15 +58,14 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     const prefetchToken = React.useCallback(async (roomId: string, participantName: string) => {
         if (prefetchedTokensRef.current[roomId]) return;
         try {
-            const response = await fetch(`/api/livekit/get-token?room=${roomId}&participantName=${participantName}`);
-            const data = await response.json();
+            const data = await generateToken({ room: roomId, participantName });
             if (data.token) {
                 setPrefetchedTokens(prev => ({ ...prev, [roomId]: data.token }));
             }
         } catch (err) {
             console.error("Failed to prefetch token", err);
         }
-    }, [setPrefetchedTokens]);
+    }, [setPrefetchedTokens, generateToken]);
 
     const prefetchTokensForSpace = React.useCallback(async (sId: string, roomIds: string[], participantName: string) => {
         const needed = roomIds.filter(id => !prefetchedTokensRef.current[id]);
@@ -73,8 +73,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
 
         await Promise.all(needed.map(async (roomId) => {
             try {
-                const response = await fetch(`/api/livekit/get-token?room=${roomId}&participantName=${participantName}`);
-                const data = await response.json();
+                const data = await generateToken({ room: roomId, participantName });
                 if (data.token) {
                     setPrefetchedTokens(prev => ({ ...prev, [roomId]: data.token }));
                 }
@@ -82,7 +81,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
                 console.error("Failed to prefetch token", roomId, err);
             }
         }));
-    }, [setPrefetchedTokens]);
+    }, [setPrefetchedTokens, generateToken]);
 
     const clearPrefetchedTokensForSpace = React.useCallback((sId: string) => {
         // Just clear all tokens to avoid memory leaks when leaving space.

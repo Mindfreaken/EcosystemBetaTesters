@@ -2,8 +2,8 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import zxcvbn from "zxcvbn";
-import * as Clerk from '@clerk/elements/common'
-import * as SignUp from '@clerk/elements/sign-up'
+import * as ClerkElements from '@clerk/elements/common'
+import * as SignUpPrimitive from '@clerk/elements/sign-up'
 import { useRouter } from 'next/navigation'
 import { useAuth, useUser } from '@clerk/nextjs'
 import Image from 'next/image'
@@ -75,7 +75,7 @@ export default function SignUpElements({
 
         // Pull data from Clerk user profile
         // Reload user to ensure latest metadata from Elements is present
-        try { await user?.reload?.(); } catch {}
+        try { await user?.reload?.(); } catch { }
         const email = user?.primaryEmailAddress?.emailAddress || user?.emailAddresses?.[0]?.emailAddress || "";
         const clerkUsername = user?.username || undefined;
         const displayNameMeta = (user?.publicMetadata as any)?.displayName as string | undefined;
@@ -124,9 +124,9 @@ export default function SignUpElements({
   // Reuse landing theme vars for a cohesive look
   const colors = useMemo(() => ({
     background: 'var(--background, #0a0a0a)',
-    backgroundDark: 'var(--background-dark, #000000)',
+    backgroundDark: 'var(--backgroundDark, #000000)',
     text: 'var(--text, #eaeaea)',
-    textSecondary: 'var(--text-secondary, #9ca3af)',
+    textSecondary: 'var(--textSecondary, #9ca3af)',
     primary: 'var(--primary, #6c47ff)',
     secondary: 'var(--secondary, #ff2d55)'
   }), []);
@@ -151,7 +151,7 @@ export default function SignUpElements({
     <div className={className} style={{ color: colors.text }}>
       <div
         className="w-[380px] rounded-2xl border shadow-2xl px-6 py-6"
-        style={{ backgroundColor: 'var(--background-light, #0f0f0f)', borderColor: 'var(--card-border)' }}
+        style={{ backgroundColor: 'var(--backgroundLight, #0f0f0f)', borderColor: 'var(--card-border)' }}
       >
         <div className="mb-5 text-left">
           <div className="relative mb-3 h-11 w-11">
@@ -169,7 +169,7 @@ export default function SignUpElements({
                 backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
               }}
             >
-              <div className="h-full w-full rounded-full p-[2px]" style={{ backgroundColor: 'var(--background-light, #0f0f0f)' }}>
+              <div className="h-full w-full rounded-full p-[2px]" style={{ backgroundColor: 'var(--backgroundLight, #0f0f0f)' }}>
                 <Image
                   src="/achievements/early_adopter_sticker.png"
                   alt="App badge"
@@ -186,171 +186,53 @@ export default function SignUpElements({
             Join the ecosystem — it takes less than a minute
           </p>
         </div>
-      <SignUp.Root routing="hash">
-        {/* Start step: email + password */}
-        <SignUp.Step name="start">
-          <div className="space-y-4">
-            <Clerk.Field name="emailAddress">
-              <Clerk.Label className="block text-sm">Email</Clerk.Label>
-              <Clerk.Input
-                type="email"
-                className={inputClass}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmailEntered(e.target.value)}
-              />
-              <Clerk.FieldError className="text-sm text-red-400" />
-            </Clerk.Field>
-
-            <Clerk.Field name="password">
-              <Clerk.Label className="block text-sm">Password</Clerk.Label>
-              <Clerk.Input
-                type="password"
-                className={inputClass}
-                minLength={8 as any}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPasswordInput(e.target.value)}
-              />
-              <Clerk.FieldError className="text-sm text-red-400" />
-            </Clerk.Field>
-
-            <p className="text-xs" style={{ color: colors.textSecondary }}>
-              Use a strong, unique password. Longer phrases with a mix of letters, numbers, and symbols work best. Weak or compromised passwords will be rejected.
-            </p>
-
-            {strength.label && (
-              <div className="space-y-1">
-                <div className="mt-1 h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
-                  <div
-                    className={`h-full transition-all ${strength.color}`}
-                    style={{ width: `${strength.percent}%` }}
-                  />
-                </div>
-                <p className="text-[11px]" style={{ color: colors.textSecondary }}>
-                  Strength: {strength.label}
-                </p>
-              </div>
-            )}
-
-            {/* Hidden placeholder for Clerk Smart CAPTCHA (prevents fallback warning). */}
-            <div id="clerk-captcha" aria-hidden className="sr-only" />
-
-            <SignUp.Action
-              submit
-              className={primaryBtnClass}
-              style={{
-                backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
-                color: '#0a0a0a'
-              }}
-            >
-              Continue
-            </SignUp.Action>
-          </div>
-        </SignUp.Step>
-
-        {/* Continue step: username + extra profile fields */}
-        <SignUp.Step name="continue">
-          <div className="space-y-4 w-[320px]">
-            <div className="grid grid-cols-2 gap-3">
-              <Clerk.Field name="firstName">
-                <Clerk.Label className="block text-sm">First name</Clerk.Label>
-                <Clerk.Input className={inputClass} />
-                <Clerk.FieldError className="text-sm text-red-400" />
-              </Clerk.Field>
-              <Clerk.Field name="lastName">
-                <Clerk.Label className="block text-sm">Last name</Clerk.Label>
-                <Clerk.Input className={inputClass} />
-                <Clerk.FieldError className="text-sm text-red-400" />
-              </Clerk.Field>
-            </div>
-
-            <Clerk.Field name="username">
-              <Clerk.Label className="block text-sm">Username</Clerk.Label>
-              <Clerk.Input
-                className={inputClass}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value.slice(0, 20))}
-                maxLength={20 as any}
-              />
-              <Clerk.FieldError className="text-sm text-red-400" />
-            </Clerk.Field>
-            {username && usernameTaken && (
-              <p className="text-xs text-red-400">This username is already taken.</p>
-            )}
-
-            <Clerk.Field name="publicMetadata.displayName">
-              <Clerk.Label className="block text-sm">Display name</Clerk.Label>
-              <Clerk.Input
-                className={inputClass}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDisplayName(e.target.value.slice(0, 20))}
-                maxLength={20 as any}
-              />
-              <Clerk.FieldError className="text-sm text-red-400" />
-            </Clerk.Field>
-            {displayName && displayNameTaken && (
-              <p className="text-xs text-red-400">This display name is already taken.</p>
-            )}
-
-            <Clerk.Field name="publicMetadata.dateOfBirth">
-              <Clerk.Label className="block text-sm">Date of birth</Clerk.Label>
-              <Clerk.Input
-                type="date"
-                className={inputClass}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDobInput(e.target.value)}
-              />
-              <Clerk.FieldError className="text-sm text-red-400" />
-            </Clerk.Field>
-
-            <div className="flex items-start gap-2 py-1">
-              <input
-                id="terms"
-                type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-white/20 bg-black/40"
-                checked={acceptedTerms}
-                onChange={(e) => setAcceptedTerms(e.target.checked)}
-              />
-              <label htmlFor="terms" className="text-xs" style={{ color: colors.textSecondary }}>
-                I agree to the Terms of Service and Privacy Policy
-              </label>
-            </div>
-
-            <SignUp.Action
-              submit
-              disabled={
-                !acceptedTerms ||
-                checkingAvailability ||
-                usernameTaken ||
-                displayNameTaken ||
-                !username.trim() ||
-                !displayName.trim() ||
-                !dobInput.trim() ||
-                username.length > 20 ||
-                displayName.length > 20
-              }
-              className={primaryBtnClass}
-              style={{
-                backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
-                color: '#0a0a0a'
-              }}
-            >
-              Create account
-            </SignUp.Action>
-            {signupError && (
-              <p className="text-sm text-red-400">{signupError}</p>
-            )}
-          </div>
-        </SignUp.Step>
-
-        {/* Verification step: email code */}
-        <SignUp.Step name="verifications">
-          <SignUp.Strategy name="email_code">
+        <SignUpPrimitive.Root routing="hash">
+          {/* Start step: email + password */}
+          <SignUpPrimitive.Step name="start">
             <div className="space-y-4">
-              <p className="text-xs" style={{ color: colors.textSecondary }}>
-                Verification code sent to {emailEntered || 'your email'}
-              </p>
-              <Clerk.Field name="code">
-                <Clerk.Label className="block text-sm">Verification code</Clerk.Label>
-                <Clerk.Input className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 tracking-widest text-center text-white outline-none focus:border-white/20 focus:ring-2 focus:ring-indigo-500/60" />
-                <Clerk.FieldError className="text-sm text-red-400" />
-              </Clerk.Field>
+              <ClerkElements.Field name="emailAddress">
+                <ClerkElements.Label className="block text-sm">Email</ClerkElements.Label>
+                <ClerkElements.Input
+                  type="email"
+                  className={inputClass}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmailEntered(e.target.value)}
+                />
+                <ClerkElements.FieldError className="text-sm text-red-400" />
+              </ClerkElements.Field>
 
-              <SignUp.Action
+              <ClerkElements.Field name="password">
+                <ClerkElements.Label className="block text-sm">Password</ClerkElements.Label>
+                <ClerkElements.Input
+                  type="password"
+                  className={inputClass}
+                  minLength={8 as any}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPasswordInput(e.target.value)}
+                />
+                <ClerkElements.FieldError className="text-sm text-red-400" />
+              </ClerkElements.Field>
+
+              <p className="text-xs" style={{ color: colors.textSecondary }}>
+                Use a strong, unique password. Longer phrases with a mix of letters, numbers, and symbols work best. Weak or compromised passwords will be rejected.
+              </p>
+
+              {strength.label && (
+                <div className="space-y-1">
+                  <div className="mt-1 h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
+                    <div
+                      className={`h-full transition-all ${strength.color}`}
+                      style={{ width: `${strength.percent}%` }}
+                    />
+                  </div>
+                  <p className="text-[11px]" style={{ color: colors.textSecondary }}>
+                    Strength: {strength.label}
+                  </p>
+                </div>
+              )}
+
+              {/* Hidden placeholder for Clerk Smart CAPTCHA (prevents fallback warning). */}
+              <div id="clerk-captcha" aria-hidden className="sr-only" />
+
+              <SignUpPrimitive.Action
                 submit
                 className={primaryBtnClass}
                 style={{
@@ -358,25 +240,143 @@ export default function SignUpElements({
                   color: '#0a0a0a'
                 }}
               >
-                Verify & Continue
-              </SignUp.Action>
-
-              <SignUp.Action
-                resend
-                className="block text-sm"
-                style={{ color: 'var(--primary, #6c47ff)' }}
-                fallback={({ resendableAfter }) => (
-                  <p className="text-sm" style={{ color: colors.textSecondary }}>
-                    Resend code in {resendableAfter}s
-                  </p>
-                )}
-              >
-                Resend code
-              </SignUp.Action>
+                Continue
+              </SignUpPrimitive.Action>
             </div>
-          </SignUp.Strategy>
-        </SignUp.Step>
-      </SignUp.Root>
+          </SignUpPrimitive.Step>
+
+          {/* Continue step: username + extra profile fields */}
+          <SignUpPrimitive.Step name="continue">
+            <div className="space-y-4 w-[320px]">
+              <div className="grid grid-cols-2 gap-3">
+                <ClerkElements.Field name="firstName">
+                  <ClerkElements.Label className="block text-sm">First name</ClerkElements.Label>
+                  <ClerkElements.Input className={inputClass} />
+                  <ClerkElements.FieldError className="text-sm text-red-400" />
+                </ClerkElements.Field>
+                <ClerkElements.Field name="lastName">
+                  <ClerkElements.Label className="block text-sm">Last name</ClerkElements.Label>
+                  <ClerkElements.Input className={inputClass} />
+                  <ClerkElements.FieldError className="text-sm text-red-400" />
+                </ClerkElements.Field>
+              </div>
+
+              <ClerkElements.Field name="username">
+                <ClerkElements.Label className="block text-sm">Username</ClerkElements.Label>
+                <ClerkElements.Input
+                  className={inputClass}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value.slice(0, 20))}
+                  maxLength={20 as any}
+                />
+                <ClerkElements.FieldError className="text-sm text-red-400" />
+              </ClerkElements.Field>
+              {username && usernameTaken && (
+                <p className="text-xs text-red-400">This username is already taken.</p>
+              )}
+
+              <ClerkElements.Field name="publicMetadata.displayName">
+                <ClerkElements.Label className="block text-sm">Display name</ClerkElements.Label>
+                <ClerkElements.Input
+                  className={inputClass}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDisplayName(e.target.value.slice(0, 20))}
+                  maxLength={20 as any}
+                />
+                <ClerkElements.FieldError className="text-sm text-red-400" />
+              </ClerkElements.Field>
+              {displayName && displayNameTaken && (
+                <p className="text-xs text-red-400">This display name is already taken.</p>
+              )}
+
+              <ClerkElements.Field name="publicMetadata.dateOfBirth">
+                <ClerkElements.Label className="block text-sm">Date of birth</ClerkElements.Label>
+                <ClerkElements.Input
+                  type="date"
+                  className={inputClass}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDobInput(e.target.value)}
+                />
+                <ClerkElements.FieldError className="text-sm text-red-400" />
+              </ClerkElements.Field>
+
+              <div className="flex items-start gap-2 py-1">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 rounded border-white/20 bg-black/40"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                />
+                <label htmlFor="terms" className="text-xs" style={{ color: colors.textSecondary }}>
+                  I agree to the Terms of Service and Privacy Policy
+                </label>
+              </div>
+
+              <SignUpPrimitive.Action
+                submit
+                disabled={
+                  !acceptedTerms ||
+                  checkingAvailability ||
+                  usernameTaken ||
+                  displayNameTaken ||
+                  !username.trim() ||
+                  !displayName.trim() ||
+                  !dobInput.trim() ||
+                  username.length > 20 ||
+                  displayName.length > 20
+                }
+                className={primaryBtnClass}
+                style={{
+                  backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+                  color: '#0a0a0a'
+                }}
+              >
+                Create account
+              </SignUpPrimitive.Action>
+              {signupError && (
+                <p className="text-sm text-red-400">{signupError}</p>
+              )}
+            </div>
+          </SignUpPrimitive.Step>
+
+          {/* Verification step: email code */}
+          <SignUpPrimitive.Step name="verifications">
+            <SignUpPrimitive.Strategy name="email_code">
+              <div className="space-y-4">
+                <p className="text-xs" style={{ color: colors.textSecondary }}>
+                  Verification code sent to {emailEntered || 'your email'}
+                </p>
+                <ClerkElements.Field name="code">
+                  <ClerkElements.Label className="block text-sm">Verification code</ClerkElements.Label>
+                  <ClerkElements.Input className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 tracking-widest text-center text-white outline-none focus:border-white/20 focus:ring-2 focus:ring-indigo-500/60" />
+                  <ClerkElements.FieldError className="text-sm text-red-400" />
+                </ClerkElements.Field>
+
+                <SignUpPrimitive.Action
+                  submit
+                  className={primaryBtnClass}
+                  style={{
+                    backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+                    color: '#0a0a0a'
+                  }}
+                >
+                  Verify & Continue
+                </SignUpPrimitive.Action>
+
+                <SignUpPrimitive.Action
+                  resend
+                  className="block text-sm"
+                  style={{ color: 'var(--primary, #6c47ff)' }}
+                  fallback={({ resendableAfter }) => (
+                    <p className="text-sm" style={{ color: colors.textSecondary }}>
+                      Resend code in {resendableAfter}s
+                    </p>
+                  )}
+                >
+                  Resend code
+                </SignUpPrimitive.Action>
+              </div>
+            </SignUpPrimitive.Strategy>
+          </SignUpPrimitive.Step>
+        </SignUpPrimitive.Root>
       </div>
     </div>
   );

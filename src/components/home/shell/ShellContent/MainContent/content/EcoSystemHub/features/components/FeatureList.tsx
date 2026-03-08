@@ -48,14 +48,14 @@ export default function FeatureList() {
             size="sm"
             value={statusFilter}
             onChange={(v) => setStatusFilter(v as any)}
-            options={[{ label: 'All statuses', value: 'all' }, ...(["open","planned","in_progress","done","tabled"] as const).map((s) => ({ label: s.replace('_',' '), value: s }))]}
+            options={[{ label: 'All statuses', value: 'all' }, ...(["open", "planned", "in_progress", "done", "tabled"] as const).map((s) => ({ label: s.replace('_', ' '), value: s }))]}
           />
         </div>
       </Box>
 
       {items.length === 0 ? (
         <Box sx={{ p: 1, border: "1px dashed color-mix(in oklab, var(--text), transparent 80%)", borderRadius: 1 }}>
-          <Typography variant="body2" sx={{ color: "var(--text-secondary)" }}>
+          <Typography variant="body2" sx={{ color: "var(--textSecondary)" }}>
             No features yet. Be the first to request one!
           </Typography>
         </Box>
@@ -67,7 +67,7 @@ export default function FeatureList() {
                 <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Chip label={topicLabel(f.topic)} size="small" sx={{ color: 'var(--text)', borderColor: 'color-mix(in oklab, var(--text), transparent 70%)' }} variant="outlined" />
-                    <Typography variant="body2" sx={{ color: 'var(--text-secondary)' }}>{f.title}</Typography>
+                    <Typography variant="body2" sx={{ color: 'var(--textSecondary)' }}>{f.title}</Typography>
                   </Stack>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <UiButton
@@ -96,7 +96,7 @@ export default function FeatureList() {
                         size="sm"
                         value={f.status ?? 'open'}
                         onChange={(v) => { void updateStatus({ id: f._id, status: v } as any); }}
-                        options={["open","planned","in_progress","done","tabled"].map((s) => ({ label: s.replace('_',' '), value: s }))}
+                        options={["open", "planned", "in_progress", "done", "tabled"].map((s) => ({ label: s.replace('_', ' '), value: s }))}
                       />
                     </div>
                     <div style={{ minWidth: 180 }}>
@@ -110,7 +110,7 @@ export default function FeatureList() {
                     </div>
                   </Stack>
                 ) : null}
-                <Typography variant="caption" sx={{ color: 'var(--text-secondary)' }}>{new Date(f.createdAt).toLocaleString()}</Typography>
+                <Typography variant="caption" sx={{ color: 'var(--textSecondary)' }}>{new Date(f.createdAt).toLocaleString()}</Typography>
               </Stack>
             </CardContent>
           </Card>

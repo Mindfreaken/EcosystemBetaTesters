@@ -61,7 +61,7 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
             sx={{
                 p: 1.5,
                 borderTop: "1px solid var(--card-border)",
-                backgroundColor: "var(--background-light, #0f0f0f)",
+                backgroundColor: "var(--backgroundLight, #0f0f0f)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -79,14 +79,14 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
                 onClick={handleNavigate}
             >
                 <Box sx={{ position: "relative", display: "flex" }}>
-                    <Signal size={20} color={isConnected ? "var(--success, #22c55e)" : "var(--text-secondary)"} />
+                    <Signal size={20} color={isConnected ? "var(--success, #22c55e)" : "var(--textSecondary)"} />
                 </Box>
                 <Box sx={{ minWidth: 0 }}>
                     <Typography
                         variant="body2"
                         sx={{
                             fontWeight: 600,
-                            color: isConnected ? "var(--success, #22c55e)" : "var(--text-secondary)",
+                            color: isConnected ? "var(--success, #22c55e)" : "var(--textSecondary)",
                             lineHeight: 1.2,
                             whiteSpace: "nowrap",
                             overflow: "hidden",
@@ -98,7 +98,7 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
                     <Typography
                         variant="caption"
                         sx={{
-                            color: "var(--text-secondary)",
+                            color: "var(--textSecondary)",
                             display: "block",
                             whiteSpace: "nowrap",
                             overflow: "hidden",
@@ -115,7 +115,7 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
                     size="small"
                     onClick={buttonProps.onClick}
                     sx={{
-                        color: isMuted ? "var(--error, #ef4444)" : "var(--text-secondary)",
+                        color: isMuted ? "var(--error, #ef4444)" : "var(--textSecondary)",
                         "&:hover": { backgroundColor: "var(--hover, rgba(255,255,255,0.05))" }
                     }}
                 >
@@ -128,7 +128,7 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
                 <IconButton
                     size="small"
                     sx={{
-                        color: "var(--text-secondary)",
+                        color: "var(--textSecondary)",
                         "&:hover": { backgroundColor: "var(--hover, rgba(255,255,255,0.05))" }
                     }}
                 >

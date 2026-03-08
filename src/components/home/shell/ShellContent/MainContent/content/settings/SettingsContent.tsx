@@ -51,15 +51,11 @@ function ConvexMediaDeviceSelect({
     <select
       value={value || activeDeviceId || ""}
       onChange={handleChange}
+      className="themed-input"
       style={{
         width: '100%',
         padding: '8px',
         borderRadius: '8px',
-        backgroundColor: 'var(--card-hover)',
-        color: 'white',
-        border: '1px solid var(--card-border)',
-        outline: 'none',
-        appearance: 'none',
         cursor: 'pointer'
       }}
     >
@@ -182,7 +178,7 @@ export default function SettingsContent() {
               }}
             >
               <UserProfile
-                routing="virtual"
+                routing="hash"
                 appearance={{
                   elements: {
                     rootBox: { background: "transparent" },

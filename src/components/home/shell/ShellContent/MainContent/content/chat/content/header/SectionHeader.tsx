@@ -26,7 +26,7 @@ export default function SectionHeader({ title, left, right }: PropsWithChildren<
         height: 56,
         minHeight: 56,
         boxSizing: "border-box",
-        borderBottom: "1px solid color-mix(in oklab, var(--foreground), transparent 92%)",
+        borderBottom: "1px solid var(--borderLight)",
         backgroundColor: "color-mix(in oklab, var(--card), transparent 94%)",
         "& .MuiIconButton-root": {
           width: 28,

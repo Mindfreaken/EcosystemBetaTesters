@@ -65,15 +65,15 @@ export default function RightSidebarContent({ onClose }: RightSidebarContentProp
     position: "relative" as const,
     overflow: "hidden",
     cursor: "pointer",
-    color: "color-mix(in oklab, var(--foreground), transparent 30%)",
+    color: "var(--textSecondary)",
     borderLeft: "3px solid transparent",
     transition: "transform .2s ease, box-shadow .2s ease, background-color .2s ease",
     backgroundColor: "color-mix(in oklab, var(--card), transparent 92%)",
     "&:hover": {
       transform: "translateX(-4px) scale(1.01)",
       backgroundColor: "color-mix(in oklab, var(--primary), transparent 92%)",
-      boxShadow: "0 4px 8px color-mix(in oklab, var(--foreground), transparent 95%)",
-      color: "var(--textPrimary)",
+      boxShadow: "0 4px 8px var(--shadow)",
+      color: "var(--text)",
       borderLeftColor: "var(--primary)",
     },
     "&::before": {

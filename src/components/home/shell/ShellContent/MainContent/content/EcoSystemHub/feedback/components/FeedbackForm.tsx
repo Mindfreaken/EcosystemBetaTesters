@@ -92,7 +92,7 @@ export default function FeedbackForm({ onSubmit }: Props) {
       />
 
       <Stack direction="row" spacing={1} alignItems="center">
-        <Typography variant="body2" sx={{ color: "var(--text-secondary)" }}>
+        <Typography variant="body2" sx={{ color: "var(--textSecondary)" }}>
           Overall opinion
         </Typography>
         <Rating
@@ -127,7 +127,7 @@ export default function FeedbackForm({ onSubmit }: Props) {
           <Box key={q.id}>
             {q.type === "rating" ? (
               <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="body2" sx={{ color: "var(--text-secondary)" }}>
+                <Typography variant="body2" sx={{ color: "var(--textSecondary)" }}>
                   {q.label}
                 </Typography>
                 <Rating

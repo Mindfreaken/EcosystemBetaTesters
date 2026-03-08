@@ -1,11 +1,22 @@
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useAuth } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import HomeView from '@/components/landing/HomeView'
 
-export default async function Landing() {
-  const { userId } = await auth()
-  if (userId) {
-    redirect('/home')
+export default function Landing() {
+  const { isLoaded, userId } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (isLoaded && userId) {
+      router.push('/home')
+    }
+  }, [isLoaded, userId, router])
+
+  if (!isLoaded || userId) {
+    return null
   }
 
   return (

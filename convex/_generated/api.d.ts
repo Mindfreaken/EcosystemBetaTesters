@@ -113,6 +113,7 @@ import type * as spaces_notes from "../spaces/notes.js";
 import type * as spaces_polls from "../spaces/polls.js";
 import type * as spaces_schedule from "../spaces/schedule.js";
 import type * as spaces_voice from "../spaces/voice.js";
+import type * as spaces_voiceToken from "../spaces/voiceToken.js";
 import type * as spaces_welcome from "../spaces/welcome.js";
 import type * as users_achievements_achievementDefs from "../users/achievements/achievementDefs.js";
 import type * as users_achievements_core from "../users/achievements/core.js";
@@ -270,6 +271,7 @@ declare const fullApi: ApiFromModules<{
   "spaces/polls": typeof spaces_polls;
   "spaces/schedule": typeof spaces_schedule;
   "spaces/voice": typeof spaces_voice;
+  "spaces/voiceToken": typeof spaces_voiceToken;
   "spaces/welcome": typeof spaces_welcome;
   "users/achievements/achievementDefs": typeof users_achievements_achievementDefs;
   "users/achievements/core": typeof users_achievements_core;

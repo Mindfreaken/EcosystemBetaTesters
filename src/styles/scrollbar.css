@@ -2,7 +2,7 @@
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--primary) var(--background-light);
+  scrollbar-color: var(--primary) var(--backgroundLight);
 }
 
 /* WebKit */
@@ -12,14 +12,14 @@
 }
 
 *::-webkit-scrollbar-track {
-  background: var(--background-light);
+  background: var(--backgroundLight);
   border-radius: 10px;
 }
 
 *::-webkit-scrollbar-thumb {
   background-color: var(--primary);
   border-radius: 10px;
-  border: 2px solid var(--background-light);
+  border: 2px solid var(--backgroundLight);
 }
 
 *::-webkit-scrollbar-thumb:hover {

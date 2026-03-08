@@ -231,11 +231,11 @@ export default function ChatThread({
                       sx={{
                         border: isMine
                           ? "1px solid color-mix(in oklab, var(--secondary), transparent 60%)"
-                          : "1px solid color-mix(in oklab, var(--foreground), transparent 88%)",
+                          : "1px solid var(--borderLight)",
                         backgroundColor: isMine
                           ? "color-mix(in oklab, var(--secondary) 12%, var(--background) 88%)"
-                          : "color-mix(in oklab, var(--background) 94%, var(--card) 6%)",
-                        boxShadow: "0 2px 8px color-mix(in oklab, var(--foreground) 10%, transparent)",
+                          : "var(--card)",
+                        boxShadow: "0 2px 8px var(--shadow)",
                         borderRadius: isMine ? "12px 12px 4px 12px" : "12px 12px 12px 4px",
                         px: 1.25,
                         py: 0.75,
@@ -265,7 +265,7 @@ export default function ChatThread({
                                 opacity: 0,
                                 transition: "opacity 0.2s",
                                 p: 0.25,
-                                color: "color-mix(in oklab, var(--foreground), transparent 60%)",
+                                color: "var(--textSecondary)",
                                 "&:hover": { color: "var(--error, #ff4444)" },
                               }}
                               title="Report message"
@@ -300,7 +300,7 @@ export default function ChatThread({
 
       {/* Composer (hidden for system chats) */}
       {!isSystemChat && (
-        <Box sx={{ borderTop: "1px solid var(--card-border)", backgroundColor: "var(--card)", p: 1 }}>
+        <Box sx={{ borderTop: "1px solid var(--borderLight)", backgroundColor: "var(--card)", p: 1 }}>
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 1 }}>
             <TextField
               size="small"
@@ -330,7 +330,7 @@ export default function ChatThread({
                 },
               }}
             />
-            <IconButton size="small" onClick={handleSend} disabled={!canSend} sx={{ color: canSend ? "var(--secondary)" : "color-mix(in oklab, var(--foreground), transparent 70%)" }}>
+            <IconButton size="small" onClick={handleSend} disabled={!canSend} sx={{ color: canSend ? "var(--secondary)" : "var(--textSecondary)" }}>
               <Send size={16} />
             </IconButton>
           </Box>
@@ -347,7 +347,7 @@ export default function ChatThread({
           sx: {
             backgroundColor: "var(--background)",
             backgroundImage: "none",
-            border: "1px solid var(--card-border)",
+            border: "1px solid var(--borderLight)",
             borderRadius: "16px",
             boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
           }

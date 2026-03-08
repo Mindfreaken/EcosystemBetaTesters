@@ -80,7 +80,7 @@ export default function ChatContent() {
               minWidth: sidebarCollapsed ? 72 : 240,
               maxWidth: sidebarCollapsed ? 90 : 340,
               height: "100%",
-              borderRight: "1px solid color-mix(in oklab, var(--foreground), transparent 92%)",
+              borderRight: "1px solid var(--borderLight)",
               backgroundColor: "color-mix(in oklab, var(--card), transparent 96%)",
               overflowX: "hidden",
             }}

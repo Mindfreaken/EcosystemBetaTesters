@@ -38,7 +38,7 @@ function ChatChip({ chat, meId, onSelect }: { chat: HomeChatItem; meId?: any; on
         width: '100%',
         justifyContent: 'flex-start',
         padding: '6px 10px',
-        background: 'linear-gradient(90deg, color-mix(in oklab, var(--card), transparent 2%), color-mix(in oklab, var(--foreground), transparent 96%))',
+        background: 'linear-gradient(90deg, color-mix(in oklab, var(--card), transparent 2%), color-mix(in oklab, var(--textSecondary), transparent 90%))',
         border: '1px solid color-mix(in oklab, var(--border), transparent 35%)',
       }}
     >
@@ -138,7 +138,7 @@ export default function ChatHome({
               Welcome to Chats Home
             </Typography>
             <Typography variant="body2" sx={{ color: 'var(--textSecondary)' }}>
-              Create a group or DM, or pick an existing conversation below. Note: Messages use Convex encryption in transit. End‑to‑end encryption isn’t available yet, so messages aren’t fully private. 
+              Create a group or DM, or pick an existing conversation below. Note: Messages use Convex encryption in transit. End‑to‑end encryption isn’t available yet, so messages aren’t fully private.
               We plan to add E2E encryption when it’s safe and ready.
             </Typography>
           </Box>

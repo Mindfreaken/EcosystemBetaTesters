@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import "@livekit/components-styles";
 import { Box, Typography, Button, CircularProgress, Slider, IconButton } from "@mui/material";
 import { useVoiceContext } from "@/context/VoiceContext";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 import {
     GridLayout,
@@ -39,6 +39,7 @@ export default function VoiceRoom({ roomId, roomName, spaceId }: VoiceRoomProps)
     const { roomName: connectedRoom, joinRoom, leaveRoom, me, prefetchedTokens, prefetchToken } = useVoiceContext();
     const [isConnecting, setIsConnecting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const generateToken = useAction(api.spaces.voiceToken.generate);
 
     // Check if we are already connected to THIS specific room
     const isConnectedToThisRoom = connectedRoom === roomId;
@@ -62,22 +63,18 @@ export default function VoiceRoom({ roomId, roomName, spaceId }: VoiceRoomProps)
         setIsConnecting(true);
         setError(null);
         try {
-            const response = await fetch(`/api/livekit/get-token?room=${encodeURIComponent(roomId)}&participantName=${encodeURIComponent(me?.displayName || me?.username || 'User')}`);
-            if (!response.ok) {
-                throw new Error("Failed to get connection token");
-            }
-            const data = await response.json();
+            const data = await generateToken({ room: roomId, participantName: me?.displayName || me?.username || 'User' });
             if (data.token) {
                 joinRoom(roomId, roomName, spaceId, data.token);
             } else {
-                setError(data.error || "Failed to join");
+                setError("Failed to join");
             }
         } catch (err: any) {
             setError(err.message || "Failed to connect to voice server");
         } finally {
             setIsConnecting(false);
         }
-    }, [roomId, roomName, spaceId, joinRoom, isConnecting, me, prefetchedTokens]);
+    }, [roomId, roomName, spaceId, joinRoom, isConnecting, me, prefetchedTokens, generateToken]);
 
     // Track if we've already tried to auto-join this room,
     // so we don't spam if they explicitly disconnect
@@ -126,7 +123,7 @@ export default function VoiceRoom({ roomId, roomName, spaceId }: VoiceRoomProps)
                         <Typography variant="body1" sx={{ color: "var(--error, #ef4444)", fontWeight: 700, mb: 1 }}>
                             Access Restricted
                         </Typography>
-                        <Typography variant="body2" sx={{ color: "var(--text-secondary)" }}>
+                        <Typography variant="body2" sx={{ color: "var(--textSecondary)" }}>
                             You are currently timed out in this space and cannot join voice channels until Your timeout expires.
                             {myFullMembership.timeoutUntil && (
                                 <Box component="span" sx={{ display: "block", mt: 1, fontWeight: 600 }}>
@@ -137,7 +134,7 @@ export default function VoiceRoom({ roomId, roomName, spaceId }: VoiceRoomProps)
                     </Box>
                 ) : (
                     <>
-                        <Typography variant="body1" sx={{ color: "var(--text-secondary)", textAlign: "center", maxWidth: 400 }}>
+                        <Typography variant="body1" sx={{ color: "var(--textSecondary)", textAlign: "center", maxWidth: 400 }}>
                             Join this voice channel to talk with others in the space.
                         </Typography>
 
@@ -331,7 +328,7 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
                         pointerEvents: 'none', // let clicks pass through to the tile
                     }}>
                         {userProfile === undefined ? (
-                            <CircularProgress size={40} sx={{ color: "var(--text-secondary)" }} />
+                            <CircularProgress size={40} sx={{ color: "var(--textSecondary)" }} />
                         ) : userProfile?.avatarUrl ? (
                             <Box
                                 component="img"
@@ -357,7 +354,7 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
                                     justifyContent: 'center',
                                     fontSize: '2rem',
                                     fontWeight: 700,
-                                    color: 'var(--text-secondary)'
+                                    color: 'var(--textSecondary)'
                                 }}
                             >
                                 {userProfile?.displayName?.charAt(0) || userProfile?.username?.charAt(0) || participant?.name?.charAt(0) || "?"}
@@ -532,7 +529,7 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
                 {connectionState === ConnectionState.Connecting ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
                         <CircularProgress sx={{ color: "var(--primary)" }} />
-                        <Typography variant="body2" sx={{ color: "var(--text-secondary)" }}>Connecting to LiveKit...</Typography>
+                        <Typography variant="body2" sx={{ color: "var(--textSecondary)" }}>Connecting to LiveKit...</Typography>
                     </Box>
                 ) : (
                     <Box sx={{ height: "100%", position: "relative" }}>

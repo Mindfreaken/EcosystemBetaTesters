@@ -11,7 +11,7 @@
 
 .neon-button-primary:hover {
   box-shadow: 0 0 25px var(--primary), 0 0 15px var(--primary) inset;
-  text-shadow: 0 0 8px var(--background-dark);
+  text-shadow: 0 0 8px var(--backgroundDark);
   transform: translateY(-2px);
 }
 
@@ -28,15 +28,15 @@
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .feature-card {
     padding: 1rem !important;
   }
-  
+
   .feature-card h3 {
     font-size: 1.125rem !important;
   }
-  
+
   .feature-card p {
     font-size: 0.875rem !important;
   }
@@ -57,6 +57,7 @@
 
 /* Mobile styles - force buttons to be in one row */
 @media (max-width: 640px) {
+
   /* Override flex-col on mobile screens for button container */
   section .flex.flex-col.sm\:flex-row.justify-center.gap-4.sm\:gap-6 {
     flex-direction: row !important;
@@ -69,10 +70,10 @@
     box-shadow: 0 0 20px var(--primary), 0 0 10px var(--primary) inset;
     text-shadow: 0 0 8px var(--text);
   }
-  
+
   .neon-button-primary:active {
     box-shadow: 0 0 25px var(--primary), 0 0 15px var(--primary) inset;
-    text-shadow: 0 0 8px var(--background-dark);
+    text-shadow: 0 0 8px var(--backgroundDark);
     transform: translateY(-2px);
   }
 }
@@ -92,15 +93,22 @@
   .hover\:shadow-neon:active {
     box-shadow: 0 0 20px rgba(var(--primary-rgb, 255, 45, 85), 0.5);
   }
-  
+
   .hover\:transform:active {
     transform: scale(1.03);
   }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
 }
 
 .icon-glow {
@@ -112,7 +120,9 @@
 }
 
 /* Ensure background covers entire viewport */
-html, body, #root {
+html,
+body,
+#root {
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -127,7 +137,7 @@ html, body, #root {
 
 /* Force feature cards to have equal width at each breakpoint */
 @media (max-width: 1023px) {
-  .flex-col > .flex-1 {
+  .flex-col>.flex-1 {
     width: 100%;
     max-width: 500px;
     margin-left: auto;
@@ -136,7 +146,7 @@ html, body, #root {
 }
 
 @media (min-width: 1024px) {
-  .flex-row > .flex-1 {
+  .flex-row>.flex-1 {
     width: calc(33.333% - 1rem);
     flex: 0 0 auto;
   }
@@ -150,5 +160,6 @@ html, body, #root {
 
 /* Convert hex to rgb for dynamic shadows */
 :root {
-  --primary-rgb: 255, 45, 85; /* Default for Night City theme */
+  --primary-rgb: 255, 45, 85;
+  /* Default for Night City theme */
 }

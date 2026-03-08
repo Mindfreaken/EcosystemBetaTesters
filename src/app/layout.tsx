@@ -4,6 +4,7 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 import Providers from './providers'
+import AuthGuard from '@/components/auth/AuthGuard'
 import '../styles/scrollbar.css'
 import '../styles/sidebar.css'
 
@@ -33,8 +34,8 @@ export default function RootLayout({
               colorPrimary: 'var(--primary)',
               colorBackground: 'var(--background)',
               colorText: 'var(--text)',
-              colorTextSecondary: 'var(--text-secondary)',
-              colorInputBackground: 'var(--background-light, #0f0f0f)',
+              colorTextSecondary: 'var(--textSecondary)',
+              colorInputBackground: 'var(--backgroundLight, #0f0f0f)',
               colorInputText: 'var(--text)',
               fontFamily: 'var(--font-geist-sans, Inter, system-ui, sans-serif)',
               borderRadius: '12px',
@@ -52,16 +53,16 @@ export default function RootLayout({
                 boxShadow: '0 10px 30px rgba(0,0,0,0.35)'
               },
               headerTitle: { color: 'var(--text)' },
-              headerSubtitle: { color: 'var(--text-secondary)' },
-              formFieldLabel: { color: 'var(--text-secondary)' },
+              headerSubtitle: { color: 'var(--textSecondary)' },
+              formFieldLabel: { color: 'var(--textSecondary)' },
               formFieldInput: {
-                backgroundColor: 'var(--background-light, #0f0f0f)',
+                backgroundColor: 'var(--backgroundLight, #0f0f0f)',
                 color: 'var(--text)',
                 borderColor: 'var(--border, rgba(255,255,255,0.12))',
               },
               // Make OTP (verification code) squares more visible without affecting other areas
               otpInput: {
-                backgroundColor: 'var(--background-light, #0f0f0f)',
+                backgroundColor: 'var(--backgroundLight, #0f0f0f)',
                 color: 'var(--text)',
                 borderColor: 'color-mix(in oklab, var(--text), transparent 70%)',
                 boxShadow: 'inset 0 0 0 1px color-mix(in oklab, var(--text), transparent 70%)',
@@ -69,19 +70,21 @@ export default function RootLayout({
               otpInput__selected: {
                 borderColor: 'var(--primary)',
                 boxShadow: '0 0 0 2px color-mix(in oklab, var(--primary), transparent 30%)',
-                backgroundColor: 'color-mix(in oklab, var(--primary), var(--background-light) 85%)',
+                backgroundColor: 'color-mix(in oklab, var(--primary), var(--backgroundLight) 85%)',
               },
               formButtonPrimary: {
                 backgroundColor: 'var(--primary)',
                 color: 'var(--background)'
               },
-              footerActionText: { color: 'var(--text-secondary)' },
+              footerActionText: { color: 'var(--textSecondary)' },
               footerActionLink: { color: 'var(--primary)' },
             },
           }}
         >
           <Providers>
-            {children}
+            <AuthGuard>
+              {children}
+            </AuthGuard>
           </Providers>
         </ClerkProvider>
       </body>

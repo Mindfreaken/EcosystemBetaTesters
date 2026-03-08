@@ -4,38 +4,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./styles/Home.css";
 
 const FeatureGrid: React.FC = () => {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const colors = useMemo(() => {
-    const defaults = {
-      background: "#0a0a0a",
-      backgroundDark: "#000000",
-      text: "#eaeaea",
-      textSecondary: "#9ca3af",
-      primary: "#6c47ff",
-      secondary: "#ff2d55",
-      card: "#111111",
-      border: "#2a2a2a",
-      shadow: "0,0,0",
-    } as const;
-
-    if (!mounted) return defaults;
-
-    const css = getComputedStyle(document.documentElement);
-    const get = (name: string, fallback: string) => css.getPropertyValue(name)?.trim() || fallback;
-    // Note: --shadow should be rgb triplet like "0,0,0" if defined; fallback to black
-    return {
-      background: get("--background", defaults.background),
-      backgroundDark: get("--background-dark", defaults.backgroundDark),
-      text: get("--text", defaults.text),
-      textSecondary: get("--text-secondary", defaults.textSecondary),
-      primary: get("--primary", defaults.primary),
-      secondary: get("--secondary", defaults.secondary),
-      card: get("--card", defaults.card),
-      border: get("--border", defaults.border),
-      shadow: get("--shadow-rgb", defaults.shadow),
-    };
-  }, [mounted]);
+  // Note: we no longer need the complex `useMemo` for colors. 
+  // We use CSS variables directly so it stays in sync with ThemeProvider,
+  // and prevents Opera GX from "force dark mode" overriding JS inline hexes.
 
   const features = [
     {
@@ -141,46 +112,47 @@ const FeatureGrid: React.FC = () => {
     <div className="flex justify-center items-center w-full px-4">
       <div className="w-full max-w-6xl px-4 feature-grid-container">
         {features.map((feature) => (
+
           <div
             key={feature.id}
             className="feature-card p-4 sm:p-6 rounded-xl transition-all duration-300 hover:transform hover:scale-105 backdrop-blur-md hover:shadow-neon"
             style={{
-              backgroundColor: `${colors.card}60`,
+              backgroundColor: `color-mix(in oklab, var(--card), transparent 40%)`,
               borderWidth: "1px",
-              borderColor: `${colors.border}60`,
-              boxShadow: `0 8px 32px ${colors.shadow}30`,
+              borderColor: `color-mix(in oklab, var(--border), transparent 40%)`,
+              boxShadow: `0 8px 32px rgba(var(--shadow), 0.3)`,
             }}
           >
             <div className="flex flex-col items-center text-center">
               <div
                 className="mb-3 sm:mb-5 p-3 sm:p-4 rounded-full border-2 icon-glow"
                 style={{
-                  borderColor: colors.primary,
-                  backgroundColor: `${colors.backgroundDark}80`,
-                  boxShadow: `0 0 15px ${colors.primary}80`,
+                  borderColor: 'var(--primary)',
+                  backgroundColor: `color-mix(in oklab, var(--backgroundDark, #000), transparent 20%)`,
+                  boxShadow: `0 0 15px color-mix(in oklab, var(--primary), transparent 20%)`,
                 }}
               >
-                <div style={{ color: colors.primary }}>{renderIcon(feature.icon)}</div>
+                <div style={{ color: 'var(--primary)' }}>{renderIcon(feature.icon)}</div>
               </div>
 
               <h3
                 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-glow"
                 style={{
-                  color: colors.text,
-                  textShadow: `0 0 5px ${colors.primary}80`,
+                  color: 'var(--text)',
+                  textShadow: `0 0 5px color-mix(in oklab, var(--primary), transparent 20%)`,
                 }}
               >
                 {feature.title}
               </h3>
 
-              <p className="text-sm sm:text-base" style={{ color: colors.textSecondary }}>
+              <p className="text-sm sm:text-base" style={{ color: 'var(--textSecondary)' }}>
                 {feature.description}
               </p>
             </div>
           </div>
         ))}
       </div>
-    </div>
+    </div >
   );
 };
 
