@@ -1,0 +1,26 @@
+diff --git a/node_modules/@clerk/nextjs/dist/cjs/server/keyless-custom-headers.js b/node_modules/@clerk/nextjs/dist/cjs/server/keyless-custom-headers.js
+index 760a475..8a4219a 100644
+--- a/node_modules/@clerk/nextjs/dist/cjs/server/keyless-custom-headers.js
++++ b/node_modules/@clerk/nextjs/dist/cjs/server/keyless-custom-headers.js
+@@ -42,7 +42,7 @@ function getNextVersion() {
+     return void 0;
+   }
+ }
+-function formatMetadataHeaders(metadata) {
++async function formatMetadataHeaders(metadata) {
+   const headers2 = new Headers();
+   if (metadata.nodeVersion) {
+     headers2.set("Clerk-Node-Version", metadata.nodeVersion);
+diff --git a/node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js b/node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js
+index 6090a59..dabd695 100644
+--- a/node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js
++++ b/node_modules/@clerk/nextjs/dist/esm/server/keyless-custom-headers.js
+@@ -19,7 +19,7 @@ function getNextVersion() {
+     return void 0;
+   }
+ }
+-function formatMetadataHeaders(metadata) {
++async function formatMetadataHeaders(metadata) {
+   const headers2 = new Headers();
+   if (metadata.nodeVersion) {
+     headers2.set("Clerk-Node-Version", metadata.nodeVersion);

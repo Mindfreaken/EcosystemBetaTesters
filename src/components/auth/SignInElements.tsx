@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef } from "react";
-import * as ClerkElements from '@clerk/elements/common'
-import * as SignInPrimitive from '@clerk/elements/sign-in'
+import * as Clerk from '@clerk/elements/common'
+import * as SignIn from '@clerk/elements/sign-in'
 import { useRouter } from 'next/navigation'
 import { useAuth, useUser, useSignIn } from '@clerk/nextjs'
 import Image from 'next/image'
@@ -20,7 +20,7 @@ export default function SignInElements({
   const router = useRouter();
   const { isSignedIn, isLoaded: isAuthLoaded, getToken } = useAuth();
   const { user } = useUser();
-  const { isLoaded: isSignInLoaded, signIn, setActive } = useSignIn() as any;
+  const { isLoaded: isSignInLoaded, signIn, setActive } = useSignIn();
   const convex = useConvex();
   const hasOnboardedRef = useRef(false);
   const [identifierEntered, setIdentifierEntered] = React.useState("");
@@ -404,31 +404,27 @@ export default function SignInElements({
             Sign in to continue
           </p>
         </div>
-        <SignInPrimitive.Root routing="hash">
-          {/* Start step: identifier + password */}
-          <SignInPrimitive.Step name="start">
+        <SignIn.Root>
+          <SignIn.Step name="start">
             <div className="space-y-4 w-[320px]">
-              <ClerkElements.Field name="identifier">
-                <ClerkElements.Label className="block text-sm">Email</ClerkElements.Label>
-                <ClerkElements.Input
+              <Clerk.Field name="identifier">
+                <Clerk.Label className="block text-sm">Email</Clerk.Label>
+                <Clerk.Input
                   type="email"
                   className={inputClass}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIdentifierEntered(e.target.value)}
                   autoComplete="email"
                 />
-                <ClerkElements.FieldError className="text-sm text-red-400" />
-              </ClerkElements.Field>
+                <Clerk.FieldError className="text-sm text-red-400" />
+              </Clerk.Field>
 
-              <ClerkElements.Field name="password">
-                <ClerkElements.Label className="block text-sm">Password</ClerkElements.Label>
-                <ClerkElements.Input type="password" className={inputClass} />
-                <ClerkElements.FieldError className="text-sm text-red-400" />
-              </ClerkElements.Field>
+              <Clerk.Field name="password">
+                <Clerk.Label className="block text-sm">Password</Clerk.Label>
+                <Clerk.Input type="password" className={inputClass} />
+                <Clerk.FieldError className="text-sm text-red-400" />
+              </Clerk.Field>
 
-              {/* Hidden placeholder for Clerk Smart CAPTCHA (prevents fallback warning). */}
-              <div id="clerk-captcha" aria-hidden className="sr-only" />
-
-              <SignInPrimitive.Action
+              <SignIn.Action
                 submit
                 className={primaryBtnClass}
                 disabled={!identifierEntered}
@@ -438,32 +434,31 @@ export default function SignInElements({
                 }}
               >
                 Sign in
-              </SignInPrimitive.Action>
+              </SignIn.Action>
               <button
                 type="button"
-                onClick={handleStartForgot}
+                onClick={handleForgotPassword}
                 className="block text-xs mt-2 text-right w-full"
                 style={{ color: colors.textSecondary }}
               >
                 Forgot password?
               </button>
             </div>
-          </SignInPrimitive.Step>
+          </SignIn.Step>
 
-          {/* Verification step: email code (if required) */}
-          <SignInPrimitive.Step name="verifications">
-            <SignInPrimitive.Strategy name="email_code">
+          <SignIn.Step name="verifications">
+            <SignIn.Strategy name="email_code">
               <div className="space-y-4 w-[320px]">
                 <p className="text-xs" style={{ color: colors.textSecondary }}>
                   Verification code sent to {identifierEntered || 'your email'}
                 </p>
-                <ClerkElements.Field name="code">
-                  <ClerkElements.Label className="block text-sm">Verification code</ClerkElements.Label>
-                  <ClerkElements.Input className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 tracking-widest text-center text-white outline-none focus:border-white/20 focus:ring-2 focus:ring-indigo-500/60" />
-                  <ClerkElements.FieldError className="text-sm text-red-400" />
-                </ClerkElements.Field>
+                <Clerk.Field name="code">
+                  <Clerk.Label className="block text-sm">Verification code</Clerk.Label>
+                  <Clerk.Input className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 tracking-widest text-center text-white outline-none focus:border-white/20 focus:ring-2 focus:ring-indigo-500/60" />
+                  <Clerk.FieldError className="text-sm text-red-400" />
+                </Clerk.Field>
 
-                <SignInPrimitive.Action
+                <SignIn.Action
                   submit
                   className={primaryBtnClass}
                   style={{
@@ -472,9 +467,9 @@ export default function SignInElements({
                   }}
                 >
                   Verify & Continue
-                </SignInPrimitive.Action>
+                </SignIn.Action>
 
-                <SignInPrimitive.Action
+                <SignIn.Action
                   resend
                   className="block text-sm"
                   style={{ color: 'var(--primary, #6c47ff)' }}
@@ -485,12 +480,13 @@ export default function SignInElements({
                   )}
                 >
                   Resend code
-                </SignInPrimitive.Action>
+                </SignIn.Action>
               </div>
-            </SignInPrimitive.Strategy>
-          </SignInPrimitive.Step>
-        </SignInPrimitive.Root>
+            </SignIn.Strategy>
+          </SignIn.Step>
+        </SignIn.Root>
       </div>
     </div>
   );
 }
+

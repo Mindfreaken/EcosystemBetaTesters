@@ -30,8 +30,8 @@
     "valorant:add-acceptable": "tsx nerdle/valorant_related_words/scripts/addAcceptableVariants.ts"
   },
   "dependencies": {
-    "@clerk/elements": "^0.24.13",
-    "@clerk/nextjs": "^7.0.1",
+    "@clerk/elements": "^0.22.1",
+    "@clerk/nextjs": "^6.31.6",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@hello-pangea/dnd": "^18.0.1",
