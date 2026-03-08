@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef } from "react";
 import * as ClerkElements from '@clerk/elements/common'
 import * as SignInPrimitive from '@clerk/elements/sign-in'
 import { useRouter } from 'next/navigation'
-import { useAuth, useUser, useSignIn } from '@clerk/nextjs'
+import { useAuth, useUser, useSignIn } from '@clerk/clerk-react'
 import Image from 'next/image'
 import { useConvex } from "convex/react";
 import { api } from "../../../convex/_generated/api";

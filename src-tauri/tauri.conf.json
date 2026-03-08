@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Ecosystem",
+  "productName": "EcoSystem Beta",
   "version": "0.1.0",
-  "identifier": "com.ecosystem.app",
+  "identifier": "com.ecosystem.beta.v2",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Ecosystem",
+        "title": "EcoSystem Testers Beta v0.1.0",
         "width": 800,
         "height": 600,
         "resizable": true,
@@ -28,7 +28,7 @@
       "endpoints": [
         "https://api.github.com/repos/Mindfreaken/ecotesters/releases/latest"
       ],
-      "pubkey": "RWRRr2gvROoXXDAGD8I4FxW0CnF6WMjvgmAsm+t6eMTSdJNNKq1t6k5V1"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEZEQTM5NzlENDAxOTk5MTAKUldRUW1SbEFuWmVqL1VYckJUd2hjWlAzTmhyZWg3SlUvUGdZVExtTFNNYU9pUGxYOFlrenR3cEwK"
     }
   },
   "bundle": {

@@ -13,6 +13,14 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
   // Auth modal state
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>("signUp");
+  const [isTauri, setIsTauri] = useState(false);
+
+  useEffect(() => {
+    // Check if running in Tauri environment
+    if (typeof window !== 'undefined' && (window as any).__TAURI_INTERNALS__) {
+      setIsTauri(true);
+    }
+  }, []);
 
   // Note: we no longer need the complex `useMemo` for colors. 
   // We use CSS variables directly so it stays in sync with ThemeProvider,
@@ -67,6 +75,22 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
       <div className="flex-1 flex flex-col items-center justify-center relative z-10 w-full">
         <section className="w-full flex flex-col justify-center items-center text-center px-4 py-12 md:py-16 lg:py-20">
           <div className="max-w-4xl mx-auto w-full">
+            <div className="flex justify-center mb-8">
+              <div className="relative group">
+                {/* Logo with interactive glow effect */}
+                <div
+                  className="absolute -inset-4 rounded-full opacity-30 blur-2xl transition-all duration-500 group-hover:opacity-50"
+                  style={{ background: `radial-gradient(circle, var(--primary) 0%, transparent 70%)` }}
+                />
+                <img
+                  src="/achievements/early_adopter_sticker.png"
+                  alt="Ecosystem Logo"
+                  className="w-32 h-32 md:w-40 md:h-40 relative z-10 transition-transform duration-500 group-hover:scale-105"
+                  style={{ filter: "drop-shadow(0 0 15px color-mix(in oklab, var(--primary), transparent 60%))" }}
+                />
+              </div>
+            </div>
+
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
               <span
                 className="bg-clip-text text-transparent bg-gradient-to-r"
@@ -103,31 +127,33 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
                 Login
               </button>
 
-              <button
-                className="px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-medium transition-all duration-300 border-2 neon-button-outline"
-                style={{
-                  borderColor: 'var(--secondary)',
-                  color: 'var(--text)',
-                  backgroundColor: "transparent",
-                }}
-                onMouseOver={(e) => {
-                  const target = e.currentTarget;
-                  target.style.backgroundColor = 'var(--secondary)';
-                  target.style.boxShadow = `0 0 20px color-mix(in oklab, var(--secondary), transparent 50%), 0 0 10px color-mix(in oklab, var(--secondary), transparent 75%) inset`;
-                  target.style.textShadow = `0 0 8px var(--text)`;
-                  target.style.color = 'var(--background)';
-                }}
-                onMouseLeave={(e) => {
-                  const target = e.currentTarget;
-                  target.style.backgroundColor = "transparent";
-                  target.style.boxShadow = "none";
-                  target.style.textShadow = "none";
-                  target.style.color = 'var(--text)';
-                }}
-                onClick={() => window.open("https://github.com/Mindfreaken/ecotesters/releases/latest", "_blank")}
-              >
-                Download
-              </button>
+              {!isTauri && (
+                <button
+                  className="px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-medium transition-all duration-300 border-2 neon-button-outline"
+                  style={{
+                    borderColor: 'var(--secondary)',
+                    color: 'var(--text)',
+                    backgroundColor: "transparent",
+                  }}
+                  onMouseOver={(e) => {
+                    const target = e.currentTarget;
+                    target.style.backgroundColor = 'var(--secondary)';
+                    target.style.boxShadow = `0 0 20px color-mix(in oklab, var(--secondary), transparent 50%), 0 0 10px color-mix(in oklab, var(--secondary), transparent 75%) inset`;
+                    target.style.textShadow = `0 0 8px var(--text)`;
+                    target.style.color = 'var(--background)';
+                  }}
+                  onMouseLeave={(e) => {
+                    const target = e.currentTarget;
+                    target.style.backgroundColor = "transparent";
+                    target.style.boxShadow = "none";
+                    target.style.textShadow = "none";
+                    target.style.color = 'var(--text)';
+                  }}
+                  onClick={() => window.open("https://github.com/Mindfreaken/ecotesters/releases/latest", "_blank")}
+                >
+                  Download
+                </button>
+              )}
 
               <button
                 className="px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-medium transition-all duration-300 neon-button-primary"

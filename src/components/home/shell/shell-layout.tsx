@@ -106,7 +106,7 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
             onToggleLeft={toggleLeftSidebar}
             onToggleRight={() => setRightSidebarOpen((v) => !v)}
             headerRight={headerRight}
-            title="EcoSystem"
+            title="EcoSystem Testers Beta"
           />
         </Box>
 

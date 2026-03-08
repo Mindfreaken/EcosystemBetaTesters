@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import zxcvbn from "zxcvbn";
 import { useRouter } from "next/navigation";
-import { useSignIn, useSignUp, useClerk } from "@clerk/nextjs";
+import { useSignIn, useSignUp, useClerk } from "@clerk/clerk-react";
 
 export const SignInForm: React.FC<{ redirectUrl?: string }> = ({ redirectUrl = "/home" }) => {
   const router = useRouter();

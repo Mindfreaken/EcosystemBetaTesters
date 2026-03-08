@@ -5,7 +5,7 @@ import zxcvbn from "zxcvbn";
 import * as ClerkElements from '@clerk/elements/common'
 import * as SignUpPrimitive from '@clerk/elements/sign-up'
 import { useRouter } from 'next/navigation'
-import { useAuth, useUser } from '@clerk/nextjs'
+import { useAuth, useUser } from '@clerk/clerk-react'
 import Image from 'next/image'
 import { useConvex } from "convex/react";
 import { api } from "../../../convex/_generated/api";

@@ -15,7 +15,7 @@ export interface HeaderContentProps {
   title?: string;
 }
 
-export default function HeaderContent({ onToggleLeft, onToggleRight, headerRight, title = "EcoSystem" }: HeaderContentProps) {
+export default function HeaderContent({ onToggleLeft, onToggleRight, headerRight, title = "EcoSystem Testers Beta" }: HeaderContentProps) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -32,6 +32,11 @@ export default function HeaderContent({ onToggleLeft, onToggleRight, headerRight
         >
           <PanelLeft size={16} />
         </IconButton>
+        <img
+          src="/achievements/early_adopter_sticker.png"
+          alt="Ecosystem Logo"
+          style={{ width: 24, height: 24, borderRadius: '4px' }}
+        />
         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
           {title}
         </Typography>

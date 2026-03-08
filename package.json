@@ -1,14 +1,15 @@
 {
-  "name": "react-to-next",
+  "name": "ecosystem-testers-beta",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n WEB -c blue \"next dev --webpack\" ",
-    "build": "next build",
+    "dev": "concurrently -n WEB -c blue \"next dev\" ",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
+    "tauri:BUILD": "npm run tauri:build",
     "riot:ingest:local": "tsx scripts/ingestLolMatchLocal.ts",
     "download:league-assets": "tsx scripts/downloadLeagueAssets.ts",
     "gutenberg:extract": "tsx english_word/scripts/extractGutenbergWords.ts",
@@ -30,8 +31,8 @@
     "valorant:add-acceptable": "tsx nerdle/valorant_related_words/scripts/addAcceptableVariants.ts"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.21.0",
     "@clerk/elements": "^0.24.13",
-    "@clerk/nextjs": "^7.0.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@hello-pangea/dnd": "^18.0.1",

@@ -8,7 +8,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import Box from "@mui/material/Box";
 import { useShellView } from "../viewContext";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/clerk-react";
 import { useGetFriendRequests } from "@/convex/friends/getFriendRequests";
 import { Megaphone } from "lucide-react";
 import { useQuery } from "convex/react";

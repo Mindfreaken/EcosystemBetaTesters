@@ -5,9 +5,6 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  turbopack: {
-    root: ".",
-  },
   webpack: (config) => {
     // Remove existing SVG handling (so we can define ours)
     const fileLoaderRule = config.module.rules.find(
