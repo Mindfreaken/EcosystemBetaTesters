@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  // Turbopack config (used by Vercel's default `next build` in Next.js 16)
+  // An explicit turbopack block silences the webpack-conflict error without
+  // needing to replicate every webpack rule (SVGs are not imported in this project).
+  turbopack: {},
+  // Webpack config (used locally via `next build --webpack` / `next dev --webpack`)
   webpack: (config) => {
     // Remove existing SVG handling (so we can define ours)
     const fileLoaderRule = config.module.rules.find(
