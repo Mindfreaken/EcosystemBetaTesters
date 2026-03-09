@@ -60,3 +60,7 @@ next-env.d.ts
 *.key
 *.pub
 /conv_backup/
+
+# Large installer binaries (served via Vercel Blob, not committed to repo)
+/public/downloads/*.exe
+/public/downloads/*.msi
