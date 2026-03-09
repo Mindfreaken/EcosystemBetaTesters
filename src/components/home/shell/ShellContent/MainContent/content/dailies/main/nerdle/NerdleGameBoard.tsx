@@ -430,8 +430,19 @@ export default function NerdleGameBoard({
   const handleEnter = async () => {
     if (!canType || validating) return;
     if (currentGuess.length !== lettersOnlyCount) return; // require full length for now
-    // Skip external dictionary validation so any full-length guess is allowed.
     setValidationError(null);
+    setValidating(true);
+    try {
+      const checkRes = await checkWords({ words: [currentGuess] });
+      if (!checkRes[currentGuess]) {
+        setValidationError("Not in word list");
+        setValidating(false);
+        return;
+      }
+    } catch (e) {
+      console.error("Validation failed", e);
+      // Fallback: allow if validation itself fails
+    }
     setValidating(false);
     if (!startTime) setStartTime(Date.now());
     const guess = currentGuess.toUpperCase();
@@ -642,6 +653,29 @@ export default function NerdleGameBoard({
           </Box>
         </Box>
         {/* Only category hint is supported */}
+        {validationError && (
+          <Box
+            sx={{
+              mt: 1,
+              px: 2,
+              py: 0.5,
+              borderRadius: 1,
+              bgcolor: `color-mix(in oklab, ${themeVar("danger")}, transparent 90%)`,
+              border: `1px solid ${themeVar("danger")}`,
+              animation: "shake 0.5s cubic-bezier(.36,.07,.19,.97) both",
+              "@keyframes shake": {
+                "10%, 90%": { transform: "translate3d(-1px, 0, 0)" },
+                "20%, 80%": { transform: "translate3d(2px, 0, 0)" },
+                "30%, 50%, 70%": { transform: "translate3d(-4px, 0, 0)" },
+                "40%, 60%": { transform: "translate3d(4px, 0, 0)" },
+              },
+            }}
+          >
+            <Typography variant="caption" sx={{ color: themeVar("danger"), fontWeight: 800, letterSpacing: 1 }}>
+              {validationError.toUpperCase()}
+            </Typography>
+          </Box>
+        )}
 
         {/* Board: rows adapt to answer length and spaces */}
         <Box sx={{ display: "grid", gap: 1.1, justifyContent: "center", mt: 1, width: "100%" }}>

@@ -4,11 +4,10 @@ import React, { useState } from "react";
 import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { PanelLeft, PanelRight, X, Home, Settings, User, FileText } from "lucide-react";
+import { PanelLeft, X, Home, Settings, User, FileText } from "lucide-react";
 import Header from "./ShellContent/header";
 import Footer from "./ShellContent/Footer";
 import LeftSidebar from "./ShellContent/LeftSidebar";
-import RightSidebar from "./ShellContent/RightSidebar";
 import MainContent from "./ShellContent/MainContent";
 import GlobalVoicePanel from "./ShellContent/GlobalVoicePanel";
 import { ShellViewProvider, ShellView } from "./ShellContent/viewContext";
@@ -28,7 +27,6 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
   const searchParams = useSearchParams();
   const viewParam = (searchParams?.get("view") || "home") as ShellView;
   const [leftSidebarState, setLeftSidebarState] = useState<LeftSidebarState>("open");
-  const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
 
   // Global Message Sound Logic
   const me = useQuery(api.users.onboarding.queries.me, {});
@@ -74,7 +72,6 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
   // Widths for left sidebar states
   const leftWidth =
     leftSidebarState === "open" ? 256 : leftSidebarState === "collapsed" ? 64 : 0;
-  const rightWidth = rightSidebarOpen ? 256 : 0;
 
   return (
     <ShellViewProvider initialView={viewParam}>
@@ -104,7 +101,6 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
         >
           <Header
             onToggleLeft={toggleLeftSidebar}
-            onToggleRight={() => setRightSidebarOpen((v) => !v)}
             headerRight={headerRight}
             title="EcoSystem Testers Beta"
           />
@@ -128,7 +124,6 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
             <Box sx={{ p: 2, flex: 1, overflowY: "auto", overflowX: "hidden" }}>
               <LeftSidebar
                 state={leftSidebarState}
-                onClose={() => setLeftSidebarState("closed")}
               />
             </Box>
             <GlobalVoicePanel />
@@ -177,21 +172,6 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
             </Box>
           </Box>
 
-          {/* Right Sidebar */}
-          <Box
-            component="aside"
-            sx={{
-              width: rightWidth,
-              transition: "width 300ms ease-in-out",
-              overflow: "hidden",
-              backgroundColor: "var(--card)",
-              borderLeft: "1px solid var(--card-border)",
-            }}
-          >
-            <Box sx={{ p: 2, height: "100%" }}>
-              <RightSidebar onClose={() => setRightSidebarOpen(false)} />
-            </Box>
-          </Box>
         </Box>
 
         {/* Footer */}

@@ -27,6 +27,8 @@ import { Doc, Id } from "convex/_generated/dataModel";
 interface ChannelsTabProps {
     space: Doc<"spaces">;
     role: "owner" | "admin" | "moderator";
+    userRole?: string;
+    canManageChannels: boolean;
 }
 
 const parseRules = (text: string) => {
@@ -49,7 +51,7 @@ const parseRules = (text: string) => {
     }
 }
 
-export default function ChannelsTab({ space, role }: ChannelsTabProps) {
+export default function ChannelsTab({ space, role, userRole, canManageChannels }: ChannelsTabProps) {
     const channels = useQuery(api.spaces.channels.getChannels, { spaceId: space._id });
     const categories = useQuery(api.spaces.channels.getCategories, { spaceId: space._id });
     const createChannel = useMutation(api.spaces.channels.createChannel);
@@ -86,14 +88,10 @@ export default function ChannelsTab({ space, role }: ChannelsTabProps) {
     const [channelToDelete, setChannelToDelete] = React.useState<{ id: Id<"spaceChannels">, name: string } | null>(null);
     const [categoryToDelete, setCategoryToDelete] = React.useState<{ id: Id<"spaceCategories">, name: string } | null>(null);
 
-    const canEditPermissions = role === "owner";
-    const isAdmin = role === "admin";
-    const isMod = role === "moderator";
-    const isOwner = role === "owner";
-
-    const canManageChannels = isOwner ||
-        (isAdmin && (space.adminCanEditChannels ?? true)) ||
-        (isMod && (space.modCanEditChannels ?? false));
+    const canEditPermissions = userRole === "owner";
+    const isAdmin = userRole === "admin";
+    const isMod = userRole === "moderator";
+    const isOwner = userRole === "owner";
 
     if (!canManageChannels) {
         return <Typography sx={{ color: themeVar("textSecondary"), p: 4 }}>You do not have permission to manage channels.</Typography>;

@@ -26,6 +26,7 @@ import ScheduleTab from "./portal-tabs/ScheduleTab";
 interface SpacePortalProps {
     space: Doc<"spaces">;
     role: "owner" | "admin" | "moderator";
+    userRole?: string;
 }
 
 function StatCard({ label, value }: { label: string, value: string | number }) {
@@ -41,7 +42,7 @@ function StatCard({ label, value }: { label: string, value: string | number }) {
     );
 }
 
-export default function SpacePortal({ space, role }: SpacePortalProps) {
+export default function SpacePortal({ space, role, userRole }: SpacePortalProps) {
     const members = useQuery(api.spaces.members.getSpaceMembers, { spaceId: space._id });
 
     // Default tab depends on role or general preference. Activity is a good default.
@@ -67,15 +68,15 @@ export default function SpacePortal({ space, role }: SpacePortalProps) {
 
     const config = portalConfig[role];
 
-    const canEditGeneral = role === "owner" || role === "admin";
-    const isAdmin = role === "admin";
-    const isMod = role === "moderator";
-    const isOwner = role === "owner";
+    const isOwner = userRole === "owner";
+    const isAdmin = userRole === "admin";
+    const isMod = userRole === "moderator";
 
+    const canEditGeneral = isOwner || isAdmin;
     const canManageChannels = isOwner ||
         (isAdmin && (space.adminCanEditChannels ?? true)) ||
         (isMod && (space.modCanEditChannels ?? false));
-    const canManageEmojis = role === "owner" || role === "admin";
+    const canManageEmojis = isOwner || isAdmin;
 
     return (
         <Box sx={{ flex: 1, overflowY: "auto", p: 4, bgcolor: themeVar("background") }}>
@@ -118,7 +119,7 @@ export default function SpacePortal({ space, role }: SpacePortalProps) {
                     {canEditGeneral && <Tab value="general" label="General" />}
                     <Tab value="members" label="Members" />
                     {canManageChannels && <Tab value="channels" label="Channels" />}
-                    {(role === "owner" || role === "admin") && <Tab value="schedule" label="Schedule" />}
+                    {(isOwner || isAdmin) && <Tab value="schedule" label="Schedule" />}
                     <Tab value="polls" label="Polls" />
                     <Tab value="bans" label="Bans & Timeouts" />
                     {canManageEmojis && <Tab value="emojis" label="Emojis" />}
@@ -126,11 +127,11 @@ export default function SpacePortal({ space, role }: SpacePortalProps) {
 
                 <Box>
                     {currentTab === "activity" && <ActivityTab space={space} role={role} />}
-                    {currentTab === "general" && canEditGeneral && <GeneralTab space={space} role={role} />}
-                    {currentTab === "members" && <MembersTab space={space} role={role} />}
-                    {currentTab === "channels" && canManageChannels && <ChannelsTab space={space} role={role} />}
-                    {currentTab === "schedule" && (role === "owner" || role === "admin") && <ScheduleTab space={space} role={role} />}
-                    {currentTab === "polls" && <PollsTab space={space} role={role} />}
+                    {currentTab === "general" && canEditGeneral && <GeneralTab space={space} role={role} userRole={userRole} />}
+                    {currentTab === "members" && <MembersTab space={space} role={role} userRole={userRole} />}
+                    {currentTab === "channels" && canManageChannels && <ChannelsTab space={space} role={role} userRole={userRole} canManageChannels={canManageChannels} />}
+                    {currentTab === "schedule" && (isOwner || isAdmin) && <ScheduleTab space={space} role={role} />}
+                    {currentTab === "polls" && <PollsTab space={space} role={role} userRole={userRole} />}
                     {currentTab === "bans" && <BansTab space={space} role={role} />}
                     {currentTab === "emojis" && canManageEmojis && <EmojisTab space={space} role={role} />}
                 </Box>

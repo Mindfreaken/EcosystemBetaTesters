@@ -15,7 +15,7 @@ import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 
 export default function Header(props: HeaderContentProps) {
-  const { onToggleLeft, onToggleRight, headerRight: headerRightProp, title: titleProp } = props;
+  const { onToggleLeft, headerRight: headerRightProp, title: titleProp } = props;
   const router = useRouter();
   const pathname = usePathname();
   const { setView } = useShellView();
@@ -173,7 +173,6 @@ export default function Header(props: HeaderContentProps) {
   return (
     <HeaderContent
       onToggleLeft={onToggleLeft}
-      onToggleRight={onToggleRight}
       headerRight={headerRight}
       title={titleProp ?? title}
     />

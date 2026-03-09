@@ -25,9 +25,10 @@ import InvitedMembersDialog from "./InvitedMembersDialog";
 interface MembersTabProps {
     space: Doc<"spaces">;
     role: "owner" | "admin" | "moderator";
+    userRole?: string;
 }
 
-export default function MembersTab({ space, role }: MembersTabProps) {
+export default function MembersTab({ space, role, userRole }: MembersTabProps) {
     const members = useQuery(api.spaces.members.getSpaceMembers, { spaceId: space._id });
     const invites = useQuery(api.spaces.invites.getSpaceInvites, { spaceId: space._id });
     const leaderboard = useQuery(api.spaces.invites.getInviteLeaderboard, { spaceId: space._id });

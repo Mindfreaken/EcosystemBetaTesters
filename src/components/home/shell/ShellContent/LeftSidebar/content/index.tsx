@@ -16,10 +16,9 @@ export type LeftSidebarState = "open" | "collapsed" | "closed";
 
 export interface LeftSidebarContentProps {
   state: LeftSidebarState;
-  onClose: () => void;
 }
 
-export default function LeftSidebarContent({ state, onClose }: LeftSidebarContentProps) {
+export default function LeftSidebarContent({ state }: LeftSidebarContentProps) {
   if (state === "closed") return null;
 
   const router = useRouter();
@@ -197,35 +196,6 @@ export default function LeftSidebarContent({ state, onClose }: LeftSidebarConten
     <>
       {state === "open" && (
         <>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              mb: 2,
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <img
-                src="/achievements/early_adopter_sticker.png"
-                alt="Ecosystem Logo"
-                style={{ width: 20, height: 20, borderRadius: '4px' }}
-              />
-              <Typography
-                variant="body2"
-                sx={{
-                  fontWeight: 700,
-                  color: "var(--text)",
-                  letterSpacing: "0.02em"
-                }}
-              >
-                EcoSystem Testers Beta
-              </Typography>
-            </Box>
-            <IconButton size="small" onClick={onClose} sx={{ p: 0.5 }}>
-              <X size={12} />
-            </IconButton>
-          </Box>
 
           {/* Nav list with blended styling from old sidebar */}
           <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>

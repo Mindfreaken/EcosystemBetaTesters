@@ -149,7 +149,7 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
                     target.style.textShadow = "none";
                     target.style.color = 'var(--text)';
                   }}
-                  onClick={() => window.open("https://26tknb7ylqqncjfe.public.blob.vercel-storage.com/EcoSystem.Beta_0.1.0_x64-setup.exe", "_blank")}
+                  onClick={() => window.open("https://26tknb7ylqqncjfe.public.blob.vercel-storage.com/EcoSystem%20Beta_0.1.0_x64-setup.exe", "_blank")}
                 >
                   Download
                 </button>

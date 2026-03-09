@@ -48,11 +48,11 @@ export default function VoiceRoom({ roomId, roomName, spaceId }: VoiceRoomProps)
     const myFullMembership = useQuery(api.spaces.members.getSpaceMember, me?._id ? { spaceId: spaceId as any, userId: me._id } : "skip");
     const isTimedOut = !!(myFullMembership?.timeoutUntil && myFullMembership.timeoutUntil > Date.now());
 
-    const handleJoin = React.useCallback(async () => {
+    const handleJoin = React.useCallback(async (forceRefresh = false) => {
         if (isConnecting) return;
 
-        // Check if we already have a prefetched token for this room
-        if (prefetchedTokens[roomId]) {
+        // Check if we already have a prefetched token for this room (and we're not forcing a refresh)
+        if (prefetchedTokens[roomId] && !forceRefresh) {
             joinRoom(roomId, roomName, spaceId, prefetchedTokens[roomId]);
             return;
         }
@@ -147,7 +147,7 @@ export default function VoiceRoom({ roomId, roomName, spaceId }: VoiceRoomProps)
                         <Button
                             variant="contained"
                             size="large"
-                            onClick={handleJoin}
+                            onClick={() => handleJoin(true)} // Force refresh tokens on manual retry
                             disabled={isConnecting}
                             startIcon={isConnecting ? <CircularProgress size={20} color="inherit" /> : <PhoneCall size={20} />}
                             sx={{

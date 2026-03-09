@@ -8,9 +8,10 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
 import { themeVar } from "@/theme/registry";
-import { Settings, Users, MessageSquare, Hash, Layout, Info, Crown, Shield, ChevronDown, ChevronRight, Volume2, Calendar, BarChart3 } from "lucide-react";
+import { Settings, Users, MessageSquare, Hash, Layout, Info, Crown, Shield, ChevronDown, ChevronRight, Volume2, Calendar, BarChart3, PanelRight } from "lucide-react";
 import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 import OwnerPortal from "./components/OwnerPortal";
 import AdminPortal from "./components/AdminPortal";
 import ModeratorPortal from "./components/ModeratorPortal";
@@ -19,7 +20,9 @@ import ScheduleChannel from "./components/ScheduleChannel";
 import PollsChannel from "./components/PollsChannel";
 import VoiceRoom from "./components/VoiceRoom";
 import UserMembersPortal from "./components/UserMembersPortal";
+import SpaceMembersSidebar from "./components/SpaceMembersSidebar";
 import { useVoiceContext } from "@/context/VoiceContext";
+import { useShellView } from "../../../viewContext";
 
 interface SpaceViewProps {
     spaceId: string;
@@ -29,7 +32,9 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
     const sId = spaceId as Id<"spaces">;
     const space = useQuery(api.spaces.core.getSpace, { spaceId: sId });
     const me = useQuery(api.spaces.core.getMe);
-    const myRole = useQuery(api.spaces.members.getMyRole, { spaceId: sId });
+    const membershipStatus = useQuery(api.spaces.members.getMembershipStatus, { spaceId: sId });
+    const myRole = membershipStatus?.role;
+    const { setView, setSelectedSpaceId } = useShellView();
     const { prefetchTokensForSpace, clearPrefetchedTokensForSpace } = useVoiceContext();
     const channels = useQuery(api.spaces.channels.getChannels, { spaceId: sId });
     const categories = useQuery(api.spaces.channels.getCategories, { spaceId: sId });
@@ -41,6 +46,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
     const [currentView, setCurrentView] = React.useState<"main" | "owner" | "admin" | "mod" | "chat" | "members">("main");
     const [activeChannelId, setActiveChannelId] = React.useState<Id<"spaceChannels"> | null>(null);
     const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>({});
+    const [showMembersSidebar, setShowMembersSidebar] = React.useState(true);
 
     const toggleCategory = (categoryId: string) => {
         setExpandedCategories(prev => ({
@@ -64,6 +70,14 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
             trackView({ spaceId: sId });
         }
     }, [spaceId, trackView, sId]);
+
+    // Handle ban redirection
+    React.useEffect(() => {
+        if (membershipStatus?.isBanned) {
+            setSelectedSpaceId(null);
+            setView("home");
+        }
+    }, [membershipStatus?.isBanned, setSelectedSpaceId, setView]);
 
     // Pre-fetch tokens for all voice rooms in this space
     React.useEffect(() => {
@@ -106,26 +120,14 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
             <Box
                 sx={{
                     width: 260,
-                    borderRight: `1px solid ${themeVar("border")}`,
-                    bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 20%)`,
+                    borderRight: `1px solid var(--card-border)`,
+                    bgcolor: `var(--card)`,
                     display: "flex",
                     flexDirection: "column",
                     flexShrink: 0,
+                    transition: "width 300ms ease-in-out",
                 }}
             >
-                {/* Space Header */}
-                <Box
-                    sx={{
-                        p: 2,
-                        borderBottom: `1px solid ${themeVar("border")}`,
-                        display: "flex",
-                        alignItems: "center",
-                    }}
-                >
-                    <Typography variant="subtitle1" noWrap sx={{ fontWeight: 800, color: themeVar("textLight") }}>
-                        {space.name}
-                    </Typography>
-                </Box>
 
                 {/* Channel List */}
                 <Box sx={{ flex: 1, overflowY: "auto", p: 1 }}>
@@ -354,17 +356,29 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                             </Box>
                         )}
                     </Box>
-                    {/* Removed inactive Info button */}
+                    <IconButton
+                        size="small"
+                        onClick={() => setShowMembersSidebar(v => !v)}
+                        sx={{
+                            color: "var(--textSecondary)",
+                            "&:hover": {
+                                backgroundColor: "color-mix(in oklab, var(--primary), transparent 88%)",
+                                color: "var(--textPrimary)",
+                            },
+                        }}
+                    >
+                        <PanelRight size={16} />
+                    </IconButton>
                 </Box>
 
                 {/* Content Area Rendering */}
                 <Box sx={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
                     {currentView === "owner" && space ? (
-                        <OwnerPortal space={space} />
+                        <OwnerPortal space={space} userRole={myRole ?? undefined} />
                     ) : currentView === "admin" && space ? (
-                        <AdminPortal space={space} />
+                        <AdminPortal space={space} userRole={myRole ?? undefined} />
                     ) : currentView === "mod" && space ? (
-                        <ModeratorPortal space={space} />
+                        <ModeratorPortal space={space} userRole={myRole ?? undefined} />
                     ) : currentView === "members" && space ? (
                         <UserMembersPortal space={space} />
                     ) : currentView === "chat" && activeChannel ? (
@@ -497,6 +511,23 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                     )}
                 </Box>
             </Box>
+
+            {/* Space Members Sidebar (Right Side) */}
+            <Box
+                sx={{
+                    width: showMembersSidebar ? 240 : 0,
+                    borderLeft: showMembersSidebar ? `1px solid var(--card-border)` : "none",
+                    bgcolor: `var(--card)`,
+                    display: "flex",
+                    flexDirection: "column",
+                    flexShrink: 0,
+                    transition: "width 300ms ease-in-out",
+                    p: 0,
+                    overflow: "hidden",
+                }}
+            >
+                <SpaceMembersSidebar spaceId={sId} />
+            </Box>
         </Box>
     );
 }
@@ -513,19 +544,43 @@ function ChannelItem({ icon, label, active = false, unread = false, onClick, ind
                 py: 0.75,
                 ml: indent ? 1 : 0,
                 mb: 0.25,
-                borderRadius: 1.5,
+                borderRadius: 1,
                 cursor: "pointer",
                 position: "relative",
-                color: active ? themeVar("textLight") : (unread ? themeVar("textLight") : themeVar("textSecondary")),
-                bgcolor: active ? `color-mix(in oklab, ${themeVar("primary")}, transparent 85%)` : "transparent",
+                overflow: "hidden",
+                color: active ? "var(--textLight)" : (unread ? "var(--textLight)" : "var(--textSecondary)"),
+                backgroundColor: active
+                    ? "color-mix(in oklab, var(--primary), transparent 92%)"
+                    : "color-mix(in oklab, var(--card), transparent 92%)",
+                borderLeft: "3px solid transparent",
+                borderLeftColor: active ? "var(--primary)" : "transparent",
+                transition: "transform .2s ease, box-shadow .2s ease, background-color .2s ease",
                 "&:hover": {
-                    bgcolor: active ? `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)` : `color-mix(in oklab, ${themeVar("textLight")}, transparent 95%)`,
-                    color: themeVar("textLight"),
+                    backgroundColor: active
+                        ? "color-mix(in oklab, var(--primary), transparent 85%)"
+                        : "color-mix(in oklab, var(--primary), transparent 92%)",
+                    color: "var(--textLight)",
+                    borderLeftColor: "var(--primary)",
+                    transform: "translateX(4px) scale(1.01)",
+                    boxShadow: "0 4px 8px var(--shadow)",
                 },
-                transition: "all 0.2s ease",
+                "&::before": {
+                    content: "''",
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    width: "100%",
+                    height: "100%",
+                    background: "linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 100%)",
+                    transform: "translateX(-100%)",
+                    transition: "transform .3s ease-out",
+                },
+                "&:hover::before": {
+                    transform: "translateX(0)",
+                },
             }}
         >
-            <Box sx={{ display: "flex", alignItems: "center" }}>{icon}</Box>
+            <Box sx={{ display: "grid", placeItems: "center", minWidth: 24 }}>{icon}</Box>
             <Typography variant="body2" sx={{ fontWeight: (active || unread) ? 900 : 500, flex: 1 }}>
                 {label}
             </Typography>
@@ -535,8 +590,8 @@ function ChannelItem({ icon, label, active = false, unread = false, onClick, ind
                         width: 8,
                         height: 8,
                         borderRadius: "50%",
-                        bgcolor: themeVar("primary"),
-                        boxShadow: `0 0 10px ${themeVar("primary")}`,
+                        bgcolor: "var(--primary)",
+                        boxShadow: `0 0 10px var(--primary)`,
                     }}
                 />
             )}

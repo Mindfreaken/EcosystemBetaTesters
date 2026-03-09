@@ -22,6 +22,35 @@ export const getMyRole = query({
 });
 
 /**
+ * Get the current user's membership status in a space, including ban and timeout info.
+ */
+export const getMembershipStatus = query({
+    args: { spaceId: v.id("spaces") },
+    handler: async (ctx, args) => {
+        const user = await ensureUserActive(ctx).catch(() => null);
+        if (!user) return { role: null, isBanned: false, isTimedOut: false };
+
+        const membership = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        const ban = await ctx.db
+            .query("spaceBans")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", user._id))
+            .unique();
+
+        const isTimedOut = !!(membership?.timeoutUntil && membership.timeoutUntil > Date.now());
+
+        return {
+            role: membership?.role ?? null,
+            isBanned: !!ban,
+            isTimedOut,
+        };
+    },
+});
+
+/**
  * Get the list of all members for a space.
  */
 export const getSpaceMembers = query({

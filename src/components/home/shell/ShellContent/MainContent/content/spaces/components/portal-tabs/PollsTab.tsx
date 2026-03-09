@@ -25,6 +25,7 @@ import { themeVar } from "@/theme/registry";
 interface PollsTabProps {
     space: Doc<"spaces">;
     role: "owner" | "admin" | "moderator";
+    userRole?: string;
 }
 
 function formatTimeLeft(expiresAt: number | undefined) {
@@ -40,7 +41,7 @@ function formatTimeLeft(expiresAt: number | undefined) {
     return `Ends in ${minutes}m`;
 }
 
-export function PollsTab({ space, role }: PollsTabProps) {
+export function PollsTab({ space, role, userRole }: PollsTabProps) {
     const polls = useQuery(api.spaces.polls.getPolls, { spaceId: space._id });
     const createPoll = useMutation(api.spaces.polls.createPoll);
     const deletePoll = useMutation(api.spaces.polls.deletePoll);

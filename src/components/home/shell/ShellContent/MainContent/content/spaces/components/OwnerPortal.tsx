@@ -4,8 +4,9 @@ import SpacePortal from './SpacePortal';
 
 interface OwnerPortalProps {
     space: Doc<"spaces">;
+    userRole?: string;
 }
 
-export default function OwnerPortal({ space }: OwnerPortalProps) {
-    return <SpacePortal space={space} role="owner" />;
+export default function OwnerPortal({ space, userRole }: OwnerPortalProps) {
+    return <SpacePortal space={space} role="owner" userRole={userRole} />;
 }

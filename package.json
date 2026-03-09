@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n WEB -c blue \"next dev\" ",
+    "dev": "concurrently -n WEB -c blue \"next dev --webpack\" ",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",

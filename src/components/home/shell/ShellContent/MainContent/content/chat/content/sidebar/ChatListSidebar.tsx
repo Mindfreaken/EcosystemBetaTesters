@@ -71,7 +71,7 @@ export default function ChatListSidebar({
   }, [sortedChats, q]);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", overflowX: "hidden" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
       {/* Header */}
       <SectionHeader
         title={collapsed ? "" : "Chats"}
@@ -132,7 +132,7 @@ export default function ChatListSidebar({
       />
 
       {/* List */}
-      <Box sx={{ overflowY: "auto", overflowX: "hidden", py: 0.5 }}>
+      <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto", overflowX: "hidden", py: 0.5 }}>
         {!me || chats === undefined ? (
           <Typography variant="body2" sx={{ opacity: 0.7, px: 1.25, py: 1 }}>
             Loading chats…
@@ -176,7 +176,7 @@ export default function ChatListSidebar({
                   transition:
                     "transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease",
                   "&:hover": {
-                    transform: "translateX(4px) scale(1.01)",
+                    transform: "translateX(2px)",
                     backgroundColor: "color-mix(in oklab, var(--primary), transparent 92%)",
                     boxShadow: "0 4px 8px var(--shadow)",
                     color: "var(--text)",

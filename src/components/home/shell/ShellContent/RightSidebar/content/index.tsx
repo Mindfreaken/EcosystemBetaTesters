@@ -94,20 +94,31 @@ export default function RightSidebarContent({ onClose }: RightSidebarContentProp
 
   return (
     <>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
-        <Box>
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 600, color: "var(--textLight)", lineHeight: 1.1 }}
-          >
-            Ecosystem Hub
-          </Typography>
-          <Typography variant="caption" sx={{ color: "var(--textSecondary)" }}>
-            Central place for updates, feedback, and experiments
-          </Typography>
+      <Box sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        height: 40,
+        mb: 1.5
+      }}>
+        <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+
         </Box>
-        <IconButton size="small" onClick={onClose} sx={{ p: 0.5 }}>
-          <X size={12} />
+        <IconButton
+          size="small"
+          onClick={onClose}
+          sx={{
+            p: 0.5,
+            color: "var(--textSecondary)",
+            transition: "all 0.2s ease",
+            "&:hover": {
+              color: "var(--text)",
+              backgroundColor: "color-mix(in oklab, var(--primary), transparent 90%)",
+              transform: "scale(1.1)",
+            }
+          }}
+        >
+          <X size={18} strokeWidth={2.5} />
         </IconButton>
       </Box>
 

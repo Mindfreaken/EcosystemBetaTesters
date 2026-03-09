@@ -76,9 +76,9 @@ export default function ChatContent() {
           {/* Left: Chat list sidebar */}
           <Box
             sx={{
-              width: sidebarCollapsed ? 76 : 280,
-              minWidth: sidebarCollapsed ? 72 : 240,
-              maxWidth: sidebarCollapsed ? 90 : 340,
+              width: sidebarCollapsed ? 76 : 260,
+              minWidth: sidebarCollapsed ? 72 : 260,
+              maxWidth: sidebarCollapsed ? 90 : 260,
               height: "100%",
               borderRight: "1px solid var(--borderLight)",
               backgroundColor: "color-mix(in oklab, var(--card), transparent 96%)",

@@ -18,9 +18,10 @@ import { Doc } from "convex/_generated/dataModel";
 interface GeneralTabProps {
     space: Doc<"spaces">;
     role: "owner" | "admin" | "moderator";
+    userRole?: string;
 }
 
-export default function GeneralTab({ space, role }: GeneralTabProps) {
+export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
     const updateMetadata = useMutation(api.spaces.core.updateSpaceMetadata);
     const generateUploadUrl = useMutation(api.chat.storage.generateUploadUrl);
     const saveFileMetadata = useMutation(api.chat.storage.saveFileMetadata);
