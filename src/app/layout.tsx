@@ -26,13 +26,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body suppressHydrationWarning className={`${GeistSans.className} ${GeistSans.variable} ${GeistMono.variable} antialiased pt-8 tauri-window`}>
-        <Providers>
-          <WindowTitleBar />
-          <AuthGuard>
-            {children}
-          </AuthGuard>
-        </Providers>
+      <body suppressHydrationWarning className={`${GeistSans.className} ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+        <div className="flex flex-col h-screen overflow-hidden">
+          <Providers>
+            <WindowTitleBar />
+            <AuthGuard>
+              {children}
+            </AuthGuard>
+          </Providers>
+        </div>
       </body>
     </html>
   )

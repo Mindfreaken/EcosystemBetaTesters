@@ -21,7 +21,7 @@ const WindowTitleBar = () => {
   return (
     <div
       data-tauri-drag-region
-      className="h-8 flex items-center justify-between select-none fixed top-0 left-0 right-0 z-[9999]"
+      className="h-8 flex items-center justify-between select-none shrink-0 z-[9999]"
       style={{
         background: "linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(20, 20, 20, 0.8))",
         backdropFilter: "blur(12px)",

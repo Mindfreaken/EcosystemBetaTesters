@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "EcoSystem Beta",
-  "version": "1.0.0-6",
+  "version": "1.0.0-7",
   "identifier": "com.ecosystem.beta.v2",
   "build": {
     "frontendDist": "../out",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "EcoSystem Testers Beta v1.0.0-6",
+        "title": "EcoSystem Testers Beta v1.0.0-7",
         "width": 1280,
         "height": 800,
         "resizable": true,

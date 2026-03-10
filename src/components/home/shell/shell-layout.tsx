@@ -77,11 +77,12 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
     <ShellViewProvider initialView={viewParam}>
       <Box
         sx={{
-          height: "100dvh",
+          flex: 1,
           display: "flex",
           flexDirection: "column",
           bgcolor: "transparent",
           overflow: "hidden",
+          height: "100%",
         }}
       >
         {/* Header */}
