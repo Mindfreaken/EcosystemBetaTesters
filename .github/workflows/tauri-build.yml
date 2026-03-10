@@ -47,6 +47,6 @@ jobs:
           tagName: v__VERSION__
           releaseName: 'EcoSystem Testers Beta v__VERSION__'
           releaseBody: 'Beta release for EcoSystem Testers. See assets for download.'
-          releaseDraft: true
-          prerelease: true
+          releaseDraft: false
+          prerelease: false
           args: ${{ matrix.settings.args }}
