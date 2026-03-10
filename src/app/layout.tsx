@@ -6,6 +6,7 @@ import Providers from './providers'
 import AuthGuard from '@/components/auth/AuthGuard'
 import '../styles/scrollbar.css'
 import '../styles/sidebar.css'
+import WindowTitleBar from '@/components/layout/WindowTitleBar'
 
 
 export const metadata: Metadata = {
@@ -25,8 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body suppressHydrationWarning className={`${GeistSans.className} ${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+      <body suppressHydrationWarning className={`${GeistSans.className} ${GeistSans.variable} ${GeistMono.variable} antialiased pt-8 tauri-window`}>
         <Providers>
+          <WindowTitleBar />
           <AuthGuard>
             {children}
           </AuthGuard>
