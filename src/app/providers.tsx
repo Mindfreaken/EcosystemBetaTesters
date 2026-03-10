@@ -6,6 +6,7 @@ import { getConvexClient } from "@/lib/convex";
 import { ThemeProvider } from "@/components/home/shell/ShellContent/MainContent/content/theme/content/ThemeProvider";
 import EnsureConvexUser from "@/components/auth/EnsureConvexUser";
 import RedirectOnAuth from "@/components/auth/RedirectOnAuth";
+import AppUpdater from "@/components/layout/AppUpdater";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import { VoiceProvider } from "@/context/VoiceContext";
@@ -75,6 +76,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       <ConvexClientProvider>
         <VoiceProvider>
           <ThemeProvider>
+            <AppUpdater />
             <EnsureConvexUser />
             <RedirectOnAuth home="/home" />
             <SiteWideTouch />
