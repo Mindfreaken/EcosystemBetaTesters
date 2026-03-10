@@ -1,6 +1,6 @@
 {
   "name": "ecosystem-testers-beta",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "concurrently -n WEB -c blue \"next dev --webpack\" ",
