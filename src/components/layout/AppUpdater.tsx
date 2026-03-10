@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { check } from "@tauri-apps/plugin-updater";
-import { relistify } from "@tauri-apps/api/core"; // Just in case, but we use relaunch from the updater
 import { Download, RefreshCw, X, Sparkles } from "lucide-react";
 
 /**
