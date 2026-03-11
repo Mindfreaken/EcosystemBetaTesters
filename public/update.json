@@ -1,11 +1,11 @@
 {
-  "version": "1.0.0-7",
-  "notes": "Initial beta release",
+  "version": "1.0.0-8",
+  "notes": "Improve voice connectivity, fix permissions, and update UI layout",
   "pub_date": "2026-03-11T00:00:00Z",
   "platforms": {
     "windows-x86_64": {
       "signature": "",
-      "url": "https://github.com/Mindfreaken/EcosystemBetaTesters/releases/download/v1.0.0-7/EcoSystem.Beta_1.0.0-7_x64-setup.exe"
+      "url": "https://github.com/Mindfreaken/EcosystemBetaTesters/releases/download/v1.0.0-8/EcoSystem.Beta_1.0.0-8_x64-setup.exe"
     }
   }
 }
