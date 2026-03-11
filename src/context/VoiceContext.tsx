@@ -92,7 +92,6 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     return (
         <VoiceContext.Provider value={{ roomName, channelName, spaceId, token, joinRoom, leaveRoom, prefetchToken, prefetchTokensForSpace, clearPrefetchedTokensForSpace, prefetchedTokens, me }}>
             <LiveKitRoom
-                key={`${roomName}-${token}`}
                 video={false}
                 audio={false} // By setting this to false, LiveKit does not force-publish default audio on connect, allowing saved user choices in MediaDeviceMenu to be respected without being overridden. Users can still toggle audio via the UI buttons which publish using their saved device.
                 token={token ?? undefined}

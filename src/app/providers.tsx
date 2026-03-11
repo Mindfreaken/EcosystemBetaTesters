@@ -74,15 +74,15 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       }}
     >
       <ConvexClientProvider>
-        <VoiceProvider>
-          <ThemeProvider>
-            <AppUpdater />
-            <EnsureConvexUser />
-            <RedirectOnAuth home="/home" />
-            <SiteWideTouch />
+        <ThemeProvider>
+          <AppUpdater />
+          <EnsureConvexUser />
+          <RedirectOnAuth home="/home" />
+          <SiteWideTouch />
+          <VoiceProvider>
             {children}
-          </ThemeProvider>
-        </VoiceProvider>
+          </VoiceProvider>
+        </ThemeProvider>
       </ConvexClientProvider>
     </ClerkProvider>
   );

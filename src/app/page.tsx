@@ -7,14 +7,10 @@ import HomeView from '@/components/landing/HomeView'
 
 export default function Landing() {
   const { isLoaded, userId } = useAuth()
-  const router = useRouter()
 
-  useEffect(() => {
-    if (isLoaded && userId) {
-      router.push('/home')
-    }
-  }, [isLoaded, userId, router])
-
+  // AuthGuard handles the loading state for the entire app.
+  // RedirectOnAuth handles redirection to /home if signed in.
+  
   if (!isLoaded || userId) {
     return null
   }

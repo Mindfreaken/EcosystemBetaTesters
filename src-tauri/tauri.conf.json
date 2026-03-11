@@ -28,7 +28,8 @@
   "plugins": {
     "updater": {
       "endpoints": [
-        "https://api.github.com/repos/Mindfreaken/EcosystemBetaTesters/releases/latest"
+        "http://localhost:3000/update.json",
+        "https://ecotesters.vercel.app/update.json"
       ],
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEZEQTM5NzlENDAxOTk5MTAKUldRUW1SbEFuWmVqL1VYckJUd2hjWlAzTmhyZWg3SlUvUGdZVExtTFNNYU9pUGxYOFlrenR3cEwK"
     }
