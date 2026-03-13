@@ -28,6 +28,10 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
 
     const [editingDescription, setEditingDescription] = React.useState(false);
     const [newDescription, setNewDescription] = React.useState(space.description || "");
+    const [editingName, setEditingName] = React.useState(false);
+    const [newName, setNewName] = React.useState(space.name || "");
+    const [savingName, setSavingName] = React.useState(false);
+
     const [uploadingAvatar, setUploadingAvatar] = React.useState(false);
     const [uploadingCover, setUploadingCover] = React.useState(false);
 
@@ -37,6 +41,23 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
     const handleUpdateDescription = async () => {
         await updateMetadata({ spaceId: space._id, description: newDescription });
         setEditingDescription(false);
+    };
+
+    const handleUpdateName = async () => {
+        const trimmed = newName.trim();
+        if (!trimmed || trimmed === space.name) {
+            setEditingName(false);
+            return;
+        }
+        setSavingName(true);
+        try {
+            await updateMetadata({ spaceId: space._id, name: trimmed });
+            setEditingName(false);
+        } catch (error) {
+            console.error("Error updating name:", error);
+        } finally {
+            setSavingName(false);
+        }
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: "avatar" | "cover") => {
@@ -93,7 +114,7 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
             {/* Branding Section */}
             <Box sx={{
                 borderRadius: 4,
-                bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 30%)`,
+                bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 30%)`,
                 border: `1px solid ${themeVar("border")}`,
                 overflow: "hidden"
             }}>
@@ -108,7 +129,7 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                 }}>
                     <Typography variant="caption" sx={{
                         fontWeight: 800,
-                        color: themeVar("textSecondary"),
+                        color: themeVar("mutedForeground"),
                         letterSpacing: "0.08em",
                         fontSize: "0.75rem",
                         textTransform: "uppercase"
@@ -146,7 +167,7 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                                             "&:hover": { transform: canEdit ? "scale(1.02)" : "none" }
                                         }}
                                     >
-                                        <ImageIcon size={40} style={{ color: themeVar("textSecondary") }} />
+                                        <ImageIcon size={40} style={{ color: themeVar("mutedForeground") }} />
                                     </Avatar>
                                     {uploadingAvatar && (
                                         <CircularProgress size={24} sx={{ position: "absolute", top: "50%", left: "50%", mt: "-12px", ml: "-12px", color: themeVar("primary") }} />
@@ -158,7 +179,7 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                                     )}
                                 </Box>
                             </Tooltip>
-                            <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 600 }}>Space Logo</Typography>
+                            <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 600 }}>Space Logo</Typography>
                         </Box>
 
                         <Box sx={{ flex: 1, display: "flex", flexDirection: "column", gap: 1.5 }}>
@@ -185,7 +206,7 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                                         "&:hover": { borderColor: canEdit ? themeVar("primary") : themeVar("border") }
                                     }}
                                 >
-                                    {!space.coverUrl && !uploadingCover && <ImageIcon size={24} style={{ color: themeVar("textSecondary") }} />}
+                                    {!space.coverUrl && !uploadingCover && <ImageIcon size={24} style={{ color: themeVar("mutedForeground") }} />}
                                     {uploadingCover && <CircularProgress size={24} sx={{ color: themeVar("primary") }} />}
                                     {canEdit && !uploadingCover && (
                                         <Box sx={{ position: "absolute", bottom: 8, right: 8, px: 1.5, py: 0.75, bgcolor: "rgba(0,0,0,0.6)", borderRadius: 2, backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.1)" }}>
@@ -194,7 +215,7 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                                     )}
                                 </Box>
                             </Tooltip>
-                            <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 600, pl: 0.5 }}>Cover Photo</Typography>
+                            <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 600, pl: 0.5 }}>Cover Photo</Typography>
                         </Box>
                     </Box>
 
@@ -213,7 +234,7 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                             <Box sx={{ p: 1, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 85%)` }}>
                                 <Avatar src={space.avatarUrl} sx={{ width: 24, height: 24, borderRadius: 1 }} />
                             </Box>
-                            <Typography variant="body2" sx={{ color: themeVar("textLight"), fontSize: "0.85rem", lineHeight: 1.4, flex: 1, pr: 4 }}>
+                            <Typography variant="body2" sx={{ color: themeVar("foreground"), fontSize: "0.85rem", lineHeight: 1.4, flex: 1, pr: 4 }}>
                                 Your <Box component="span" sx={{ fontWeight: 700, color: themeVar("primary") }}>Space Logo</Box> also serves as the default avatar for your <Box component="span" sx={{ fontWeight: 700 }}>Space Assistant</Box>.
                             </Typography>
                             <IconButton
@@ -223,8 +244,8 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                                     position: "absolute",
                                     top: 4,
                                     right: 4,
-                                    color: themeVar("textSecondary"),
-                                    "&:hover": { color: themeVar("danger"), bgcolor: "rgba(255,0,0,0.1)" }
+                                    color: themeVar("mutedForeground"),
+                                    "&:hover": { color: themeVar("destructive"), bgcolor: "rgba(255,0,0,0.1)" }
                                 }}
                             >
                                 <X size={14} />
@@ -234,10 +255,10 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                 </Box>
             </Box>
 
-            {/* Description Section */}
+            {/* Name Section */}
             <Box sx={{
                 borderRadius: 4,
-                bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 30%)`,
+                bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 30%)`,
                 border: `1px solid ${themeVar("border")}`,
                 overflow: "hidden"
             }}>
@@ -252,7 +273,110 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                 }}>
                     <Typography variant="caption" sx={{
                         fontWeight: 800,
-                        color: themeVar("textSecondary"),
+                        color: themeVar("mutedForeground"),
+                        letterSpacing: "0.08em",
+                        fontSize: "0.75rem",
+                        textTransform: "uppercase"
+                    }}>
+                        Space Name
+                    </Typography>
+                    {canEdit && !editingName && (
+                        <Button
+                            size="small"
+                            onClick={() => setEditingName(true)}
+                            startIcon={<Edit2 size={14} />}
+                            sx={{ color: themeVar("primary"), textTransform: "none", fontWeight: 700 }}
+                        >
+                            Edit
+                        </Button>
+                    )}
+                </Box>
+
+                <Box sx={{ p: 3 }}>
+                    {editingName && canEdit ? (
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                            <TextField
+                                fullWidth
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                placeholder="Enter space name..."
+                                inputProps={{ maxLength: 32 }}
+                                helperText={`${newName.length}/32`}
+                                FormHelperTextProps={{ sx: { textAlign: "right", color: "rgba(255,255,255,0.3)" } }}
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        color: themeVar("foreground"),
+                                        bgcolor: `rgba(0,0,0,0.2)`,
+                                        borderRadius: 3,
+                                        "& fieldset": { borderColor: "rgba(255,255,255,0.1)" },
+                                        "&:hover fieldset": { borderColor: "rgba(255,255,255,0.2)" },
+                                        "&.Mui-focused fieldset": { borderColor: themeVar("primary") },
+                                    }
+                                }}
+                            />
+                            <Box sx={{ display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
+                                <Button
+                                    size="small"
+                                    onClick={() => { setEditingName(false); setNewName(space.name); }}
+                                    sx={{ color: themeVar("mutedForeground"), fontWeight: 700, textTransform: "none" }}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    size="small"
+                                    variant="contained"
+                                    onClick={handleUpdateName}
+                                    disabled={savingName || !newName.trim() || newName === space.name}
+                                    sx={{
+                                        bgcolor: themeVar("primary"),
+                                        color: "white",
+                                        fontWeight: 800,
+                                        textTransform: "none",
+                                        borderRadius: 2,
+                                        px: 3,
+                                        "&:hover": { bgcolor: themeVar("primary"), filter: "brightness(1.1)" }
+                                    }}
+                                >
+                                    {savingName ? "Saving..." : "Save Changes"}
+                                </Button>
+                            </Box>
+                        </Box>
+                    ) : (
+                        <Typography sx={{
+                            color: themeVar("foreground"),
+                            lineHeight: 1.6,
+                            fontSize: "1.1rem",
+                            fontWeight: 700,
+                            bgcolor: `rgba(0,0,0,0.1)`,
+                            p: 2,
+                            borderRadius: 3,
+                            border: `1px solid rgba(255,255,255,0.05)`
+                        }}>
+                            {space.name}
+                        </Typography>
+                    )}
+                </Box>
+            </Box>
+
+            {/* Description Section */}
+            <Box sx={{
+                borderRadius: 4,
+                bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 30%)`,
+                border: `1px solid ${themeVar("border")}`,
+                overflow: "hidden"
+            }}>
+                <Box sx={{
+                    px: 3,
+                    py: 2,
+                    bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 40%)`,
+                    borderBottom: `1px solid ${themeVar("border")}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between"
+                }}>
+                    <Typography variant="caption" sx={{
+                        fontWeight: 800,
+                        color: themeVar("mutedForeground"),
                         letterSpacing: "0.08em",
                         fontSize: "0.75rem",
                         textTransform: "uppercase"
@@ -286,7 +410,7 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                                 FormHelperTextProps={{ sx: { textAlign: "right", color: "rgba(255,255,255,0.3)" } }}
                                 sx={{
                                     "& .MuiOutlinedInput-root": {
-                                        color: themeVar("textLight"),
+                                        color: themeVar("foreground"),
                                         bgcolor: `rgba(0,0,0,0.2)`,
                                         borderRadius: 3,
                                         "& fieldset": { borderColor: "rgba(255,255,255,0.1)" },
@@ -299,7 +423,7 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                                 <Button
                                     size="small"
                                     onClick={() => setEditingDescription(false)}
-                                    sx={{ color: themeVar("textSecondary"), fontWeight: 700, textTransform: "none" }}
+                                    sx={{ color: themeVar("mutedForeground"), fontWeight: 700, textTransform: "none" }}
                                 >
                                     Cancel
                                 </Button>
@@ -323,7 +447,7 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                         </Box>
                     ) : (
                         <Typography sx={{
-                            color: space.description ? themeVar("textLight") : themeVar("textSecondary"),
+                            color: space.description ? themeVar("foreground") : themeVar("mutedForeground"),
                             lineHeight: 1.6,
                             fontSize: "0.95rem",
                             fontStyle: space.description ? "normal" : "italic",
@@ -340,3 +464,5 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
         </Box>
     );
 }
+
+

@@ -17,6 +17,7 @@ import { api } from "convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
 import { themeVar } from "@/theme/registry";
 import { Trash2, FileText, X } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface MemberNotesDialogProps {
     open: boolean;
@@ -29,6 +30,7 @@ interface MemberNotesDialogProps {
 }
 
 export default function MemberNotesDialog({ open, onClose, spaceId, userId, username, avatarUrl, myRole }: MemberNotesDialogProps) {
+    const { toast } = useToast();
     const [newNote, setNewNote] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -45,7 +47,11 @@ export default function MemberNotesDialog({ open, onClose, spaceId, userId, user
             setNewNote("");
         } catch (e: any) {
             console.error("Failed to add note", e);
-            alert(e.message);
+            toast({
+                title: "Failed to Add Note",
+                description: e.message,
+                variant: "destructive",
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -56,7 +62,11 @@ export default function MemberNotesDialog({ open, onClose, spaceId, userId, user
             await deleteNoteMut({ spaceId, noteId });
         } catch (e: any) {
             console.error("Failed to delete note", e);
-            alert(e.message);
+            toast({
+                title: "Failed to Delete Note",
+                description: e.message,
+                variant: "destructive",
+            });
         }
     };
 
@@ -68,8 +78,8 @@ export default function MemberNotesDialog({ open, onClose, spaceId, userId, user
             fullWidth
             PaperProps={{
                 sx: {
-                    bgcolor: themeVar("backgroundAlt"),
-                    color: themeVar("textLight"),
+                    bgcolor: themeVar("muted"),
+                    color: themeVar("foreground"),
                     backgroundImage: 'none',
                     border: `1px solid ${themeVar("border")}`,
                     borderRadius: 4,
@@ -92,10 +102,10 @@ export default function MemberNotesDialog({ open, onClose, spaceId, userId, user
                     </Avatar>
                     <Box>
                         <Typography variant="subtitle1" sx={{ fontWeight: 800, lineHeight: 1 }}>{username}</Typography>
-                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", mt: 0.5 }}>Staff Notes</Typography>
+                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "block", mt: 0.5 }}>Staff Notes</Typography>
                     </Box>
                 </Box>
-                <IconButton onClick={onClose} size="small" sx={{ color: themeVar("textSecondary") }}>
+                <IconButton onClick={onClose} size="small" sx={{ color: themeVar("mutedForeground") }}>
                     <X size={20} />
                 </IconButton>
             </DialogTitle>
@@ -125,7 +135,7 @@ export default function MemberNotesDialog({ open, onClose, spaceId, userId, user
 
                             return (
                                 <Box key={note._id} sx={{
-                                    bgcolor: themeVar("backgroundAlt"),
+                                    bgcolor: themeVar("muted"),
                                     p: 2,
                                     borderRadius: 3,
                                     border: `1px solid ${themeVar("border")}`,
@@ -135,10 +145,10 @@ export default function MemberNotesDialog({ open, onClose, spaceId, userId, user
                                         <Avatar src={note.author.avatarUrl} sx={{ width: 20, height: 20 }}>
                                             {note.author.displayName[0]}
                                         </Avatar>
-                                        <Typography variant="caption" sx={{ fontWeight: 700, color: themeVar("textLight") }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: themeVar("foreground") }}>
                                             {note.author.displayName}
                                         </Typography>
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), ml: 'auto' }}>
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), ml: 'auto' }}>
                                             {new Date(note.createdAt).toLocaleString(undefined, {
                                                 month: 'short', day: 'numeric',
                                                 hour: 'numeric', minute: '2-digit'
@@ -151,15 +161,15 @@ export default function MemberNotesDialog({ open, onClose, spaceId, userId, user
                                                 sx={{
                                                     p: 0.25,
                                                     ml: 0.5,
-                                                    color: themeVar("textSecondary"),
-                                                    "&:hover": { color: themeVar("danger") }
+                                                    color: themeVar("mutedForeground"),
+                                                    "&:hover": { color: themeVar("destructive") }
                                                 }}
                                             >
                                                 <Trash2 size={14} />
                                             </IconButton>
                                         )}
                                     </Box>
-                                    <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", color: themeVar("textLight") }}>
+                                    <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", color: themeVar("foreground") }}>
                                         {note.note}
                                     </Typography>
                                 </Box>
@@ -189,7 +199,7 @@ export default function MemberNotesDialog({ open, onClose, spaceId, userId, user
                         "& .MuiOutlinedInput-root": {
                             bgcolor: themeVar("background"),
                             borderRadius: 2,
-                            color: themeVar("textLight"),
+                            color: themeVar("foreground"),
                             "& fieldset": { borderColor: themeVar("border") },
                             "&:hover fieldset": { borderColor: themeVar("primary") },
                             "&.Mui-focused fieldset": { borderColor: themeVar("primary") }
@@ -215,3 +225,5 @@ export default function MemberNotesDialog({ open, onClose, spaceId, userId, user
         </Dialog>
     );
 }
+
+

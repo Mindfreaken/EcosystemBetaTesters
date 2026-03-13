@@ -47,25 +47,25 @@ export default function BansTab({ space, role }: BansTabProps) {
             <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
                 {/* Bans Section */}
                 <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textSecondary"), mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("mutedForeground"), mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
                         <ShieldAlert size={16} /> BANNED USERS
                     </Typography>
                     <Stack spacing={1} sx={{ maxHeight: 600, overflowY: "auto", pr: 1 }}>
                         {bans?.map((ban: any) => (
-                            <Box key={ban._id} sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("danger")}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <Box key={ban._id} sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px solid ${themeVar("destructive")}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                                     <Avatar src={ban.user?.avatarUrl} sx={{ width: 40, height: 40 }} />
                                     <Box>
-                                        <Typography sx={{ fontWeight: 700, color: themeVar("textLight") }}>{ban.user?.displayName || "User"}</Typography>
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block" }}>Reason: {ban.reason || "No reason specified"}</Typography>
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary") }}>Banned on {new Date(ban.createdAt).toLocaleDateString()}</Typography>
+                                        <Typography sx={{ fontWeight: 700, color: themeVar("foreground") }}>{ban.user?.displayName || "User"}</Typography>
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "block" }}>Reason: {ban.reason || "No reason specified"}</Typography>
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground") }}>Banned on {new Date(ban.createdAt).toLocaleDateString()}</Typography>
                                     </Box>
                                 </Box>
                                 {canUnban && (
                                     <Tooltip title="Revoke Ban">
                                         <IconButton
                                             size="small"
-                                            sx={{ color: themeVar("success") }}
+                                            sx={{ color: themeVar("primary") }}
                                             onClick={() => {
                                                 setConfirmDialog({
                                                     open: true,
@@ -87,8 +87,8 @@ export default function BansTab({ space, role }: BansTabProps) {
                             </Box>
                         ))}
                         {(!bans || bans.length === 0) && (
-                            <Box sx={{ p: 4, textAlign: "center", borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px dashed ${themeVar("border")}` }}>
-                                <Typography variant="body2" sx={{ color: themeVar("textSecondary") }}>No banned users.</Typography>
+                            <Box sx={{ p: 4, textAlign: "center", borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px dashed ${themeVar("border")}` }}>
+                                <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>No banned users.</Typography>
                             </Box>
                         )}
                     </Stack>
@@ -96,25 +96,25 @@ export default function BansTab({ space, role }: BansTabProps) {
 
                 {/* Timeouts Section */}
                 <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textSecondary"), mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("mutedForeground"), mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
                         <Timer size={16} /> ACTIVE TIMEOUTS
                     </Typography>
                     <Stack spacing={1} sx={{ maxHeight: 600, overflowY: "auto", pr: 1 }}>
                         {timeouts?.map((timeout: any) => (
-                            <Box key={timeout._id} sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("warning")}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <Box key={timeout._id} sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px solid ${themeVar("chart4")}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                                     <Avatar src={timeout.user?.avatarUrl} sx={{ width: 40, height: 40 }} />
                                     <Box>
-                                        <Typography sx={{ fontWeight: 700, color: themeVar("textLight") }}>{timeout.user?.displayName || "User"}</Typography>
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block" }}>Reason: {timeout.reason || "No reason specified"}</Typography>
-                                        <Typography variant="caption" sx={{ color: themeVar("warning") }}>Expires: {new Date(timeout.expiresAt).toLocaleString()}</Typography>
+                                        <Typography sx={{ fontWeight: 700, color: themeVar("foreground") }}>{timeout.user?.displayName || "User"}</Typography>
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "block" }}>Reason: {timeout.reason || "No reason specified"}</Typography>
+                                        <Typography variant="caption" sx={{ color: themeVar("chart4") }}>Expires: {new Date(timeout.expiresAt).toLocaleString()}</Typography>
                                     </Box>
                                 </Box>
                                 {canUnban && (
                                     <Tooltip title="Remove Timeout">
                                         <IconButton
                                             size="small"
-                                            sx={{ color: themeVar("success") }}
+                                            sx={{ color: themeVar("primary") }}
                                             onClick={() => {
                                                 setConfirmDialog({
                                                     open: true,
@@ -136,21 +136,23 @@ export default function BansTab({ space, role }: BansTabProps) {
                             </Box>
                         ))}
                         {(!timeouts || timeouts.length === 0) && (
-                            <Box sx={{ p: 4, textAlign: "center", borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px dashed ${themeVar("border")}` }}>
-                                <Typography variant="body2" sx={{ color: themeVar("textSecondary") }}>No active timeouts.</Typography>
+                            <Box sx={{ p: 4, textAlign: "center", borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px dashed ${themeVar("border")}` }}>
+                                <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>No active timeouts.</Typography>
                             </Box>
                         )}
                     </Stack>
                 </Box>
             </Box>
 
-            <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))} PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: "none" } }}>
+            <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))} PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none" } }}>
                 <DialogTitle>{confirmDialog.title}</DialogTitle>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))} sx={{ color: themeVar("textSecondary") }}>Cancel</Button>
-                    <Button variant="contained" onClick={confirmDialog.onConfirm} sx={{ bgcolor: confirmDialog.isDanger ? themeVar("danger") : themeVar("primary"), color: "white" }}>{confirmDialog.confirmLabel}</Button>
+                    <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>
+                    <Button variant="contained" onClick={confirmDialog.onConfirm} sx={{ bgcolor: confirmDialog.isDanger ? themeVar("destructive") : themeVar("primary"), color: "white" }}>{confirmDialog.confirmLabel}</Button>
                 </DialogActions>
             </Dialog>
         </Box>
     );
 }
+
+

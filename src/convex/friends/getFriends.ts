@@ -24,3 +24,5 @@ export function useGetFriends(params: UseGetFriendsParams) {
 
   return result;
 }
+
+

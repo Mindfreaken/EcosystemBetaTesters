@@ -33,6 +33,7 @@ const userChatListItem = v.object({
   _creationTime: v.number(),
   admins: v.optional(v.array(v.id("users"))),
   description: v.optional(v.string()),
+  unreadCount: v.optional(v.number()),
 });
 
 export const getUserChats = query({
@@ -41,6 +42,13 @@ export const getUserChats = query({
   handler: async (ctx, args) => {
     const allChats = await ctx.db.query("chats").collect();
     const userParticipatedChats = allChats.filter((chat: Doc<"chats">) => chat.participants.includes(args.userId));
+
+    // Get all user's read receipts globally once
+    const readReceipts = await ctx.db
+      .query("messageReadReceipts")
+      .withIndex("by_user_recent", (q) => q.eq("userId", args.userId))
+      .collect();
+    const readMessageIds = new Set(readReceipts.map((receipt) => receipt.messageId.toString()));
 
     const processedChats: any[] = [];
     for (const chat of userParticipatedChats) {
@@ -82,6 +90,18 @@ export const getUserChats = query({
         }
       }
 
+      // Calculate unread count for this specific chat
+      const messages = await ctx.db
+        .query("messages")
+        .withIndex("by_chat_and_time", (q) => q.eq("chatId", chat._id))
+        .collect();
+
+      let unreadCount = 0;
+      for (const message of messages) {
+        if (message.senderId?.toString() === args.userId.toString()) continue;
+        if (!readMessageIds.has(message._id.toString())) unreadCount++;
+      }
+
       processedChats.push({
         _id: chat._id,
         name: resolvedName,
@@ -94,6 +114,7 @@ export const getUserChats = query({
         _creationTime: chat._creationTime,
         admins: chat.admins,
         description: chat.description,
+        unreadCount,
       });
     }
 
@@ -575,7 +596,7 @@ export const getChatMembers = query({
       displayName: v.optional(v.string()),
       avatarUrl: v.optional(v.string()),
       isCreator: v.boolean(),
-      isAdmin: v.boolean(),
+      isChatAdmin: v.boolean(),
     })
   ),
   handler: async (ctx, args) => {
@@ -592,7 +613,7 @@ export const getChatMembers = query({
           displayName: userDoc.displayName,
           avatarUrl: userDoc.avatarUrl,
           isCreator: chat.createdBy === userId,
-          isAdmin: chat.admins?.includes(userId) || false,
+          isChatAdmin: chat.admins?.includes(userId) || false,
         });
       }
     }

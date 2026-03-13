@@ -80,20 +80,20 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                 {/* Member Management Section */}
                 <Box>
                     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textSecondary") }}>MEMBER MANAGEMENT</Typography>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("mutedForeground") }}>MEMBER MANAGEMENT</Typography>
                         <TextField
                             size="small" placeholder="Search members..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                             InputProps={{
-                                startAdornment: <InputAdornment position="start"><Search size={14} style={{ color: themeVar("textSecondary") }} /></InputAdornment>,
+                                startAdornment: <InputAdornment position="start"><Search size={14} style={{ color: themeVar("mutedForeground") }} /></InputAdornment>,
                                 sx: {
                                     fontSize: "0.8rem",
                                     height: 32,
                                     bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
-                                    color: themeVar("textLight"),
+                                    color: themeVar("foreground"),
                                     border: `1px solid ${themeVar("border")}`,
                                     borderRadius: 1,
                                     "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                                    "& input::placeholder": { color: themeVar("textSecondary"), opacity: 1 }
+                                    "& input::placeholder": { color: themeVar("mutedForeground"), opacity: 1 }
                                 }
                             }}
                         />
@@ -103,7 +103,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                             <Box
                                 key={member._id}
                                 sx={{
-                                    p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}`,
+                                    p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px solid ${themeVar("border")}`,
                                     display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.2s ease",
                                     "&:hover": { borderColor: themeVar("primary") }
                                 }}
@@ -111,23 +111,23 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                                     <Avatar src={member.user?.avatarUrl} sx={{ width: 40, height: 40 }} />
                                     <Box>
-                                        <Typography sx={{ fontWeight: 700, color: themeVar("textLight") }}>{member.user?.displayName || "User"}</Typography>
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary") }}>Joined {new Date(member.joinedAt).toLocaleDateString()}</Typography>
+                                        <Typography sx={{ fontWeight: 700, color: themeVar("foreground") }}>{member.user?.displayName || "User"}</Typography>
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground") }}>Joined {new Date(member.joinedAt).toLocaleDateString()}</Typography>
                                     </Box>
                                 </Box>
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                                     <Box sx={{
                                         px: 1, py: 0.25, borderRadius: 1, mr: 1,
-                                        bgcolor: member.role === "owner" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` : member.role === "admin" ? `color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)` : member.role === "moderator" ? `color-mix(in oklab, ${themeVar("warning")}, transparent 90%)` : "rgba(0,0,0,0.2)",
-                                        border: `1px solid ${member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("warning") : themeVar("border")}`
-                                    }}>
-                                        <Typography variant="caption" sx={{ fontWeight: 800, color: member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("warning") : themeVar("textSecondary") }}>
-                                            {member.role.toUpperCase()}
-                                        </Typography>
-                                    </Box>
+                                    bgcolor: member.role === "owner" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` : member.role === "admin" ? `color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)` : member.role === "moderator" ? `color-mix(in oklab, ${themeVar("chart4")}, transparent 90%)` : `color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
+                                    border: `1px solid ${member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("chart4") : themeVar("border")}`
+                                }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("chart4") : themeVar("mutedForeground") }}>
+                                        {member.role.toUpperCase()}
+                                    </Typography>
+                                </Box>
 
                                     <Tooltip title="View Notes">
-                                        <IconButton size="small" sx={{ color: themeVar("textSecondary"), "&:hover": { bgcolor: "rgba(255,255,255,0.1)", color: themeVar("textLight") } }} onClick={() => { setNotesDialogMember(member); setNotesDialogOpen(true); }}>
+                                        <IconButton size="small" sx={{ color: themeVar("mutedForeground"), "&:hover": { bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 90%)`, color: themeVar("foreground") } }} onClick={() => { setNotesDialogMember(member); setNotesDialogOpen(true); }}>
                                             <FileText size={18} />
                                         </IconButton>
                                     </Tooltip>
@@ -143,7 +143,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                                     <Tooltip title={`Promote to ${role === "owner" ? "Admin" : "Moderator"}`}>
                                                         <IconButton
                                                             size="small"
-                                                            sx={{ color: themeVar("warning") }}
+                                                            sx={{ color: themeVar("chart4") }}
                                                             onClick={() => {
                                                                 const promoteTo = role === "owner" ? "admin" : "moderator";
                                                                 setConfirmDialog({
@@ -176,7 +176,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                                     <Tooltip title="Demote to Member">
                                                         <IconButton
                                                             size="small"
-                                                            sx={{ color: themeVar("textSecondary") }}
+                                                            sx={{ color: themeVar("mutedForeground") }}
                                                             onClick={() => {
                                                                 setConfirmDialog({
                                                                     open: true, title: "Demote Member", message: `Demote ${member.user?.displayName} to regular member?`, confirmLabel: "Demote", isDanger: true,
@@ -191,7 +191,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
 
                                                 <Tooltip title="Kick Member">
                                                     <IconButton
-                                                        size="small" sx={{ color: themeVar("danger") }}
+                                                        size="small" sx={{ color: themeVar("destructive") }}
                                                         onClick={() => {
                                                             setConfirmDialog({
                                                                 open: true, title: "Kick Member", message: `Are you sure you want to kick ${member.user?.displayName}? They will need a new invite to join back.`, confirmLabel: "Kick", isDanger: true,
@@ -215,7 +215,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                     <Stack spacing={4}>
                         <Box>
                             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textSecondary") }}>INVITE MANAGEMENT</Typography>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("mutedForeground") }}>INVITE MANAGEMENT</Typography>
                                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                                     <Tooltip title={space.allowInvites !== false ? "Disable Invites for Space" : "Enable Invites for Space"}>
                                         <Switch
@@ -224,17 +224,17 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                             onChange={(e) => toggleInvites({ spaceId: space._id, allowInvites: e.target.checked })}
                                             sx={{
                                                 '& .MuiSwitch-switchBase.Mui-checked': {
-                                                    color: themeVar("success"),
+                                                    color: themeVar("primary"),
                                                     '& + .MuiSwitch-track': {
-                                                        backgroundColor: themeVar("success"),
+                                                        backgroundColor: themeVar("primary"),
                                                         opacity: 0.5,
                                                     },
                                                 },
                                                 '& .MuiSwitch-switchBase': {
-                                                    color: themeVar("danger"),
+                                                    color: themeVar("destructive"),
                                                 },
                                                 '& .MuiSwitch-track': {
-                                                    backgroundColor: themeVar("danger"),
+                                                    backgroundColor: themeVar("destructive"),
                                                     opacity: 0.5,
                                                 }
                                             }}
@@ -247,7 +247,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                                     open: true, title: "Revoke All Invites", message: "Are you sure you want to revoke all active invite codes? Existing users are not affected, but all outstanding links will become invalid.", confirmLabel: "Revoke All", isDanger: true,
                                                     onConfirm: async () => { await revokeAllInvites({ spaceId: space._id }); setConfirmDialog(prev => ({ ...prev, open: false })); }
                                                 });
-                                            }} sx={{ color: themeVar("danger") }} disabled={!invites || invites.length === 0}>
+                                            }} sx={{ color: themeVar("destructive") }} disabled={!invites || invites.length === 0}>
                                                 <Trash2 size={20} />
                                             </IconButton>
                                         </span>
@@ -262,8 +262,8 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                 </Box>
                             </Box>
 
-                            <Box sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
-                                <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("textSecondary"), mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+                            <Box sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
+                                <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("mutedForeground"), mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
                                     <Trophy size={14} /> LEADERBOARD
                                 </Typography>
                                 <Stack spacing={1} sx={{ maxHeight: 250, overflowY: "auto" }}>
@@ -274,19 +274,19 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                             sx={{
                                                 display: "flex", alignItems: "center", justifyContent: "space-between", p: 1,
                                                 borderRadius: 1, cursor: "pointer", transition: "all 0.2s ease",
-                                                "&:hover": { bgcolor: "rgba(255,255,255,0.05)" }
+                                                "&:hover": { bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)` }
                                             }}
                                         >
                                             <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}>
-                                                <Typography variant="caption" sx={{ fontWeight: 900, color: index === 0 ? themeVar("highlight") : themeVar("textSecondary"), width: 12 }}>{index + 1}.</Typography>
+                                                <Typography variant="caption" sx={{ fontWeight: 900, color: index === 0 ? themeVar("chart3") : themeVar("mutedForeground"), width: 12 }}>{index + 1}.</Typography>
                                                 <Avatar src={entry.avatarUrl} sx={{ width: 24, height: 24 }} />
-                                                <Typography variant="caption" sx={{ fontWeight: 700, color: themeVar("textLight"), whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{entry.displayName}</Typography>
+                                                <Typography variant="caption" sx={{ fontWeight: 700, color: themeVar("foreground"), whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{entry.displayName}</Typography>
                                             </Box>
                                             <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("primary") }}>{entry.count}</Typography>
                                         </Box>
                                     ))}
                                     {(!leaderboard || leaderboard.length === 0) && (
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontStyle: "italic", textAlign: "center", py: 2, display: "block" }}>No leaderboard data.</Typography>
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontStyle: "italic", textAlign: "center", py: 2, display: "block" }}>No leaderboard data.</Typography>
                                     )}
                                 </Stack>
                             </Box>
@@ -295,11 +295,11 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                 )}
             </Box>
 
-            <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))} PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: "none" } }}>
+            <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))} PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none" } }}>
                 <DialogTitle>{confirmDialog.title}</DialogTitle>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))} sx={{ color: themeVar("textSecondary") }}>Cancel</Button>
-                    <Button variant="contained" onClick={confirmDialog.onConfirm} sx={{ bgcolor: confirmDialog.isDanger ? themeVar("danger") : themeVar("primary"), color: "white" }}>{confirmDialog.confirmLabel}</Button>
+                    <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>
+                    <Button variant="contained" onClick={confirmDialog.onConfirm} sx={{ bgcolor: confirmDialog.isDanger ? themeVar("destructive") : themeVar("primary"), color: themeVar("foreground") }}>{confirmDialog.confirmLabel}</Button>
                 </DialogActions>
             </Dialog>
 
@@ -331,3 +331,5 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
         </Box >
     );
 }
+
+

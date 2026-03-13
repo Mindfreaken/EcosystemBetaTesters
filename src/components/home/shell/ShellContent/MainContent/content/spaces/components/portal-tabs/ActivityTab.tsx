@@ -34,7 +34,7 @@ function StatTable({ title, icon, rows, emptyMessage = "No activity data recorde
             flex: 1,
             minWidth: 0,
             borderRadius: 3,
-            bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 30%)`,
+            bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 30%)`,
             border: `1px solid ${themeVar("border")}`,
             display: "flex",
             flexDirection: "column",
@@ -51,7 +51,7 @@ function StatTable({ title, icon, rows, emptyMessage = "No activity data recorde
             }}>
                 <Typography variant="caption" sx={{
                     fontWeight: 800,
-                    color: themeVar("textSecondary"),
+                    color: themeVar("mutedForeground"),
                     display: "flex",
                     alignItems: "center",
                     gap: 0.75,
@@ -74,7 +74,7 @@ function StatTable({ title, icon, rows, emptyMessage = "No activity data recorde
             }}>
                 <Box />
                 {[
-                    { label: "VISITS", color: themeVar("success") },
+                    { label: "VISITS", color: themeVar("primary") },
                     { label: "MSGS", color: themeVar("primary") },
                     { label: "VOICE", color: themeVar("secondary") },
                 ].map(({ label, color }) => (
@@ -99,7 +99,7 @@ function StatTable({ title, icon, rows, emptyMessage = "No activity data recorde
             <Box sx={{ flex: 1, overflowY: "auto", maxHeight: 300 }}>
                 {rows.length === 0 ? (
                     <Typography variant="caption" sx={{
-                        color: themeVar("textSecondary"),
+                        color: themeVar("mutedForeground"),
                         fontStyle: "italic",
                         display: "block",
                         textAlign: "center",
@@ -119,7 +119,7 @@ function StatTable({ title, icon, rows, emptyMessage = "No activity data recorde
                                     px: 2,
                                     py: 1.25,
                                     bgcolor: i % 2 === 0
-                                        ? "rgba(0,0,0,0.12)"
+                                        ? `color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`
                                         : "transparent",
                                     "&:hover": {
                                         bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)`,
@@ -129,14 +129,14 @@ function StatTable({ title, icon, rows, emptyMessage = "No activity data recorde
                             >
                                 <Typography variant="body2" sx={{
                                     fontWeight: 600,
-                                    color: themeVar("textLight"),
+                                    color: themeVar("foreground"),
                                     fontSize: "0.8rem",
                                     letterSpacing: "0.01em",
                                 }}>
                                     {row.label}
                                 </Typography>
                                 {[
-                                    { value: row.visits, color: themeVar("success") },
+                                    { value: row.visits, color: themeVar("primary") },
                                     { value: row.msgs, color: themeVar("primary") },
                                     { value: row.voice, color: themeVar("secondary") },
                                 ].map(({ value, color }, ci) => (
@@ -220,7 +220,7 @@ export default function ActivityTab({ space, role }: ActivityTabProps) {
                     ].map(({ icon, label, sublabel, value, color }) => (
                         <Box key={label} sx={{
                             borderRadius: 3,
-                            bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 30%)`,
+                            bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 30%)`,
                             border: `1px solid ${themeVar("border")}`,
                             overflow: "hidden",
                         }}>
@@ -234,7 +234,7 @@ export default function ActivityTab({ space, role }: ActivityTabProps) {
                             }}>
                                 <Typography variant="caption" sx={{
                                     fontWeight: 800,
-                                    color: themeVar("textSecondary"),
+                                    color: themeVar("mutedForeground"),
                                     display: "flex",
                                     alignItems: "center",
                                     gap: 0.75,
@@ -257,7 +257,7 @@ export default function ActivityTab({ space, role }: ActivityTabProps) {
                                         {value.toLocaleString()}
                                     </Typography>
                                 </Box>
-                                <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontSize: "0.7rem" }}>
+                                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontSize: "0.7rem" }}>
                                     {sublabel}
                                 </Typography>
                             </Box>
@@ -294,7 +294,7 @@ export default function ActivityTab({ space, role }: ActivityTabProps) {
             <Box sx={{
                 width: { xs: "100%", lg: 340 },
                 flexShrink: 0,
-                bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`,
+                bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`,
                 borderRadius: 3,
                 border: `1px solid ${themeVar("border")}`,
                 display: "flex",
@@ -311,7 +311,7 @@ export default function ActivityTab({ space, role }: ActivityTabProps) {
                 }}>
                     <Typography variant="caption" sx={{
                         fontWeight: 800,
-                        color: themeVar("textSecondary"),
+                        color: themeVar("mutedForeground"),
                         display: "flex",
                         alignItems: "center",
                         gap: 0.75,
@@ -326,34 +326,34 @@ export default function ActivityTab({ space, role }: ActivityTabProps) {
                         {globalActions?.map((action: any) => {
                             let borderColor = themeVar("primary");
                             if (action.actionType.includes("poll")) borderColor = themeVar("secondary");
-                            if (action.actionType.includes("event")) borderColor = themeVar("warning");
+                            if (action.actionType.includes("event")) borderColor = themeVar("chart4");
 
                             return (
                                 <Box key={action._id} sx={{
                                     p: 1.5,
                                     borderRadius: 2,
-                                    bgcolor: "rgba(0,0,0,0.1)",
+                                    bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
                                     borderLeft: `3px solid ${borderColor}`,
                                 }}>
                                     <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
                                         <Avatar src={action.admin?.avatarUrl} sx={{ width: 20, height: 20 }} />
-                                        <Typography variant="caption" sx={{ fontWeight: 700, color: themeVar("textLight"), flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: themeVar("foreground"), flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                             {action.admin?.displayName}
                                         </Typography>
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), flexShrink: 0, fontSize: "0.65rem" }}>
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), flexShrink: 0, fontSize: "0.65rem" }}>
                                             {new Date(action.timestamp).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
                                         </Typography>
                                     </Box>
-                                    <Typography variant="body2" sx={{ color: themeVar("textSecondary"), fontSize: "0.78rem", lineHeight: 1.4, display: "flex", alignItems: "flex-start", gap: 1 }}>
+                                    <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), fontSize: "0.78rem", lineHeight: 1.4, display: "flex", alignItems: "flex-start", gap: 1 }}>
                                         {action.actionType.includes("poll") && <BarChart3 size={14} style={{ marginTop: 2, flexShrink: 0, color: themeVar("secondary") }} />}
-                                        {action.actionType.includes("event") && <CalendarDays size={14} style={{ marginTop: 2, flexShrink: 0, color: themeVar("warning") }} />}
+                                        {action.actionType.includes("event") && <CalendarDays size={14} style={{ marginTop: 2, flexShrink: 0, color: themeVar("chart4") }} />}
                                         {action.details}
                                     </Typography>
                                 </Box>
                             );
                         })}
                         {(!globalActions || globalActions.length === 0) && (
-                            <Typography variant="body2" sx={{ color: themeVar("textSecondary"), textAlign: "center", py: 4 }}>
+                            <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), textAlign: "center", py: 4 }}>
                                 Audit logs are empty.
                             </Typography>
                         )}
@@ -363,3 +363,5 @@ export default function ActivityTab({ space, role }: ActivityTabProps) {
         </Box>
     );
 }
+
+

@@ -89,12 +89,12 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
     const [categoryToDelete, setCategoryToDelete] = React.useState<{ id: Id<"spaceCategories">, name: string } | null>(null);
 
     const canEditPermissions = userRole === "owner";
-    const isAdmin = userRole === "admin";
+    const isSpaceAdmin = userRole === "admin";
     const isMod = userRole === "moderator";
     const isOwner = userRole === "owner";
 
     if (!canManageChannels) {
-        return <Typography sx={{ color: themeVar("textSecondary"), p: 4 }}>You do not have permission to manage channels.</Typography>;
+        return <Typography sx={{ color: themeVar("mutedForeground"), p: 4 }}>You do not have permission to manage channels.</Typography>;
     }
 
     const handleOpenWelcomeSetup = () => {
@@ -242,20 +242,20 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 p: 2, borderRadius: 3,
                 bgcolor: "rgba(0,0,0,0.15)",
-                border: `1px solid ${value ? `color-mix(in oklab, ${themeVar("success")}, transparent 70%)` : "rgba(255,255,255,0.05)"}`,
+                border: `1px solid ${value ? `color-mix(in oklab, ${themeVar("primary")}, transparent 70%)` : "rgba(255,255,255,0.05)"}`,
                 cursor: "pointer",
                 transition: "all 0.2s ease",
                 "&:hover": {
                     bgcolor: "rgba(0,0,0,0.25)",
-                    borderColor: value ? themeVar("success") : "rgba(255,255,255,0.15)",
+                    borderColor: value ? themeVar("primary") : "rgba(255,255,255,0.15)",
                 }
             }}
         >
-            <Typography variant="body2" sx={{ color: themeVar("textLight"), fontWeight: 600 }}>{label}</Typography>
+            <Typography variant="body2" sx={{ color: themeVar("foreground"), fontWeight: 600 }}>{label}</Typography>
             <Box
                 sx={{
                     width: 44, height: 24, borderRadius: 12,
-                    bgcolor: value ? themeVar("success") : "rgba(255,255,255,0.1)",
+                    bgcolor: value ? themeVar("primary") : "rgba(255,255,255,0.1)",
                     position: "relative",
                     transition: "background-color 0.3s ease"
                 }}
@@ -280,13 +280,13 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
             <Box sx={{ flex: 1 }}>
                 <Box sx={{ mb: 4, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <Box>
-                        <Typography variant="h6" sx={{ fontWeight: 900, color: themeVar("textLight") }}>Space Control Center</Typography>
-                        <Typography variant="body2" sx={{ color: themeVar("textSecondary") }}>Manage categories and channel structure.</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 900, color: themeVar("foreground") }}>Space Control Center</Typography>
+                        <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>Manage categories and channel structure.</Typography>
                     </Box>
                     <Box sx={{ display: "flex", gap: 1.5 }}>
                         <Button
                             startIcon={<Plus size={16} />} onClick={() => setCreatingCategory(true)}
-                            sx={{ color: themeVar("textSecondary"), bgcolor: "rgba(255,255,255,0.05)", textTransform: "none", fontWeight: 700, "&:hover": { bgcolor: "rgba(255,255,255,0.1)" } }}
+                            sx={{ color: themeVar("mutedForeground"), bgcolor: "rgba(255,255,255,0.05)", textTransform: "none", fontWeight: 700, "&:hover": { bgcolor: "rgba(255,255,255,0.1)" } }}
                         >
                             Category
                         </Button>
@@ -307,48 +307,149 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                     </Box>
                 </Box>
 
-                {creatingCategory && (
-                    <Box sx={{ p: 2.5, mb: 3, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("background")}, white 1%)`, border: `1px solid ${themeVar("primary")}`, boxShadow: `0 4px 20px rgba(0,0,0,0.4)` }}>
-                        <Stack spacing={2.5}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textLight") }}>Create Category</Typography>
+                <Box sx={{ mb: 4, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 900, color: themeVar("foreground") }}>Space Control Center</Typography>
+                        <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>Manage categories and channel structure.</Typography>
+                    </Box>
+                    <Box sx={{ display: "flex", gap: 1.5 }}>
+                        <Button
+                            startIcon={<Plus size={16} />} onClick={() => setCreatingCategory(true)}
+                            sx={{ color: themeVar("mutedForeground"), bgcolor: "rgba(255,255,255,0.05)", textTransform: "none", fontWeight: 700, "&:hover": { bgcolor: "rgba(255,255,255,0.1)" } }}
+                        >
+                            Category
+                        </Button>
+                        <Button
+                            variant="contained" startIcon={<MessageSquarePlus size={16} />} onClick={() => setCreatingChannel(true)}
+                            sx={{
+                                bgcolor: themeVar("primary"), color: "white", textTransform: "none", fontWeight: 800, px: 2,
+                                "&:hover": {
+                                    bgcolor: themeVar("primary"),
+                                    filter: "brightness(1.1)",
+                                    boxShadow: `0 4px 12px color-mix(in oklab, ${themeVar("primary")}, transparent 50%)`,
+                                },
+                                transition: "all 0.2s ease"
+                            }}
+                        >
+                            New Channel
+                        </Button>
+                    </Box>
+                </Box>
+
+                {/* Create Category Modal */}
+                <Dialog 
+                    open={creatingCategory} 
+                    onClose={() => { setCreatingCategory(false); setNewCategoryName(""); }}
+                    slotProps={{
+                        backdrop: {
+                            sx: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                                backdropFilter: 'blur(4px)',
+                            }
+                        }
+                    }}
+                    PaperProps={{
+                        sx: {
+                            bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
+                            backdropFilter: "blur(12px)",
+                            borderRadius: "9px",
+                            border: `1px solid ${themeVar("border")}`,
+                            backgroundImage: "none",
+                            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                            width: "100%",
+                            maxWidth: 400
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{ 
+                        fontWeight: 900, 
+                        color: themeVar("foreground"),
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        pb: 1
+                    }}>
+                        Create Category
+                        <IconButton size="small" onClick={() => { setCreatingCategory(false); setNewCategoryName(""); }} sx={{ color: themeVar("mutedForeground") }}>
+                            <X size={18} />
+                        </IconButton>
+                    </DialogTitle>
+                    <DialogContent>
+                        <Box sx={{ py: 1 }}>
                             <TextField
                                 size="small" fullWidth label="Category Name" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)}
                                 placeholder="e.g. text channels" autoFocus
-                                InputLabelProps={{ sx: { color: themeVar("textSecondary"), "&.Mui-focused": { color: themeVar("primary") } } }}
-                                InputProps={{ sx: { color: themeVar("textLight"), bgcolor: "rgba(0,0,0,0.2)", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" }, "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") } } }}
+                                InputLabelProps={{ sx: { color: themeVar("mutedForeground"), "&.Mui-focused": { color: themeVar("primary") } } }}
+                                InputProps={{ sx: { color: themeVar("foreground"), bgcolor: "rgba(0,0,0,0.2)", borderRadius: 2, "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" }, "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") } } }}
                             />
-                            <Box sx={{ display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-                                <Button size="small" onClick={() => { setCreatingCategory(false); setNewCategoryName(""); }} sx={{ color: themeVar("textSecondary"), textTransform: "none", fontWeight: 700 }}>Cancel</Button>
-                                <Button size="small" variant="contained" onClick={handleCreateCategory} disabled={!newCategoryName.trim()} sx={{ bgcolor: themeVar("primary"), color: "white", fontWeight: 900, textTransform: "uppercase" }}>Create</Button>
-                            </Box>
-                        </Stack>
-                    </Box>
-                )}
+                        </Box>
+                    </DialogContent>
+                    <DialogActions sx={{ p: 2.5, gap: 1.5 }}>
+                        <Button onClick={() => { setCreatingCategory(false); setNewCategoryName(""); }} sx={{ color: themeVar("mutedForeground"), fontWeight: 700, textTransform: "none" }}>Cancel</Button>
+                        <Button variant="contained" onClick={handleCreateCategory} disabled={!newCategoryName.trim()} sx={{ bgcolor: themeVar("primary"), color: "white", fontWeight: 900, px: 3, borderRadius: 2 }}>Create</Button>
+                    </DialogActions>
+                </Dialog>
 
-                {creatingChannel && (
-                    <Box sx={{ p: 2.5, mb: 3, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("background")}, white 1%)`, border: `1px solid ${themeVar("primary")}`, boxShadow: `0 4px 20px rgba(0,0,0,0.4)` }}>
-                        <Stack spacing={2.5}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textLight") }}>Create Channel</Typography>
+                {/* Create Channel Modal */}
+                <Dialog 
+                    open={creatingChannel} 
+                    onClose={() => { setCreatingChannel(false); setNewChannelName(""); }}
+                    slotProps={{
+                        backdrop: {
+                            sx: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                                backdropFilter: 'blur(4px)',
+                            }
+                        }
+                    }}
+                    PaperProps={{
+                        sx: {
+                            bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
+                            backdropFilter: "blur(12px)",
+                            borderRadius: "9px",
+                            border: `1px solid ${themeVar("border")}`,
+                            backgroundImage: "none",
+                            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                            width: "100%",
+                            maxWidth: 450
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{ 
+                        fontWeight: 900, 
+                        color: themeVar("foreground"),
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        pb: 1
+                    }}>
+                        Create Channel
+                        <IconButton size="small" onClick={() => { setCreatingChannel(false); setNewChannelName(""); }} sx={{ color: themeVar("mutedForeground") }}>
+                            <X size={18} />
+                        </IconButton>
+                    </DialogTitle>
+                    <DialogContent>
+                        <Stack spacing={2.5} sx={{ py: 1 }}>
                             <TextField
                                 size="small" fullWidth label="Channel Name" value={newChannelName} onChange={(e) => setNewChannelName(e.target.value)}
                                 placeholder="e.g. general" autoFocus
                                 InputLabelProps={{
                                     shrink: true,
-                                    sx: { color: themeVar("textLight"), fontWeight: 700, "&.Mui-focused": { color: themeVar("primary") } }
+                                    sx: { color: themeVar("foreground"), fontWeight: 700, "&.Mui-focused": { color: themeVar("primary") } }
                                 }}
                                 InputProps={{
                                     startAdornment: newChannelType === "text" ? <MessageSquare size={16} style={{ marginRight: 8, color: themeVar("primary") }} /> : <Volume2 size={16} style={{ marginRight: 8, color: themeVar("primary") }} />,
                                     sx: {
-                                        color: themeVar("textLight"),
-                                        bgcolor: "rgba(0,0,0,0.4)",
-                                        "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.2)", borderWidth: 2 },
-                                        "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
-                                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") }
+                                        color: themeVar("foreground"),
+                                        bgcolor: "rgba(0,0,0,0.3)",
+                                        borderRadius: 2,
+                                        "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+                                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary"), borderWidth: 2 }
                                     }
                                 }}
                             />
 
-                            <Box sx={{ p: 0.5, bgcolor: "rgba(0,0,0,0.3)", borderRadius: 2, display: "flex", gap: 0.5 }}>
+                            <Box sx={{ p: 0.5, bgcolor: "rgba(0,0,0,0.2)", borderRadius: 2, display: "flex", gap: 0.5 }}>
                                 <Button
                                     fullWidth size="small"
                                     onClick={() => setNewChannelType("text")}
@@ -357,7 +458,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                                     sx={{
                                         textTransform: "none", borderRadius: 1.5, fontWeight: 700,
                                         bgcolor: newChannelType === "text" ? themeVar("primary") : "transparent",
-                                        color: newChannelType === "text" ? "white" : themeVar("textSecondary"),
+                                        color: newChannelType === "text" ? "white" : themeVar("mutedForeground"),
                                         "&:hover": { bgcolor: newChannelType === "text" ? themeVar("primary") : "rgba(255,255,255,0.05)" }
                                     }}
                                 >
@@ -371,7 +472,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                                     sx={{
                                         textTransform: "none", borderRadius: 1.5, fontWeight: 700,
                                         bgcolor: newChannelType === "voice" ? themeVar("primary") : "transparent",
-                                        color: newChannelType === "voice" ? "white" : themeVar("textSecondary"),
+                                        color: newChannelType === "voice" ? "white" : themeVar("mutedForeground"),
                                         "&:hover": { bgcolor: newChannelType === "voice" ? themeVar("primary") : "rgba(255,255,255,0.05)" }
                                     }}
                                 >
@@ -380,33 +481,33 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                             </Box>
 
                             <FormControl fullWidth size="small">
-                                <InputLabel shrink sx={{ color: themeVar("textLight"), fontWeight: 700, "&.Mui-focused": { color: themeVar("primary") } }}>Category (Optional)</InputLabel>
+                                <InputLabel shrink sx={{ color: themeVar("foreground"), fontWeight: 700, "&.Mui-focused": { color: themeVar("primary") } }}>Category (Optional)</InputLabel>
                                 <Select
                                     value={newChannelCategoryId} label="Category (Optional)" onChange={(e) => setNewChannelCategoryId(e.target.value as any)}
                                     sx={{
-                                        color: themeVar("textLight"),
-                                        bgcolor: "rgba(0,0,0,0.4)",
-                                        "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.2)", borderWidth: 2 },
-                                        "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.3)" },
-                                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") },
-                                        "& .MuiSvgIcon-root": { color: themeVar("textSecondary") }
+                                        color: themeVar("foreground"),
+                                        bgcolor: "rgba(0,0,0,0.3)",
+                                        borderRadius: 2,
+                                        "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+                                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary"), borderWidth: 2 },
+                                        "& .MuiSvgIcon-root": { color: themeVar("mutedForeground") }
                                     }}
-                                    MenuProps={{ PaperProps: { sx: { bgcolor: themeVar("backgroundAlt"), border: `1px solid ${themeVar("border")}` } } }}
+                                    MenuProps={{ PaperProps: { sx: { bgcolor: themeVar("muted"), border: `1px solid ${themeVar("border")}`, borderRadius: 2 } } }}
                                 >
-                                    <MenuItem value="" sx={{ color: themeVar("textLight") }}><em>None</em></MenuItem>
+                                    <MenuItem value="" sx={{ color: themeVar("foreground") }}><em>None</em></MenuItem>
                                     {categories?.sort((a, b) => a.order - b.order).map(cat => (
-                                        <MenuItem key={cat._id} value={cat._id} sx={{ color: themeVar("textLight") }}>{cat.name}</MenuItem>
+                                        <MenuItem key={cat._id} value={cat._id} sx={{ color: themeVar("foreground") }}>{cat.name}</MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
                             {renderToggle("Read-Only Channel (Staff Only)", newChannelIsReadOnly, () => setNewChannelIsReadOnly(!newChannelIsReadOnly))}
-                            <Box sx={{ display: "flex", gap: 1.5, justifyContent: "flex-end" }}>
-                                <Button size="small" onClick={() => { setCreatingChannel(false); setNewChannelName(""); setNewChannelCategoryId(""); setNewChannelIsReadOnly(false); }} sx={{ color: themeVar("textSecondary"), textTransform: "none", fontWeight: 700 }}>Cancel</Button>
-                                <Button size="small" variant="contained" onClick={handleCreateChannel} disabled={!newChannelName.trim()} sx={{ bgcolor: themeVar("primary"), color: "white", fontWeight: 900, textTransform: "uppercase" }}>Create</Button>
-                            </Box>
                         </Stack>
-                    </Box>
-                )}
+                    </DialogContent>
+                    <DialogActions sx={{ p: 2.5, gap: 1.5 }}>
+                        <Button onClick={() => { setCreatingChannel(false); setNewChannelName(""); setNewChannelCategoryId(""); setNewChannelIsReadOnly(false); }} sx={{ color: themeVar("mutedForeground"), fontWeight: 700, textTransform: "none" }}>Cancel</Button>
+                        <Button variant="contained" onClick={handleCreateChannel} disabled={!newChannelName.trim()} sx={{ bgcolor: themeVar("primary"), color: "white", fontWeight: 900, px: 3, borderRadius: 2 }}>Create Channel</Button>
+                    </DialogActions>
+                </Dialog>
 
                 <DragDropContext onDragEnd={onDragEnd}>
                     <Droppable droppableId="categories" type="category">
@@ -418,7 +519,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                                         {(pProvided) => (
                                             <Box ref={pProvided.innerRef} {...pProvided.droppableProps}>
                                                 {channels?.filter(c => !c.categoryId).length !== undefined && channels.filter(c => !c.categoryId).length > 0 && (
-                                                    <Typography variant="overline" sx={{ display: "block", color: themeVar("textSecondary"), fontWeight: 800, mb: 1, pl: 1 }}>Uncategorized</Typography>
+                                                    <Typography variant="overline" sx={{ display: "block", color: themeVar("mutedForeground"), fontWeight: 800, mb: 1, pl: 1 }}>Uncategorized</Typography>
                                                 )}
                                                 <Stack spacing={1}>
                                                     {channels?.filter(c => !c.categoryId)
@@ -447,25 +548,25 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                                         {(draggableProvided) => (
                                             <Box
                                                 ref={draggableProvided.innerRef} {...draggableProvided.draggableProps} {...draggableProvided.dragHandleProps}
-                                                sx={{ bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 30%)`, p: 0, borderRadius: 3, border: `1px solid ${themeVar("border")}`, overflow: "hidden" }}
+                                                sx={{ bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 30%)`, p: 0, borderRadius: 3, border: `1px solid ${themeVar("border")}`, overflow: "hidden" }}
                                             >
                                                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, py: 1.25, bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 40%)`, borderBottom: `1px solid ${themeVar("border")}`, "&:hover .cat-actions": { opacity: 1 } }}>
                                                     {editingCategoryId === category._id ? (
                                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1, mr: 2 }}>
-                                                            <TextField size="small" value={editingCategoryName} onChange={e => setEditingCategoryName(e.target.value)} autoFocus InputProps={{ sx: { color: themeVar("textLight"), height: 32, bgcolor: "rgba(0,0,0,0.2)" } }} />
-                                                            <IconButton size="small" onClick={handleUpdateCategory} sx={{ color: themeVar("success") }}><Check size={16} /></IconButton>
-                                                            <IconButton size="small" onClick={() => { setEditingCategoryId(null); setEditingCategoryName(""); }} sx={{ color: themeVar("danger") }}><X size={16} /></IconButton>
+                                                            <TextField size="small" value={editingCategoryName} onChange={e => setEditingCategoryName(e.target.value)} autoFocus InputProps={{ sx: { color: themeVar("foreground"), height: 32, bgcolor: "rgba(0,0,0,0.2)" } }} />
+                                                            <IconButton size="small" onClick={handleUpdateCategory} sx={{ color: themeVar("primary") }}><Check size={16} /></IconButton>
+                                                            <IconButton size="small" onClick={() => { setEditingCategoryId(null); setEditingCategoryName(""); }} sx={{ color: themeVar("destructive") }}><X size={16} /></IconButton>
                                                         </Box>
                                                     ) : (
                                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                            <GripVertical size={16} style={{ color: themeVar("textSecondary") }} />
-                                                            <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 800, letterSpacing: "0.08em", fontSize: "0.68rem" }}>{category.name}</Typography>
+                                                            <GripVertical size={16} style={{ color: themeVar("mutedForeground") }} />
+                                                            <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 800, letterSpacing: "0.08em", fontSize: "0.68rem" }}>{category.name}</Typography>
                                                         </Box>
                                                     )}
                                                     {editingCategoryId !== category._id && (
                                                         <Box className="cat-actions" sx={{ opacity: 0.5, transition: "opacity 0.2s", display: "flex", gap: 0.5 }}>
-                                                            <IconButton size="small" onClick={() => { setEditingCategoryId(category._id); setEditingCategoryName(category.name); }}><Edit2 size={14} color={themeVar("textSecondary")} /></IconButton>
-                                                            <IconButton size="small" onClick={() => setCategoryToDelete({ id: category._id, name: category.name })}><Trash2 size={14} color={themeVar("danger")} /></IconButton>
+                                                            <IconButton size="small" onClick={() => { setEditingCategoryId(category._id); setEditingCategoryName(category.name); }}><Edit2 size={14} color={themeVar("mutedForeground")} /></IconButton>
+                                                            <IconButton size="small" onClick={() => setCategoryToDelete({ id: category._id, name: category.name })}><Trash2 size={14} color={themeVar("destructive")} /></IconButton>
                                                         </Box>
                                                     )}
                                                 </Box>
@@ -487,7 +588,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                                                                         />
                                                                     ))}
                                                                 {channels?.filter(c => c.categoryId === category._id).length === 0 && (
-                                                                    <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontStyle: "italic", pl: 2, py: 1 }}>Empty category</Typography>
+                                                                    <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontStyle: "italic", pl: 2, py: 1 }}>Empty category</Typography>
                                                                 )}
                                                                 {cProvided.placeholder}
                                                             </Stack>
@@ -505,7 +606,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                 </DragDropContext>
 
                 {channels?.length === 0 && categories?.length === 0 && (
-                    <Typography variant="body2" sx={{ color: themeVar("textSecondary"), textAlign: "center", py: 4, fontStyle: "italic" }}>
+                    <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), textAlign: "center", py: 4, fontStyle: "italic" }}>
                         No categories or channels created yet.
                     </Typography>
                 )}
@@ -516,7 +617,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                 <Box sx={{ width: { xs: "100%", lg: 320 }, flexShrink: 0 }}>
                     <Box sx={{
                         borderRadius: 3,
-                        bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 30%)`,
+                        bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 30%)`,
                         border: `1px solid ${themeVar("border")}`,
                         overflow: "hidden",
                         position: { lg: "sticky" },
@@ -530,7 +631,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                         }}>
                             <Typography variant="caption" sx={{
                                 fontWeight: 800,
-                                color: themeVar("textSecondary"),
+                                color: themeVar("mutedForeground"),
                                 letterSpacing: "0.08em",
                                 fontSize: "0.68rem",
                             }}>
@@ -540,7 +641,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                         <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 2.5 }}>
                             {/* Admin Permissions */}
                             <Box>
-                                <Typography variant="caption" sx={{ display: "block", color: themeVar("textSecondary"), fontWeight: 900, mb: 1, ml: 1, fontSize: "0.6rem", letterSpacing: "0.1em" }}>ADMINS</Typography>
+                                <Typography variant="caption" sx={{ display: "block", color: themeVar("mutedForeground"), fontWeight: 900, mb: 1, ml: 1, fontSize: "0.6rem", letterSpacing: "0.1em" }}>ADMINS</Typography>
                                 <Stack spacing={1}>
                                     {renderToggle("Can edit channels", space.adminCanEditChannels ?? true, () => updateChannelPermissions({ spaceId: space._id, adminCanEdit: !(space.adminCanEditChannels ?? true) }))}
                                     {renderToggle("Can create polls", space.adminCanCreatePolls ?? true, () => updateChannelPermissions({ spaceId: space._id, adminCanCreatePolls: !(space.adminCanCreatePolls ?? true) }))}
@@ -550,7 +651,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
 
                             {/* Moderator Permissions */}
                             <Box>
-                                <Typography variant="caption" sx={{ display: "block", color: themeVar("textSecondary"), fontWeight: 900, mb: 1, ml: 1, fontSize: "0.6rem", letterSpacing: "0.1em" }}>MODERATORS</Typography>
+                                <Typography variant="caption" sx={{ display: "block", color: themeVar("mutedForeground"), fontWeight: 900, mb: 1, ml: 1, fontSize: "0.6rem", letterSpacing: "0.1em" }}>MODERATORS</Typography>
                                 <Stack spacing={1}>
                                     {renderToggle("Can edit channels", space.modCanEditChannels ?? false, () => updateChannelPermissions({ spaceId: space._id, modCanEdit: !(space.modCanEditChannels ?? false) }))}
                                     {renderToggle("Can create polls", space.modCanCreatePolls ?? false, () => updateChannelPermissions({ spaceId: space._id, modCanCreatePolls: !(space.modCanCreatePolls ?? false) }))}
@@ -562,26 +663,26 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                 </Box>
             )}
 
-            <Dialog open={setupWelcomeOpen} onClose={() => setSetupWelcomeOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: "none" } }}>
+            <Dialog open={setupWelcomeOpen} onClose={() => setSetupWelcomeOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none" } }}>
                 <DialogTitle sx={{ fontWeight: 900 }}>Setup Welcome Category</DialogTitle>
                 <DialogContent>
-                    <DialogContentText sx={{ color: themeVar("textSecondary"), mb: 3 }}>
+                    <DialogContentText sx={{ color: themeVar("mutedForeground"), mb: 3 }}>
                         This will create or update the "Welcome" category. The #rules channel will be completely refreshed with the contents below.
                         The #announcements channel will be created if it doesn't exist.
                     </DialogContentText>
                     <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>Rules</Typography>
                     {welcomeRules.map((r, i) => (
                         <Box key={i} sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'flex-start' }}>
-                            <TextField size="small" label="ID" value={r.id} onChange={e => { const newR = [...welcomeRules]; newR[i].id = e.target.value; setWelcomeRules(newR); }} sx={{ width: 80 }} InputProps={{ sx: { color: themeVar("textLight") } }} />
-                            <TextField size="small" label="Title" value={r.title} onChange={e => { const newR = [...welcomeRules]; newR[i].title = e.target.value; setWelcomeRules(newR); }} sx={{ flex: 1 }} InputProps={{ sx: { color: themeVar("textLight") } }} />
-                            <TextField size="small" label="Description" value={r.description} onChange={e => { const newR = [...welcomeRules]; newR[i].description = e.target.value; setWelcomeRules(newR); }} sx={{ flex: 2 }} InputProps={{ sx: { color: themeVar("textLight") } }} />
-                            <IconButton onClick={() => setWelcomeRules(welcomeRules.filter((_, idx) => idx !== i))} sx={{ color: themeVar("danger") }}><Trash2 size={16} /></IconButton>
+                            <TextField size="small" label="ID" value={r.id} onChange={e => { const newR = [...welcomeRules]; newR[i].id = e.target.value; setWelcomeRules(newR); }} sx={{ width: 80 }} InputProps={{ sx: { color: themeVar("foreground") } }} />
+                            <TextField size="small" label="Title" value={r.title} onChange={e => { const newR = [...welcomeRules]; newR[i].title = e.target.value; setWelcomeRules(newR); }} sx={{ flex: 1 }} InputProps={{ sx: { color: themeVar("foreground") } }} />
+                            <TextField size="small" label="Description" value={r.description} onChange={e => { const newR = [...welcomeRules]; newR[i].description = e.target.value; setWelcomeRules(newR); }} sx={{ flex: 2 }} InputProps={{ sx: { color: themeVar("foreground") } }} />
+                            <IconButton onClick={() => setWelcomeRules(welcomeRules.filter((_, idx) => idx !== i))} sx={{ color: themeVar("destructive") }}><Trash2 size={16} /></IconButton>
                         </Box>
                     ))}
                     <Button startIcon={<Plus size={16} />} onClick={() => setWelcomeRules([...welcomeRules, { id: `${welcomeRules.length + 1}`, title: "", description: "" }])} sx={{ color: themeVar("primary"), textTransform: "none", fontWeight: 700 }}>Add Rule</Button>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setSetupWelcomeOpen(false)} sx={{ color: themeVar("textSecondary") }}>Cancel</Button>
+                    <Button onClick={() => setSetupWelcomeOpen(false)} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>
                     <Button variant="contained" onClick={async () => { await setupWelcomeCategory({ spaceId: space._id, rulesItems: welcomeRules as any }); setSetupWelcomeOpen(false); setWelcomeRules([{ id: "1", title: "Be Respectful", description: "Treat everyone with respect." }]); }} sx={{ bgcolor: themeVar("primary"), color: "white", fontWeight: 700 }}>Save Welcome Category</Button>
                 </DialogActions>
             </Dialog>
@@ -590,16 +691,16 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
             <Dialog
                 open={Boolean(channelToDelete)}
                 onClose={() => setChannelToDelete(null)}
-                PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: "none", border: `1px solid ${themeVar("border")}`, borderRadius: 3 } }}
+                PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none", border: `1px solid ${themeVar("border")}`, borderRadius: 3 } }}
             >
                 <DialogTitle sx={{ fontWeight: 900 }}>Delete Channel?</DialogTitle>
                 <DialogContent>
-                    <Typography variant="body2" sx={{ color: themeVar("textSecondary") }}>
-                        Are you sure you want to delete the <Box component="span" sx={{ fontWeight: 900, color: themeVar("textLight") }}>#{channelToDelete?.name}</Box> channel? This action cannot be undone and all message history will be permanently lost.
+                    <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>
+                        Are you sure you want to delete the <Box component="span" sx={{ fontWeight: 900, color: themeVar("foreground") }}>#{channelToDelete?.name}</Box> channel? This action cannot be undone and all message history will be permanently lost.
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setChannelToDelete(null)} sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}>Cancel</Button>
+                    <Button onClick={() => setChannelToDelete(null)} sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>Cancel</Button>
                     <Button
                         onClick={handleDeleteChannel}
                         variant="contained"
@@ -615,17 +716,17 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
             <Dialog
                 open={Boolean(categoryToDelete)}
                 onClose={() => setCategoryToDelete(null)}
-                PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: "none", border: `1px solid ${themeVar("border")}`, borderRadius: 3 } }}
+                PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none", border: `1px solid ${themeVar("border")}`, borderRadius: 3 } }}
             >
                 <DialogTitle sx={{ fontWeight: 900 }}>Delete Category?</DialogTitle>
                 <DialogContent>
-                    <Typography variant="body2" sx={{ color: themeVar("textSecondary") }}>
-                        Are you sure you want to delete the category <Box component="span" sx={{ fontWeight: 900, color: themeVar("textLight") }}>"{categoryToDelete?.name}"</Box>?
+                    <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>
+                        Are you sure you want to delete the category <Box component="span" sx={{ fontWeight: 900, color: themeVar("foreground") }}>"{categoryToDelete?.name}"</Box>?
                         Channels within this category will not be deleted, but will become uncategorized.
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setCategoryToDelete(null)} sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}>Cancel</Button>
+                    <Button onClick={() => setCategoryToDelete(null)} sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>Cancel</Button>
                     <Button
                         onClick={handleDeleteCategory}
                         variant="contained"
@@ -650,23 +751,23 @@ export function RenderChannelItem({
             <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "rgba(0,0,0,0.15)", border: `1px solid ${themeVar("border")}`, display: "flex", alignItems: "center", gap: 1 }}>
                 <TextField
                     size="small" fullWidth label="Edit Name" value={editingName} onChange={onChangeName} autoFocus
-                    InputLabelProps={{ sx: { color: themeVar("textSecondary"), "&.Mui-focused": { color: themeVar("primary") } } }}
-                    InputProps={{ startAdornment: <MessageSquare size={16} style={{ marginRight: 8, color: themeVar("primary") }} />, sx: { color: themeVar("textLight"), bgcolor: "rgba(0,0,0,0.2)", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" } } }}
+                    InputLabelProps={{ sx: { color: themeVar("mutedForeground"), "&.Mui-focused": { color: themeVar("primary") } } }}
+                    InputProps={{ startAdornment: <MessageSquare size={16} style={{ marginRight: 8, color: themeVar("primary") }} />, sx: { color: themeVar("foreground"), bgcolor: "rgba(0,0,0,0.2)", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" } } }}
                 />
                 <Select
                     size="small" value={editingCategoryId} onChange={onChangeCategory} displayEmpty
-                    sx={{ color: themeVar("textLight"), bgcolor: "rgba(0,0,0,0.2)", minWidth: 120, "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" }, "& .MuiSvgIcon-root": { color: themeVar("textSecondary") } }}
+                    sx={{ color: themeVar("foreground"), bgcolor: "rgba(0,0,0,0.2)", minWidth: 120, "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" }, "& .MuiSvgIcon-root": { color: themeVar("mutedForeground") } }}
                 >
                     <MenuItem value=""><em>No Category</em></MenuItem>
                     {categories?.sort((a: any, b: any) => a.order - b.order).map((cat: any) => (
                         <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
                     ))}
                 </Select>
-                <IconButton onClick={() => onChangeIsReadOnly(!editingIsReadOnly)} sx={{ color: editingIsReadOnly ? themeVar("danger") : themeVar("textSecondary") }} title="Toggle Read-Only">
+                <IconButton onClick={() => onChangeIsReadOnly(!editingIsReadOnly)} sx={{ color: editingIsReadOnly ? themeVar("destructive") : themeVar("mutedForeground") }} title="Toggle Read-Only">
                     <Lock size={16} />
                 </IconButton>
-                <IconButton onClick={onSaveEdit} sx={{ color: themeVar("success") }}><Check size={18} /></IconButton>
-                <IconButton onClick={onCancelEdit} sx={{ color: themeVar("danger") }}><X size={18} /></IconButton>
+                <IconButton onClick={onSaveEdit} sx={{ color: themeVar("primary") }}><Check size={18} /></IconButton>
+                <IconButton onClick={onCancelEdit} sx={{ color: themeVar("destructive") }}><X size={18} /></IconButton>
             </Box>
         );
     }
@@ -691,22 +792,22 @@ export function RenderChannelItem({
                     }}
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                        <GripVertical size={16} style={{ color: themeVar("textSecondary") }} />
+                        <GripVertical size={16} style={{ color: themeVar("mutedForeground") }} />
                         <Box sx={{ color: themeVar("primary"), opacity: 0.7, display: "flex" }}><MessageSquare size={16} /></Box>
-                        <Typography sx={{ fontWeight: 700, color: themeVar("textLight") }}>{channel.name}</Typography>
+                        <Typography sx={{ fontWeight: 700, color: themeVar("foreground") }}>{channel.name}</Typography>
                         {channel.isReadOnly && (
                             <Tooltip title="Read-Only (Staff Only)" arrow placement="top">
                                 <Box sx={{ display: "flex", alignItems: "center" }}>
-                                    <Lock size={14} style={{ color: themeVar("textSecondary"), marginLeft: 4 }} />
+                                    <Lock size={14} style={{ color: themeVar("mutedForeground"), marginLeft: 4 }} />
                                 </Box>
                             </Tooltip>
                         )}
                     </Box>
                     <Box>
-                        <IconButton size="small" onClick={() => onStartEdit(channel._id, channel.name, channel.categoryId, channel.isReadOnly)} sx={{ color: themeVar("warning"), opacity: 0.5, "&:hover": { opacity: 1 } }}>
+                        <IconButton size="small" onClick={() => onStartEdit(channel._id, channel.name, channel.categoryId, channel.isReadOnly)} sx={{ color: themeVar("chart4"), opacity: 0.5, "&:hover": { opacity: 1 } }}>
                             <Edit2 size={16} />
                         </IconButton>
-                        <IconButton size="small" onClick={onDelete} sx={{ color: themeVar("danger"), opacity: 0.5, "&:hover": { opacity: 1 } }}>
+                        <IconButton size="small" onClick={onDelete} sx={{ color: themeVar("destructive"), opacity: 0.5, "&:hover": { opacity: 1 } }}>
                             <Trash2 size={16} />
                         </IconButton>
                     </Box>
@@ -715,3 +816,5 @@ export function RenderChannelItem({
         </Draggable>
     );
 }
+
+

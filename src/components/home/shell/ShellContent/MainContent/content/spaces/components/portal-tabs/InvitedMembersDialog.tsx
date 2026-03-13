@@ -32,8 +32,8 @@ export default function InvitedMembersDialog({ open, onClose, spaceId, inviterId
             fullWidth
             PaperProps={{
                 sx: {
-                    bgcolor: themeVar("backgroundAlt"),
-                    color: themeVar("textLight"),
+                    bgcolor: themeVar("muted"),
+                    color: themeVar("foreground"),
                     backgroundImage: "none",
                     borderRadius: 3
                 }
@@ -41,18 +41,18 @@ export default function InvitedMembersDialog({ open, onClose, spaceId, inviterId
         >
             <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
                 <Typography variant="h6" sx={{ fontWeight: 800 }}>Users invited by {inviterName}</Typography>
-                <IconButton onClick={onClose} size="small" sx={{ color: themeVar("textSecondary") }}>
+                <IconButton onClick={onClose} size="small" sx={{ color: themeVar("mutedForeground") }}>
                     <X size={20} />
                 </IconButton>
             </DialogTitle>
             <DialogContent>
                 {invitedMembers === undefined && (
-                    <Box sx={{ p: 4, textAlign: "center", color: themeVar("textSecondary") }}>
+                    <Box sx={{ p: 4, textAlign: "center", color: themeVar("mutedForeground") }}>
                         <Typography>Loading...</Typography>
                     </Box>
                 )}
                 {invitedMembers && invitedMembers.length === 0 && (
-                    <Box sx={{ p: 4, textAlign: "center", color: themeVar("textSecondary") }}>
+                    <Box sx={{ p: 4, textAlign: "center", color: themeVar("mutedForeground") }}>
                         <Typography>No users found.</Typography>
                     </Box>
                 )}
@@ -65,24 +65,24 @@ export default function InvitedMembersDialog({ open, onClose, spaceId, inviterId
                                 justifyContent: "space-between",
                                 p: 2,
                                 borderRadius: 2,
-                                bgcolor: "rgba(0,0,0,0.2)",
+                                bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
                                 border: `1px solid ${themeVar("border")}`
                             }}>
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                                     <Avatar src={member.avatarUrl} sx={{ width: 40, height: 40 }} />
                                     <Box>
-                                        <Typography sx={{ fontWeight: 700, color: themeVar("textLight") }}>{member.displayName}</Typography>
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary") }}>
+                                        <Typography sx={{ fontWeight: 700, color: themeVar("foreground") }}>{member.displayName}</Typography>
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground") }}>
                                             Joined {new Date(member.joinedAt).toLocaleDateString()}
                                         </Typography>
                                     </Box>
                                 </Box>
                                 <Box sx={{
                                     px: 1, py: 0.25, borderRadius: 1,
-                                    bgcolor: member.role === "owner" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` : member.role === "admin" ? `color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)` : member.role === "moderator" ? `color-mix(in oklab, ${themeVar("warning")}, transparent 90%)` : "rgba(0,0,0,0.2)",
-                                    border: `1px solid ${member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("warning") : themeVar("border")}`
+                                    bgcolor: member.role === "owner" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` : member.role === "admin" ? `color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)` : member.role === "moderator" ? `color-mix(in oklab, ${themeVar("chart4")}, transparent 90%)` : `color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
+                                    border: `1px solid ${member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("chart4") : themeVar("border")}`
                                 }}>
-                                    <Typography variant="caption" sx={{ fontWeight: 800, color: member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("warning") : themeVar("textSecondary") }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("chart4") : themeVar("mutedForeground") }}>
                                         {member.role.toUpperCase()}
                                     </Typography>
                                 </Box>
@@ -94,3 +94,5 @@ export default function InvitedMembersDialog({ open, onClose, spaceId, inviterId
         </Dialog>
     );
 }
+
+

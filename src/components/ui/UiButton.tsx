@@ -23,7 +23,7 @@ function cx(...parts: Array<string | undefined | false>) {
   return parts.filter(Boolean).join(" ");
 }
 
-const baseStyles = "inline-flex items-center justify-center font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-[color:var(--highlight)] disabled:opacity-60 disabled:cursor-not-allowed select-none";
+const baseStyles = "inline-flex items-center justify-center font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-[color:var(--primary)] disabled:opacity-60 disabled:cursor-not-allowed select-none";
 
 const sizeStyles: Record<ButtonSize, string> = {
   sm: "h-8 px-3 text-[13px] gap-1.5",
@@ -37,35 +37,35 @@ const shapeStyles = (pill?: boolean, circular?: boolean) =>
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: cx(
-    "text-[color:var(--textDark)]",
-    "bg-[color:var(--buttonPrimaryHover)]",
+    "text-[color:var(--primary-foreground)]",
+    "bg-[color:var(--primary)]",
     "border border-[color:var(--border)]",
-    "shadow-[0_10px_30px_-10px_var(--shadow)]",
-    "hover:bg-[color:var(--buttonPrimary)] hover:shadow-[0_16px_40px_-12px_var(--shadow)]",
-    "active:bg-[color:var(--buttonPrimaryActive)]"
+    "shadow-[0_10px_30px_-10px_rgba(0,0,0,0.3)]",
+    "hover:opacity-90 hover:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.4)]",
+    "active:opacity-80"
   ),
   secondary: cx(
-    "text-[color:var(--text)]",
-    "bg-[color:var(--backgroundAlt)]",
+    "text-[color:var(--foreground)]",
+    "bg-[color:var(--muted)]",
     "border border-[color:var(--border)]",
     "hover:bg-[color:color-mix(in_oklab,var(--primary),transparent_92%)]"
   ),
   outline: cx(
-    "text-[color:var(--text)]",
+    "text-[color:var(--foreground)]",
     "bg-transparent",
     "border border-[color:var(--border)]",
     "hover:bg-[color:color-mix(in_oklab,var(--primary),transparent_92%)]"
   ),
   ghost: cx(
-    "text-[color:var(--textSecondary)]",
+    "text-[color:var(--muted-foreground)]",
     "bg-transparent border border-transparent",
-    "hover:bg-[color:color-mix(in_oklab,var(--foreground),transparent_96%)] hover:text-[color:var(--textPrimary)]"
+    "hover:bg-[color:color-mix(in_oklab,var(--foreground),transparent_96%)] hover:text-[color:var(--foreground)]"
   ),
   danger: cx(
-    "text-white",
-    "bg-[color:var(--danger,#ff5555)]",
-    "border border-[color:color-mix(in_oklab,var(--danger,#ff5555),transparent_30%)]",
-    "hover:bg-[color:color-mix(in_oklab,var(--danger,#ff5555),transparent_10%)]"
+    "text-[color:var(--destructive-foreground)]",
+    "bg-[color:var(--destructive)]",
+    "border border-[color:color-mix(in_oklab,var(--destructive),transparent_30%)]",
+    "hover:bg-[color:color-mix(in_oklab,var(--destructive),transparent_10%)]"
   ),
 };
 
@@ -142,3 +142,5 @@ export const UiButton = React.forwardRef<HTMLButtonElement, UiButtonProps>(funct
 });
 
 export default UiButton;
+
+

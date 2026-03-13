@@ -17,7 +17,7 @@ export const getUserByClerkId = query({
       email: v.string(),
       avatarUrl: v.optional(v.string()),
       coverUrl: v.optional(v.string()),
-      isAdmin: v.optional(v.boolean()),
+      overseeradmin: v.optional(v.boolean()),
       lastSeen: v.optional(v.number()),
       status: v.optional(v.string()),
       customStatus: v.optional(v.string()),
@@ -47,7 +47,7 @@ export const getUserByClerkId = query({
         email: user.email,
         avatarUrl: user.avatarUrl,
         coverUrl: user.coverUrl,
-        isAdmin: user.isAdmin,
+        overseeradmin: user.overseeradmin,
         lastSeen: user.lastSeen,
         status: user.status,
         customStatus: user.customStatus,
@@ -117,6 +117,7 @@ export const getUsersDetailsByConvexId = query({
       displayName: v.string(),
       avatarUrl: v.optional(v.string()),
       coverUrl: v.optional(v.string()),
+      clerkUserId: v.optional(v.string()),
     })
   ),
   handler: async (ctx, { userIds }) => {
@@ -134,6 +135,7 @@ export const getUsersDetailsByConvexId = query({
         displayName: user!.displayName || user!.username || "Unknown User",
         avatarUrl: user!.avatarUrl, // Already an optional string in the schema
         coverUrl: user!.coverUrl, // Add coverUrl to the returned object
+        clerkUserId: user!.clerkUserId,
       }));
   },
 });

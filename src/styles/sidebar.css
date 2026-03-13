@@ -4,8 +4,8 @@
   --sb-width: 280px;
   width: var(--sb-width);
   background: color-mix(in oklab, var(--background), black 5%);
-  border-right: 1px solid color-mix(in oklab, var(--text), transparent 90%);
-  color: var(--text);
+  border-right: 1px solid color-mix(in oklab, var(--foreground), transparent 90%);
+  color: var(--foreground);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -16,7 +16,7 @@
 .sidebar--inset {
   margin: 12px;
   border-radius: 12px;
-  border: 1px solid color-mix(in oklab, var(--text), transparent 92%);
+  border: 1px solid color-mix(in oklab, var(--foreground), transparent 92%);
   background: linear-gradient(
     180deg,
     color-mix(in oklab, var(--background), transparent 0%),
@@ -30,7 +30,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 8px 12px;
-  color: var(--text);
+  color: var(--foreground);
   font-weight: 600;
 }
 
@@ -39,7 +39,7 @@
   font-size: 12px;
   letter-spacing: .04em;
   text-transform: uppercase;
-  color: color-mix(in oklab, var(--text), transparent 40%);
+  color: color-mix(in oklab, var(--foreground), transparent 40%);
 }
 
 .sidebar__list {
@@ -54,7 +54,7 @@
   gap: 10px;
   padding: 8px 10px;
   border-radius: 10px;
-  color: var(--text);
+  color: var(--foreground);
   text-decoration: none;
   border: 1px solid transparent;
   transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
@@ -74,8 +74,8 @@
 .sidebar__footer {
   margin-top: auto;
   padding-top: 8px;
-  border-top: 1px dashed color-mix(in oklab, var(--text), transparent 90%);
-  color: color-mix(in oklab, var(--text), transparent 35%);
+  border-top: 1px dashed color-mix(in oklab, var(--foreground), transparent 90%);
+  color: color-mix(in oklab, var(--foreground), transparent 35%);
   font-size: 12px;
 }
 
@@ -91,3 +91,6 @@
   border: 2px solid transparent;
   border-radius: 10px;
 }
+
+
+

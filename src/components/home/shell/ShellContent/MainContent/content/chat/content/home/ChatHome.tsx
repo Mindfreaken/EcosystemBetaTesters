@@ -7,11 +7,12 @@ import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import InputBase from "@mui/material/InputBase";
 import { MessageSquarePlus, Search } from "lucide-react";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import GlowPilledButton from "@/components/ui/GlowPilledButton";
 import glowStyles from "@/components/ui/GlowPilledButton.module.css";
 import NewChatModal from "../sidebar/componants/NewChatModal";
+import { themeVar } from "@/theme/registry";
 
 export type HomeChatItem = {
   _id: string;
@@ -33,22 +34,22 @@ function ChatChip({ chat, meId, onSelect }: { chat: HomeChatItem; meId?: any; on
       key={chat._id}
       onClick={() => onSelect({ _id: chat._id, name: chat.name })}
       className={glowStyles["accentHover"]}
-      glowColor="color-mix(in oklab, var(--secondary), transparent 20%)"
+      glowColor={`color-mix(in oklab, ${themeVar("secondary")}, transparent 20%)`}
       style={{
         width: '100%',
         justifyContent: 'flex-start',
         padding: '6px 10px',
-        background: 'linear-gradient(90deg, color-mix(in oklab, var(--card), transparent 2%), color-mix(in oklab, var(--textSecondary), transparent 90%))',
-        border: '1px solid color-mix(in oklab, var(--border), transparent 35%)',
+        background: `linear-gradient(90deg, color-mix(in oklab, ${themeVar("card")}, transparent 2%), color-mix(in oklab, ${themeVar("mutedForeground")}, transparent 90%))`,
+        border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 35%)`,
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
         {chat.avatarUrl ? (
           <Avatar src={chat.avatarUrl} sx={{ width: 20, height: 20 }} />
         ) : (
-          <Avatar sx={{ width: 20, height: 20, bgcolor: 'var(--secondary)' }} />
+          <Avatar sx={{ width: 20, height: 20, bgcolor: themeVar("secondary") }} />
         )}
-        <Typography variant="body2" sx={{ color: 'var(--text)' }} noWrap>
+        <Typography variant="body2" sx={{ color: themeVar("foreground") }} noWrap>
           {chat.name}
         </Typography>
         {(count ?? 0) > 0 && (
@@ -119,8 +120,8 @@ export default function ChatHome({
           px: 2,
           pt: 2,
           pb: 1,
-          background: 'linear-gradient(180deg, color-mix(in oklab, var(--background), transparent 0%), color-mix(in oklab, var(--background), transparent 0%))',
-          borderBottom: '1px solid color-mix(in oklab, var(--border), transparent 40%)',
+          background: `linear-gradient(180deg, color-mix(in oklab, ${themeVar("background")}, transparent 0%), color-mix(in oklab, ${themeVar("background")}, transparent 0%))`,
+          borderBottom: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 40%)`,
           backdropFilter: 'saturate(120%)',
         }}
       >
@@ -134,10 +135,10 @@ export default function ChatHome({
           }}
         >
           <Box sx={{ minWidth: 0 }}>
-            <Typography variant="h6" sx={{ color: 'var(--text)', fontWeight: 600 }}>
+            <Typography variant="h6" sx={{ color: themeVar("foreground"), fontWeight: 600 }}>
               Welcome to Chats Home
             </Typography>
-            <Typography variant="body2" sx={{ color: 'var(--textSecondary)' }}>
+            <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>
               Create a group or DM, or pick an existing conversation below. Note: Messages use Convex encryption in transit. End‑to‑end encryption isn’t available yet, so messages aren’t fully private.
               We plan to add E2E encryption when it’s safe and ready.
             </Typography>
@@ -151,9 +152,9 @@ export default function ChatHome({
                 height: 34,
                 width: 320,
                 maxWidth: 'min(420px, 100%)',
-                border: '1px solid color-mix(in oklab, var(--borderLight), transparent 30%)',
+                border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 30%)`,
                 borderRadius: 999,
-                backgroundColor: 'color-mix(in oklab, var(--card), transparent 10%)',
+                backgroundColor: `color-mix(in oklab, ${themeVar("card")}, transparent 10%)`,
               }}
               className={glowStyles["glow-pilled-button"]}
               onMouseMove={(e: MouseEvent<HTMLDivElement>) => {
@@ -163,7 +164,7 @@ export default function ChatHome({
                 const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
                 el.style.setProperty('--glow-pos-x', `${x}%`);
                 el.style.setProperty('--glow-pos-y', `${y}%`);
-                el.style.setProperty('--glow-color', 'color-mix(in oklab, var(--secondary), transparent 80%)');
+                el.style.setProperty('--glow-color', `color-mix(in oklab, ${themeVar("secondary")}, transparent 80%)`);
               }}
               onMouseLeave={(e: MouseEvent<HTMLDivElement>) => {
                 const el = e.currentTarget as HTMLElement;
@@ -172,23 +173,23 @@ export default function ChatHome({
                 el.style.removeProperty('--glow-color');
               }}
             >
-              <Search size={14} color="var(--textSecondary)" />
+              <Search size={14} style={{ color: themeVar("mutedForeground") }} />
               <InputBase
                 placeholder="Search your chats"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                sx={{ flex: 1, color: 'var(--text)', fontSize: 14 }}
+                sx={{ flex: 1, color: themeVar("foreground"), fontSize: 14 }}
                 inputProps={{ 'aria-label': 'search chats' }}
               />
             </Box>
             {/* New chat button to the RIGHT */}
             <GlowPilledButton
               onClick={() => setOpenNewChat(true)}
-              glowColor="color-mix(in oklab, var(--secondary), transparent 20%)"
+              glowColor={`color-mix(in oklab, ${themeVar("secondary")}, transparent 20%)`}
               style={{
-                background: 'linear-gradient(90deg, color-mix(in oklab, var(--secondary), transparent 80%), color-mix(in oklab, var(--primary), transparent 80%))',
-                color: 'var(--text)',
-                border: '1px solid color-mix(in oklab, var(--border), transparent 20%)',
+                background: `linear-gradient(90deg, color-mix(in oklab, ${themeVar("secondary")}, transparent 80%), color-mix(in oklab, ${themeVar("primary")}, transparent 80%))`,
+                color: themeVar("foreground"),
+                border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 20%)`,
                 height: 34,
               }}
               icon={<MessageSquarePlus size={16} />}
@@ -234,3 +235,5 @@ export default function ChatHome({
     </Box>
   );
 }
+
+

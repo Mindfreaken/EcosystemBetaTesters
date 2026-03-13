@@ -6,80 +6,44 @@ const voidDarkGreenTheme: Theme = {
   id: 'voidDarkGreen',
   name: 'Void Dark Green',
   colors: {
-    // --- Primary Accent Colors (Green) ---
-    primary: '#10b981',
-    primaryDark: '#059669',
-    primaryLight: '#34d399',
-    primaryHover: '#10b98199',
-    primaryActive: '#047857',
-
-    // --- Secondary Accent Colors ---
-    secondary: '#6366f1',
-    secondaryDark: '#4f46e5',
-    secondaryLight: '#818cf8',
-    secondaryHover: '#6366f199',
-    secondaryActive: '#4338ca',
-
-    // --- Background Colors (Dark) ---
     background: '#000000',
-    backgroundAlt: '#080808',
-    backgroundLight: '#101010',
-    backgroundDark: '#030303',
-
-    // --- Card Colors ---
+    foreground: '#FFFFFF',
+    primary: '#10b981',
+    primaryForeground: '#000000',
+    secondary: '#6366f1',
+    secondaryForeground: '#ffffff',
+    accent: '#080808',
+    accentForeground: '#FFFFFF',
     card: '#080808',
-    cardHover: '#101010',
-    cardActive: '#181818',
-
-    // --- Border Colors ---
+    cardForeground: '#FFFFFF',
+    popover: '#080808',
+    popoverForeground: '#FFFFFF',
+    muted: '#101010',
+    mutedForeground: '#888888',
+    destructive: '#ef4444',
+    destructiveForeground: '#ffffff',
     border: '#1f1f1f',
-    borderLight: '#282828',
-    borderDark: '#101010',
-
-    // --- Text Colors ---
-    text: '#FFFFFF',
-    textPrimary: '#FFFFFF',
-    textLight: '#FFFFFF',
-    textDark: '#E0E0E0',
-    textMuted: '#888888',
-    textSecondary: '#aaaaaa',
-
-    // --- Semantic Colors ---
-    success: '#10b981',
-    successDark: '#059669',
-    successLight: '#34d399',
-
-    danger: '#ef4444',
-    dangerDark: '#dc2626',
-    dangerLight: '#f87171',
-
-    warning: '#f59e0b',
-    warningDark: '#d97706',
-    warningLight: '#fbbf24',
-
-    info: '#6366f1',
-    infoDark: '#4f46e5',
-    infoLight: '#818cf8',
-
-    // --- Interactive Element Colors ---
-    link: '#34d399',
-    linkHover: '#10b981',
-    linkActive: '#059669',
-
-    buttonPrimary: '#10b981',
-    buttonPrimaryHover: '#059669',
-    buttonPrimaryActive: '#047857',
-
-    buttonSecondary: '#6366f1',
-    buttonSecondaryHover: '#4f46e5',
-    buttonSecondaryActive: '#4338ca',
-
-    // --- Miscellaneous Colors ---
-    shadow: '#00000099',
-    highlight: '#ffffff1a',
-    overlay: '#000000cc',
-    disabled: '#333333'
+    input: '#080808',
+    ring: '#10b981',
+    chart1: '#10b981',
+    chart2: '#6366f1',
+    chart3: '#34d399',
+    chart4: '#f59e0b',
+    chart5: '#6c47ff',
+    sidebar: '#030303',
+    sidebarForeground: '#FFFFFF',
+    sidebarPrimary: '#10b981',
+    sidebarPrimaryForeground: '#000000',
+    sidebarAccent: '#080808',
+    sidebarAccentForeground: '#FFFFFF',
+    sidebarBorder: '#1f1f1f',
+    sidebarRing: '#10b981',
+    fontSans: '"Geist Sans", sans-serif',
+    fontSerif: 'Georgia, serif',
+    fontMono: '"Geist Mono", monospace',
   }
 };
 
 export { voidDarkGreenTheme }; 
+
+

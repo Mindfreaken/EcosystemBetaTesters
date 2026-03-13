@@ -43,7 +43,7 @@ export default function PredictionBadge({
         background: `color-mix(in oklab, ${tint}, transparent 96%)`,
         // Very subtle ring using the outcome tint
         boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${tint}, transparent 90%)`,
-        color: "var(--textSecondary)",
+        color: "var(--muted-foreground)",
         fontWeight: 700,
         fontSize: 11,
         lineHeight: 1.05,
@@ -97,7 +97,7 @@ export default function PredictionBadge({
         <span className="whitespace-nowrap" style={{ opacity: 0.9 }}>Predicted</span>
       </div>
       {/* Bottom row: centered outcome */}
-      <div className="w-full text-center" style={{ fontSize: 10, opacity: 0.9, color: `color-mix(in oklab, ${tint}, var(--textSecondary) 70%)` }}>
+      <div className="w-full text-center" style={{ fontSize: 10, opacity: 0.9, color: `color-mix(in oklab, ${tint}, var(--muted-foreground) 70%)` }}>
         {outcome}
       </div>
     </div>
@@ -119,3 +119,5 @@ export default function PredictionBadge({
     </button>
   )
 }
+
+

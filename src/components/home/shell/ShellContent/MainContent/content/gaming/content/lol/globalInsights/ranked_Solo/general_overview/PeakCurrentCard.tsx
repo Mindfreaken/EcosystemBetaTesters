@@ -34,18 +34,18 @@ export default function PeakCurrentCard(props: PeakCurrentCardProps) {
   return (
     <Paper elevation={0} sx={{ ...cardSx, p: 1.25, height: '100%', width: { xs: '100%', md: 'auto' } }}>
       {loading ? (
-        <Typography variant="body2" sx={{ color: 'var(--textSecondary)' }}>Loading…</Typography>
+        <Typography variant="body2" sx={{ color: 'var(--muted-foreground)' }}>Loading…</Typography>
       ) : empty || !uiPeak || !uiCurrent ? (
-        <Typography variant="body2" sx={{ color: 'var(--textSecondary)' }}>No data.</Typography>
+        <Typography variant="body2" sx={{ color: 'var(--muted-foreground)' }}>No data.</Typography>
       ) : (
         <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 1.25 }}>
           <MetaItem label="Peak" iconSrc={`/league/emblems/emblem_${uiPeak.tier}.svg`} iconAlt="peak badge">
-            <Typography sx={{ fontWeight: 900, color: 'var(--textPrimary)', fontSize: '0.95rem', lineHeight: 1.1 }}>
+            <Typography sx={{ fontWeight: 900, color: 'var(--foreground)', fontSize: '0.95rem', lineHeight: 1.1 }}>
               {uiPeak.tier} {uiPeak.lp} LP
             </Typography>
           </MetaItem>
           <MetaItem label="Current" iconSrc={`/league/emblems/emblem_${uiCurrent.tier}.svg`} iconAlt="current badge">
-            <Typography sx={{ fontWeight: 900, color: 'var(--textPrimary)', fontSize: '0.95rem', lineHeight: 1.1 }}>
+            <Typography sx={{ fontWeight: 900, color: 'var(--foreground)', fontSize: '0.95rem', lineHeight: 1.1 }}>
               {uiCurrent.tier} {uiCurrent.lp} LP
             </Typography>
           </MetaItem>
@@ -67,7 +67,7 @@ function MetaItem({ label, iconSrc, iconAlt, children }: { label: string; iconSr
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
       <Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Typography variant="caption" sx={{ color: 'var(--textSecondary)', lineHeight: 1.1, fontWeight: 700, fontSize: '0.95rem' }}>{label}</Typography>
+          <Typography variant="caption" sx={{ color: 'var(--muted-foreground)', lineHeight: 1.1, fontWeight: 700, fontSize: '0.95rem' }}>{label}</Typography>
           {iconSrc ? (
             <Box component="img" src={iconSrc} alt={iconAlt ?? label} sx={{ width: 20, height: 20 }} />
           ) : null}
@@ -112,3 +112,5 @@ function usePeakCurrentData(props: PeakCurrentCardProps, fetchMode: boolean) {
 
   return { ...ui, loading: false, empty: false } as const;
 }
+
+

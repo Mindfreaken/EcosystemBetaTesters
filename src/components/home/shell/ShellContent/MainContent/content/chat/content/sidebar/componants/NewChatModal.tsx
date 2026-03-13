@@ -20,6 +20,7 @@ import IconButton from "@mui/material/IconButton";
 import { Search, X } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
+import { themeVar } from "@/theme/registry";
 
 export type FriendDetail = {
   userId: string;
@@ -112,15 +113,15 @@ export default function NewChatModal({
       slotProps={{
         backdrop: {
           sx: {
-            backgroundColor: 'color-mix(in oklab, var(--overlay), transparent 20%)',
+            backgroundColor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
             backdropFilter: 'blur(4px)',
           },
         },
         paper: {
           sx: {
-            background: 'color-mix(in oklab, var(--card), transparent 5%)',
-            border: '1px solid color-mix(in oklab, var(--border), transparent 35%)',
-            boxShadow: '0 6px 18px color-mix(in oklab, var(--shadow), transparent 40%)',
+            background: `color-mix(in oklab, ${themeVar("card")}, transparent 5%)`,
+            border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 35%)`,
+            boxShadow: `0 6px 18px color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
             borderRadius: '9px',
             overflow: 'hidden',
           },
@@ -130,7 +131,7 @@ export default function NewChatModal({
       <DialogTitle sx={{
         px: 1.8,
         py: 1.2,
-        color: 'var(--textPrimary)',
+        color: themeVar("foreground"),
         fontWeight: 700,
         letterSpacing: 0.2,
         fontSize: 17,
@@ -143,16 +144,16 @@ export default function NewChatModal({
           size="small"
           onClick={handleClose}
           sx={{
-            color: 'var(--textSecondary)',
+            color: themeVar("mutedForeground"),
             ml: 1,
-            '&:hover': { color: 'var(--textPrimary)', backgroundColor: 'transparent' },
+            '&:hover': { color: themeVar("foreground"), backgroundColor: 'transparent' },
           }}
         >
           <X size={16} />
         </IconButton>
       </DialogTitle>
       <DialogContent sx={{ pt: 0.5, pb: 0.8, px: 1.8, overflow: 'hidden' }}>
-        <Typography variant="body2" sx={{ mb: 1, color: 'var(--textSecondary)', fontSize: 13 }}>
+        <Typography variant="body2" sx={{ mb: 1, color: themeVar("mutedForeground"), fontSize: 13 }}>
           Start a new conversation by selecting one or more friends.
         </Typography>
         {/* Friends search */}
@@ -160,17 +161,17 @@ export default function NewChatModal({
           sx={{
             display: 'flex', alignItems: 'center', gap: 1, mb: 1.25,
             px: 1,
-            border: '1px solid color-mix(in oklab, var(--borderLight), transparent 15%)',
+            border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 15%)`,
             borderRadius: 999,
-            backgroundColor: 'color-mix(in oklab, var(--card), transparent 10%)',
+            backgroundColor: `color-mix(in oklab, ${themeVar("card")}, transparent 10%)`,
           }}
         >
-          <Search size={14} color="var(--textSecondary)" />
+          <Search size={14} style={{ color: themeVar("mutedForeground") }} />
           <InputBase
             placeholder="Search friends"
             value={friendSearch}
             onChange={(e) => setFriendSearch(e.target.value)}
-            sx={{ flex: 1, color: 'var(--text)' }}
+            sx={{ flex: 1, color: themeVar("foreground") }}
             inputProps={{ 'aria-label': 'search friends' }}
           />
         </Box>
@@ -189,21 +190,21 @@ export default function NewChatModal({
                   borderRadius: 1.25,
                   my: 0.25,
                   backgroundColor: selectedFriendIds.includes(u.userId)
-                    ? 'color-mix(in oklab, var(--primary), transparent 92%)'
+                    ? `color-mix(in oklab, ${themeVar("primary")}, transparent 92%)`
                     : 'transparent',
-                  '&:hover': { backgroundColor: 'color-mix(in oklab, var(--foreground), transparent 96%)' },
+                  '&:hover': { backgroundColor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 96%)` },
                 }}
               >
                 <ListItemAvatar>
                   {u.avatarUrl ? (
-                    <Avatar src={u.avatarUrl} sx={{ width: 36, height: 36, boxShadow: '0 1px 4px rgba(0,0,0,0.25)' }} />
+                    <Avatar src={u.avatarUrl} sx={{ width: 36, height: 36, boxShadow: `0 1px 4px color-mix(in oklab, ${themeVar("foreground")}, transparent 90%)` }} />
                   ) : (
-                    <Avatar sx={{ width: 36, height: 36, bgcolor: 'var(--secondary)', boxShadow: '0 1px 4px rgba(0,0,0,0.25)' }} />
+                    <Avatar sx={{ width: 36, height: 36, bgcolor: themeVar("secondary"), boxShadow: `0 1px 4px color-mix(in oklab, ${themeVar("foreground")}, transparent 90%)` }} />
                   )}
                 </ListItemAvatar>
                 <ListItemText
-                  primaryTypographyProps={{ noWrap: true, sx: { fontSize: 14, color: 'var(--text)', fontWeight: 600 } }}
-                  secondaryTypographyProps={{ noWrap: true, sx: { fontSize: 12, color: 'var(--textSecondary)' } }}
+                  primaryTypographyProps={{ noWrap: true, sx: { fontSize: 14, color: themeVar("foreground"), fontWeight: 600 } }}
+                  secondaryTypographyProps={{ noWrap: true, sx: { fontSize: 12, color: themeVar("mutedForeground") } }}
                   primary={u.displayName}
                 />
                 <Checkbox
@@ -217,7 +218,7 @@ export default function NewChatModal({
               </ListItemButton>
             ))}
             {filteredFriends && filteredFriends.length === 0 && (
-              <Typography variant="body2" sx={{ px: 1, py: 1, color: 'var(--textSecondary)' }}>
+              <Typography variant="body2" sx={{ px: 1, py: 1, color: themeVar("mutedForeground") }}>
                 No friends found.
               </Typography>
             )}
@@ -229,11 +230,11 @@ export default function NewChatModal({
           onClick={handleClose}
           disabled={creating}
           sx={{
-            color: 'var(--textSecondary)',
+            color: themeVar("mutedForeground"),
             fontSize: 13,
             px: 1.25,
             minWidth: 0,
-            '&:hover': { backgroundColor: 'color-mix(in oklab, var(--foreground), transparent 96%)' },
+            '&:hover': { backgroundColor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 96%)` },
           }}
         >
           Cancel
@@ -244,18 +245,18 @@ export default function NewChatModal({
           disabled={!canSubmit}
           startIcon={creating ? <CircularProgress size={14} /> : undefined}
           sx={{
-            backgroundColor: 'var(--primary)',
+            backgroundColor: themeVar("primary"),
             color: 'white',
             px: 1.25,
             py: 0.4,
             fontSize: 13,
-            boxShadow: '0 3px 8px color-mix(in oklab, var(--primary), transparent 80%)',
+            boxShadow: `0 3px 8px color-mix(in oklab, ${themeVar("primary")}, transparent 80%)`,
             '&:hover': {
-              backgroundColor: 'var(--buttonPrimaryHover)',
-              boxShadow: '0 4px 10px color-mix(in oklab, var(--primary), transparent 75%)',
+              backgroundColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 10%)`,
+              boxShadow: `0 4px 10px color-mix(in oklab, ${themeVar("primary")}, transparent 75%)`,
             },
             '&:disabled': {
-              backgroundColor: 'var(--disabled)',
+              backgroundColor: `${themeVar("foreground")}1a`,
               boxShadow: 'none',
               color: 'rgba(255,255,255,0.7)'
             }
@@ -268,3 +269,5 @@ export default function NewChatModal({
     </Dialog>
   );
 }
+
+

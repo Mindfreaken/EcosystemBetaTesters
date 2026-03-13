@@ -124,9 +124,9 @@ export default function Last50Summary({
   return (
     <Paper elevation={0} sx={{ ...cardSx, p: 1.25, height: '100%' }}>
       {loading ? (
-        <Typography variant="body2" sx={{ color: 'var(--textSecondary)' }}>Loading last matches…</Typography>
+        <Typography variant="body2" sx={{ color: 'var(--muted-foreground)' }}>Loading last matches…</Typography>
       ) : empty || !stats ? (
-        <Typography variant="body2" sx={{ color: 'var(--textSecondary)' }}>No recent ranked matches.</Typography>
+        <Typography variant="body2" sx={{ color: 'var(--muted-foreground)' }}>No recent ranked matches.</Typography>
       ) : (
         <>
           <Typography variant="subtitle2" sx={sectionLabelSx}>Last {stats.n} Matches</Typography>
@@ -173,12 +173,14 @@ const sectionLabelSx = { fontWeight: 900, color: "var(--textLight)", letterSpaci
 function StatPill({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-      <Typography variant="caption" sx={{ color: "var(--textSecondary)", fontWeight: 700, fontSize: '0.95rem', lineHeight: 1.1 }}>
+      <Typography variant="caption" sx={{ color: "var(--muted-foreground)", fontWeight: 700, fontSize: '0.95rem', lineHeight: 1.1 }}>
         {label}
       </Typography>
-      <Typography sx={{ fontWeight: 900, color: color ?? "var(--textPrimary)", fontSize: '0.95rem', lineHeight: 1.1 }}>
+      <Typography sx={{ fontWeight: 900, color: color ?? "var(--foreground)", fontSize: '0.95rem', lineHeight: 1.1 }}>
         {value}
       </Typography>
     </Box>
   );
 }
+
+

@@ -29,13 +29,6 @@ export default function SpacesContent() {
   const maxFreeSpaces = 5;
   const isAtLimit = ownedSpacesCount >= maxFreeSpaces;
 
-  const goToFeatureRequests = () => {
-    setView("ecosystemHub");
-    const sp = new URLSearchParams(Array.from(searchParams?.entries?.() || []));
-    sp.set("ecoHubView", "features");
-    const qs = sp.toString();
-    router.replace(qs ? `/home?${qs}` : "/home");
-  };
 
   const handleCreateSpace = () => {
     if (isAtLimit) return;
@@ -67,7 +60,7 @@ export default function SpacesContent() {
             variant="h3"
             sx={{
               fontWeight: 900,
-              color: themeVar("textLight"),
+              color: themeVar("foreground"),
               mb: 2,
               letterSpacing: "-0.02em",
               textShadow: `0 0 20px color-mix(in oklab, ${themeVar("primary")}, transparent 70%)`,
@@ -78,7 +71,7 @@ export default function SpacesContent() {
           <Typography
             variant="body1"
             sx={{
-              color: themeVar("textSecondary"),
+              color: themeVar("mutedForeground"),
               maxWidth: 600,
               mx: "auto",
               fontSize: "1.1rem",
@@ -110,7 +103,7 @@ export default function SpacesContent() {
               <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Shield size={16} style={{ color: themeVar("secondary") }} />
-                  <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 600 }}>
+                  <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 600 }}>
                     {ownedSpacesCount} / {maxFreeSpaces} Free Spaces Used
                   </Typography>
                 </Box>
@@ -120,9 +113,9 @@ export default function SpacesContent() {
                       px: 1.5,
                       py: 0.5,
                       borderRadius: 1,
-                      bgcolor: `color-mix(in oklab, ${themeVar("warning")}, transparent 90%)`,
-                      border: `1px solid ${themeVar("warning")}`,
-                      color: themeVar("warning"),
+                      bgcolor: `color-mix(in oklab, ${themeVar("chart4")}, transparent 90%)`,
+                      border: `1px solid ${themeVar("chart4")}`,
+                      color: themeVar("chart4"),
                     }}
                   >
                     <Typography variant="caption" sx={{ fontWeight: 700 }}>Limit Reached</Typography>
@@ -141,8 +134,8 @@ export default function SpacesContent() {
             onClick={handleJoinSpace}
             extraContent={
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <Zap size={16} style={{ color: themeVar("highlight") }} />
-                <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 600 }}>
+                <Zap size={16} style={{ color: themeVar("chart3") }} />
+                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 600 }}>
                   Instant Access via Code
                 </Typography>
               </Box>
@@ -155,7 +148,7 @@ export default function SpacesContent() {
           <Box sx={{ mb: 8 }}>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
               <Users size={24} style={{ color: themeVar("primary") }} />
-              <Typography variant="h5" sx={{ fontWeight: 800, color: themeVar("textLight") }}>
+              <Typography variant="h5" sx={{ fontWeight: 800, color: themeVar("foreground") }}>
                 Your Spaces
               </Typography>
             </Box>
@@ -189,7 +182,7 @@ export default function SpacesContent() {
                     <Typography
                       variant="caption"
                       sx={{
-                        color: space.coverUrl ? "white" : themeVar("textSecondary"),
+                        color: space.coverUrl ? "white" : themeVar("mutedForeground"),
                         fontWeight: 600,
                         opacity: 0.8
                       }}
@@ -213,10 +206,10 @@ export default function SpacesContent() {
               mb: 8,
             }}
           >
-            <Typography variant="h6" sx={{ color: themeVar("textSecondary"), mb: 1 }}>
+            <Typography variant="h6" sx={{ color: themeVar("mutedForeground"), mb: 1 }}>
               No spaces yet.
             </Typography>
-            <Typography variant="body2" sx={{ color: themeVar("textSecondary") }}>
+            <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>
               Create your first space to get started!
             </Typography>
           </Box>
@@ -236,3 +229,5 @@ export default function SpacesContent() {
     </ContentTemplate>
   );
 }
+
+

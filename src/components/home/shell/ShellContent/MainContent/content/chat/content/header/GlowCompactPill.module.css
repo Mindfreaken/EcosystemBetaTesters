@@ -17,3 +17,6 @@
 .compactGlow:hover::before {
   opacity: 0.9;             /* still vivid on hover but not overwhelming */
 }
+
+
+

@@ -17,10 +17,12 @@ export default function ScheduleTab({ space, role }: ScheduleTabProps) {
 
     return (
         <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textSecondary"), mb: 2 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("mutedForeground"), mb: 2 }}>
                 EVENT SCHEDULE
             </Typography>
             <ScheduleManager spaceId={space._id} />
         </Box>
     );
 }
+
+

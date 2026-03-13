@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
-import { Send, Flag, ShieldAlert } from "lucide-react";
+import { Send, Flag, ShieldAlert, Smile, X } from "lucide-react";
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import Dialog from "@mui/material/Dialog";
@@ -15,6 +15,10 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
+import Tooltip from "@mui/material/Tooltip";
+import EmotePicker from "./EmotePicker";
+import { themeVar } from "@/theme/registry";
+import { useToast } from "@/hooks/use-toast";
 
 export type MinimalChat = { _id: string; name: string };
 
@@ -23,6 +27,7 @@ export default function ChatThread({
 }: {
   chat: MinimalChat;
 }) {
+  const { toast } = useToast();
   const [input, setInput] = useState("");
   const listRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -41,10 +46,23 @@ export default function ChatThread({
 
   // Messages for selected chat (paginated)
   const messages = usePaginatedQuery(
-    api.chat.functions.messages.getMessagesForChat,
+    api.chat.functions.messages.getMessagesWithReactions,
     chat ? { chatId: chat._id as any } : ("skip" as any),
     { initialNumItems: 25 }
   );
+
+  // Custom user emotes
+  const customEmojis = useQuery(api.spaces.emojis.getUserAllCustomEmojis);
+  const emojiMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const e of customEmojis || []) {
+      map.set(e.name, e.url);
+    }
+    return map;
+  }, [customEmojis]);
+
+  const [emotePickerAnchor, setEmotePickerAnchor] = useState<HTMLElement | null>(null);
+  const [reactionTargetId, setReactionTargetId] = useState<string | null>(null);
 
   const orderedMessages = useMemo(() => {
     if (!messages || !chat) return [] as typeof messages.results;
@@ -139,12 +157,13 @@ export default function ChatThread({
   );
 
   const senderMap = useMemo(() => {
-    const map = new Map<string, { displayName: string; username: string; avatarUrl?: string }>();
-    for (const s of senders || []) map.set(s.userId.toString(), { displayName: s.displayName, username: s.username, avatarUrl: s.avatarUrl });
+    const map = new Map<string, { displayName: string; username: string; avatarUrl?: string; clerkUserId?: string }>();
+    for (const s of senders || []) map.set(s.userId.toString(), { displayName: s.displayName, username: s.username, avatarUrl: s.avatarUrl, clerkUserId: s.clerkUserId });
     return map;
   }, [senders]);
 
   const sendMessage = useMutation(api.chat.functions.messages.sendMessage);
+  const toggleReaction = useMutation(api.chat.functions.messages.toggleReaction);
   const reportMessage = useMutation(api.hub.overseer.reportMessage);
   const canSend = !!chat && !isSystemChat && !!me && input.trim().length > 0;
 
@@ -175,13 +194,78 @@ export default function ChatThread({
       await reportMessage({ messageId: reportMessageId as any, reason: reportReason.trim() });
       setReportMessageId(null);
       setReportReason("");
-      alert("Report submitted. Thank you for your feedback.");
+      toast({
+        title: "Report Submitted",
+        description: "Thank you for your feedback.",
+      });
     } catch (e) {
       console.error("Failed to report message", e);
-      alert("Failed to submit report. Please try again.");
+      toast({
+        title: "Report Failed",
+        description: "Failed to submit report. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsReporting(false);
     }
+  };
+
+  const handleEmoteSelect = (name: string, isCustom: boolean) => {
+    if (reactionTargetId) {
+      toggleReaction({ messageId: reactionTargetId as any, userId: me!._id, reaction: name });
+      setReactionTargetId(null);
+      setEmotePickerAnchor(null);
+    } else {
+      const textToInsert = isCustom ? `:${name}: ` : `${name} `;
+      setInput(prev => prev + textToInsert);
+    }
+  };
+
+  const isOnlyEmotes = (content: string) => {
+    const trimmed = content.trim();
+    if (!trimmed) return false;
+    // Regex to match custom emotes :name: and standard emojis
+    const customEmoteRegex = /:[a-zA-Z0-9_]+:/g;
+    const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
+    const remaining = trimmed.replace(customEmoteRegex, "").replace(emojiRegex, "").replace(/\s+/g, "");
+    return remaining.length === 0;
+  };
+
+  const renderContent = (content: string) => {
+    const isJumbo = isOnlyEmotes(content);
+    const size = isJumbo ? 48 : 22;
+    const emojiSize = isJumbo ? "2.5rem" : "inherit";
+
+    const parts = content.split(/(:[a-zA-Z0-9_]+:)/g);
+    return (
+      <Box component="span" sx={{ fontSize: emojiSize, display: "inline-block", verticalAlign: "middle" }}>
+        {parts.map((part, i) => {
+          if (part.startsWith(":") && part.endsWith(":")) {
+            const name = part.slice(1, -1);
+            const url = emojiMap.get(name);
+            if (url) {
+              return (
+                <Tooltip key={i} title={part}>
+                  <Box
+                    component="img"
+                    src={url}
+                    sx={{
+                      width: size,
+                      height: size,
+                      verticalAlign: "middle",
+                      display: "inline-block",
+                      mx: 0.25,
+                      transition: "transform 0.2s"
+                    }}
+                  />
+                </Tooltip>
+              );
+            }
+          }
+          return <span key={i}>{part}</span>;
+        })}
+      </Box>
+    );
   };
 
   return (
@@ -212,10 +296,12 @@ export default function ChatThread({
           <>
             {orderedMessages.map((m) => {
               const isMine = !!me && m.senderId && m.senderId.toString() === (me._id as any).toString();
+              const senderUser = m.senderId ? senderMap.get(m.senderId.toString()) : undefined;
               const senderLabel = !isMine
-                ? (m.senderId && (senderMap.get(m.senderId.toString())?.displayName || senderMap.get(m.senderId.toString())?.username)) || "Unknown"
+                ? (senderUser?.displayName || senderUser?.username) || "Unknown"
                 : undefined;
-              const avatarUrl = m.senderId ? senderMap.get(m.senderId.toString())?.avatarUrl : undefined;
+              const avatarUrl = senderUser?.avatarUrl;
+              const isSystemUser = senderUser?.clerkUserId === "system-user-0000-0000-0000-000000000000";
               const timeLabel = new Date(m._creationTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
               return (
                 <Box key={m._id} sx={{ display: "flex", justifyContent: isMine ? "flex-end" : "flex-start" }}>
@@ -230,12 +316,12 @@ export default function ChatThread({
                     <Box
                       sx={{
                         border: isMine
-                          ? "1px solid color-mix(in oklab, var(--secondary), transparent 60%)"
-                          : "1px solid var(--borderLight)",
+                          ? `1px solid color-mix(in oklab, ${themeVar("secondary")}, transparent 40%)`
+                          : `1px solid ${themeVar("border")}`,
                         backgroundColor: isMine
-                          ? "color-mix(in oklab, var(--secondary) 12%, var(--background) 88%)"
-                          : "var(--card)",
-                        boxShadow: "0 2px 8px var(--shadow)",
+                          ? `color-mix(in oklab, ${themeVar("secondary")} 12%, ${themeVar("background")} 88%)`
+                          : themeVar("card"),
+                        boxShadow: `0 2px 8px color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
                         borderRadius: isMine ? "12px 12px 4px 12px" : "12px 12px 12px 4px",
                         px: 1.25,
                         py: 0.75,
@@ -245,47 +331,99 @@ export default function ChatThread({
                         wordBreak: "break-word",
                         overflowWrap: "anywhere",
                         position: "relative",
-                        "&:hover .report-button": { opacity: 1 },
+                        "&:hover .report-button, &:hover .react-button": { opacity: 1 },
                       }}
                     >
                       {/* For others: header with name + time */}
-                      {!isMine && m.senderId && (
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                          <Typography variant="caption" sx={{ color: "var(--textSecondary)", display: "flex", gap: 0.75, alignItems: "center", justifyContent: "flex-start", fontVariantNumeric: "tabular-nums", letterSpacing: ".02em" }}>
-                            <span>{senderLabel}</span>
-                            <span style={{ opacity: 0.8 }}>•</span>
+                      {m.senderId && (
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.5 }}>
+                          <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "flex", gap: 0.75, alignItems: "center", justifyContent: "flex-start", fontVariantNumeric: "tabular-nums", letterSpacing: ".02em" }}>
+                            {!isMine && <span>{senderLabel}</span>}
+                            {!isMine && <span style={{ opacity: 0.8 }}>•</span>}
                             <span>{timeLabel}</span>
                           </Typography>
-                          {!isMine && (
+                          <Stack direction="row" spacing={1} sx={{ ml: 1.5, alignItems: "center" }}>
                             <IconButton
-                              className="report-button"
+                              className="react-button"
                               size="small"
-                              onClick={() => handleReport(m._id)}
+                              onClick={(e) => {
+                                setEmotePickerAnchor(e.currentTarget);
+                                setReactionTargetId(m._id);
+                              }}
                               sx={{
                                 opacity: 0,
                                 transition: "opacity 0.2s",
-                                p: 0.25,
-                                color: "var(--textSecondary)",
-                                "&:hover": { color: "var(--error, #ff4444)" },
+                                p: 0.5,
+                                color: themeVar("mutedForeground"),
+                                "&:hover": { color: themeVar("primary"), bgcolor: "rgba(255,255,255,0.05)" },
                               }}
-                              title="Report message"
+                              title="React to message"
                             >
-                              <Flag size={12} />
+                              <Smile size={14} />
                             </IconButton>
-                          )}
+                            {!isMine && !isSystemUser && (
+                              <IconButton
+                                className="report-button"
+                                size="small"
+                                onClick={() => handleReport(m._id)}
+                                sx={{
+                                  opacity: 0,
+                                  transition: "opacity 0.2s",
+                                  p: 0.5,
+                                  color: themeVar("mutedForeground"),
+                                  "&:hover": { color: themeVar("destructive"), bgcolor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 90%)` },
+                                }}
+                                title="Report message"
+                              >
+                                <Flag size={14} />
+                              </IconButton>
+                            )}
+                          </Stack>
                         </Box>
                       )}
 
-                      {/* No report button for own messages */}
-
-                      <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word", overflowWrap: "anywhere", color: "var(--text)" }}>
-                        {m.content}
+                      <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word", overflowWrap: "anywhere", color: themeVar("foreground") }}>
+                        {renderContent(m.content)}
                       </Typography>
-                      {/* For mine: footer timestamp right-aligned */}
-                      {isMine && (
-                        <Typography variant="caption" sx={{ color: "var(--textSecondary)", display: "flex", justifyContent: "flex-end", mt: 0.25, fontVariantNumeric: "tabular-nums", letterSpacing: ".02em" }}>
-                          {timeLabel}
-                        </Typography>
+
+                      {/* Reactions display */}
+                      {(m as any).reactions && (m as any).reactions.length > 0 && (
+                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 1 }}>
+                          {Object.entries(
+                            (m as any).reactions.reduce((acc: any, r: any) => {
+                              acc[r.reaction] = (acc[r.reaction] || 0) + 1;
+                              return acc;
+                            }, {})
+                          ).map(([reaction, count]) => {
+                            const isMyReaction = (m as any).reactions.some((r: any) => r.reaction === reaction && r.userId === me?._id);
+                            const url = emojiMap.get(reaction);
+                            return (
+                              <Box
+                                key={reaction}
+                                onClick={() => toggleReaction({ messageId: m._id as any, userId: me!._id, reaction })}
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 0.5,
+                                  px: 0.75,
+                                  py: 0.25,
+                                  borderRadius: 1.5,
+                                  bgcolor: isMyReaction ? `color-mix(in oklab, ${themeVar("primary")} 20%, transparent)` : "rgba(0,0,0,0.1)",
+                                  border: `1px solid ${isMyReaction ? themeVar("primary") : themeVar("border")}`,
+                                  cursor: "pointer",
+                                  "&:hover": { bgcolor: "rgba(255,255,255,0.05)" }
+                                }}
+                              >
+                                {url ? (
+                                  <Box component="img" src={url} sx={{ width: 14, height: 14 }} />
+                                ) : (
+                                  <Typography variant="caption">{reaction}</Typography>
+                                )}
+                                <Typography variant="caption" sx={{ fontWeight: 800 }}>{count as number}</Typography>
+                              </Box>
+                            );
+                          })}
+                        </Box>
                       )}
                     </Box>
                   </Box>
@@ -300,7 +438,7 @@ export default function ChatThread({
 
       {/* Composer (hidden for system chats) */}
       {!isSystemChat && (
-        <Box sx={{ borderTop: "1px solid var(--borderLight)", backgroundColor: "var(--card)", p: 1 }}>
+        <Box sx={{ borderTop: `1px solid ${themeVar("border")}`, backgroundColor: themeVar("card"), p: 1 }}>
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 1 }}>
             <TextField
               size="small"
@@ -318,24 +456,44 @@ export default function ChatThread({
               variant="outlined"
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  backgroundColor: 'var(--input)',
-                  '& fieldset': { borderColor: 'var(--input-border)' },
-                  '&:hover fieldset': { borderColor: 'color-mix(in oklab, var(--primary), transparent 40%)' },
+                  backgroundColor: themeVar("input"),
+                  '& fieldset': { borderColor: themeVar("border") },
+                  '&:hover fieldset': { borderColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 40%)` },
                   '&.Mui-focused fieldset': {
-                    borderColor: 'var(--primary)',
-                    boxShadow: '0 0 0 2px color-mix(in oklab, var(--primary), transparent 70%)',
+                    borderColor: themeVar("primary"),
+                    boxShadow: `0 0 0 2px color-mix(in oklab, ${themeVar("primary")}, transparent 70%)`,
                   },
-                  '& .MuiInputBase-input': { color: 'var(--text)' },
-                  '& .MuiInputBase-input::placeholder': { color: 'var(--text)' },
+                  '& .MuiInputBase-input': { color: themeVar("foreground") },
+                  '& .MuiInputBase-input::placeholder': { color: themeVar("mutedForeground") },
                 },
               }}
             />
-            <IconButton size="small" onClick={handleSend} disabled={!canSend} sx={{ color: canSend ? "var(--secondary)" : "var(--textSecondary)" }}>
-              <Send size={16} />
-            </IconButton>
+            <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  setReactionTargetId(null);
+                  setEmotePickerAnchor(e.currentTarget);
+                }}
+                disabled={!me}
+                sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("primary") } }}
+              >
+                <Smile size={16} />
+              </IconButton>
+              <IconButton size="small" onClick={handleSend} disabled={!canSend} sx={{ color: canSend ? themeVar("secondary") : themeVar("mutedForeground") }}>
+                <Send size={16} />
+              </IconButton>
+            </Stack>
           </Box>
         </Box>
       )}
+
+      <EmotePicker
+        open={Boolean(emotePickerAnchor)}
+        anchorEl={emotePickerAnchor}
+        onClose={() => setEmotePickerAnchor(null)}
+        onSelect={handleEmoteSelect}
+      />
 
       {/* Report Dialog */}
       <Dialog
@@ -343,22 +501,49 @@ export default function ChatThread({
         onClose={() => !isReporting && setReportMessageId(null)}
         maxWidth="xs"
         fullWidth
-        PaperProps={{
-          sx: {
-            backgroundColor: "var(--background)",
-            backgroundImage: "none",
-            border: "1px solid var(--borderLight)",
-            borderRadius: "16px",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
-          }
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
+              backdropFilter: 'blur(4px)',
+            },
+          },
+          paper: {
+            sx: {
+              background: `color-mix(in oklab, ${themeVar("card")}, transparent 5%)`,
+              border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 35%)`,
+              boxShadow: `0 6px 18px color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
+              borderRadius: '9px',
+              overflow: 'hidden',
+            },
+          },
         }}
       >
-        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1.5, color: "var(--text)" }}>
-          <ShieldAlert size={24} color="#ff4444" />
-          Report Message
+        <DialogTitle sx={{ 
+          px: 1.8, 
+          py: 1.2, 
+          color: themeVar("foreground"), 
+          fontWeight: 700, 
+          letterSpacing: 0.2, 
+          fontSize: 17, 
+          display: "flex", 
+          alignItems: "center", 
+          justifyContent: "space-between" 
+        }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <ShieldAlert size={20} color={themeVar("destructive")} />
+            Report Message
+          </Box>
+          <IconButton
+            size="small"
+            onClick={() => setReportMessageId(null)}
+            sx={{ color: themeVar("mutedForeground"), ml: 1, '&:hover': { color: themeVar("foreground"), backgroundColor: 'transparent' } }}
+          >
+            <X size={16} />
+          </IconButton>
         </DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" sx={{ color: "var(--textSecondary)", mb: 2 }}>
+        <DialogContent sx={{ pt: 0.5, pb: 0.8, px: 1.8, overflow: 'hidden' }}>
+          <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), mb: 2 }}>
             Help us understand what's wrong with this message. Your report will be reviewed by the Ecosystem Overseers.
           </Typography>
           <TextField
@@ -373,20 +558,26 @@ export default function ChatThread({
             disabled={isReporting}
             sx={{
               "& .MuiOutlinedInput-root": {
-                backgroundColor: "var(--input)",
-                "& fieldset": { borderColor: "var(--input-border)" },
-                "&:hover fieldset": { borderColor: "var(--primary)" },
-                "&.Mui-focused fieldset": { borderColor: "var(--primary)" },
-                color: "var(--text)",
+                backgroundColor: themeVar("input"),
+                "& fieldset": { borderColor: themeVar("border") },
+                "&:hover fieldset": { borderColor: themeVar("primary") },
+                "&.Mui-focused fieldset": { borderColor: themeVar("primary") },
+                color: themeVar("foreground"),
               },
             }}
           />
         </DialogContent>
-        <DialogActions sx={{ p: 2, pt: 1 }}>
+        <DialogActions sx={{ px: 1.8, py: 1.2, gap: 1 }}>
           <Button
             onClick={() => setReportMessageId(null)}
             disabled={isReporting}
-            sx={{ color: "var(--textSecondary)" }}
+            sx={{
+              color: themeVar("mutedForeground"),
+              fontSize: 13,
+              px: 1.25,
+              minWidth: 0,
+              '&:hover': { backgroundColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)`, color: themeVar("primary") },
+            }}
           >
             Cancel
           </Button>
@@ -395,8 +586,13 @@ export default function ChatThread({
             disabled={!reportReason.trim() || isReporting}
             variant="contained"
             sx={{
-              backgroundColor: "#ff4444",
-              "&:hover": { backgroundColor: "#cc0000" },
+              backgroundColor: themeVar("destructive"),
+              color: "white",
+              px: 1.25,
+              py: 0.4,
+              fontSize: 13,
+              boxShadow: `0 3px 8px color-mix(in oklab, ${themeVar("destructive")}, transparent 60%)`,
+              "&:hover": { backgroundColor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 10%)` },
               textTransform: "none",
               borderRadius: "8px",
               fontWeight: 600,
@@ -409,3 +605,5 @@ export default function ChatThread({
     </Box>
   );
 }
+
+

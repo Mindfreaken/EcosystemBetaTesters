@@ -59,7 +59,7 @@ export default function TrendMini({ region, queue, puuid, role = "all" as RoleKe
   if (!data) {
     return (
       <Box>
-        <Typography variant="caption" sx={{ color: "var(--textSecondary)" }}>No trend data.</Typography>
+        <Typography variant="caption" sx={{ color: "var(--muted-foreground)" }}>No trend data.</Typography>
       </Box>
     );
   }
@@ -97,7 +97,9 @@ function LegendSwatch({ color, label }: { color: string; label: string }) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
       <Box sx={{ width: 10, height: 10, borderRadius: 0.75, backgroundColor: `${color}66`, border: `1px solid ${color}99` }} />
-      <Typography variant="caption" sx={{ color: "var(--textSecondary)" }}>{label}</Typography>
+      <Typography variant="caption" sx={{ color: "var(--muted-foreground)" }}>{label}</Typography>
     </Box>
   );
 }
+
+

@@ -1,69 +1,39 @@
 export interface ThemeColors {
     primary: string;
-    primaryDark: string;
-    primaryLight: string;
-    primaryHover: string;
-    primaryActive: string;
-    
+    primaryForeground: string;
     secondary: string;
-    secondaryDark: string;
-    secondaryLight: string;
-    secondaryHover: string;
-    secondaryActive: string;
-    
+    secondaryForeground: string;
+    accent: string;
+    accentForeground: string;
     background: string;
-    backgroundAlt: string;
-    backgroundLight: string;
-    backgroundDark: string;
-    
+    foreground: string;
     card: string;
-    cardHover: string;
-    cardActive: string;
-    
+    cardForeground: string;
+    popover: string;
+    popoverForeground: string;
+    muted: string;
+    mutedForeground: string;
+    destructive: string;
+    destructiveForeground: string;
     border: string;
-    borderLight: string;
-    borderDark: string;
-
-    text: string;
-    textPrimary: string;
-    textLight: string;
-    textDark: string;
-    textMuted: string;
-    textSecondary: string;
-    
-    success: string;
-    successDark: string;
-    successLight: string;
-    
-    danger: string;
-    dangerDark: string;
-    dangerLight: string;
-    
-    warning: string;
-    warningDark: string;
-    warningLight: string;
-
-    info: string;
-    infoDark: string;
-    infoLight: string;
-
-    link: string;
-    linkHover: string;
-    linkActive: string;
-
-    buttonPrimary: string;
-    buttonPrimaryHover: string;
-    buttonPrimaryActive: string;
-
-    buttonSecondary: string;
-    buttonSecondaryHover: string;
-    buttonSecondaryActive: string;
-
-    shadow: string;
-    highlight: string;
-
-    overlay: string;
-    disabled: string;
+    input: string;
+    ring: string;
+    chart1: string;
+    chart2: string;
+    chart3: string;
+    chart4: string;
+    chart5: string;
+    sidebar: string;
+    sidebarForeground: string;
+    sidebarPrimary: string;
+    sidebarPrimaryForeground: string;
+    sidebarAccent: string;
+    sidebarAccentForeground: string;
+    sidebarBorder: string;
+    sidebarRing: string;
+    fontSans: string;
+    fontSerif: string;
+    fontMono: string;
 }
 
 export interface Theme {
@@ -71,3 +41,5 @@ export interface Theme {
     name: string;
     colors: ThemeColors;
 }
+
+

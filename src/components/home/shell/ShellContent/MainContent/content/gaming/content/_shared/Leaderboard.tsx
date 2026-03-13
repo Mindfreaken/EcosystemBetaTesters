@@ -18,6 +18,7 @@ import { Globe } from "lucide-react";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
+import { themeVar } from "@/theme/registry";
 
 export type LeaderboardRow = {
   rank: number;
@@ -135,7 +136,7 @@ export default function Leaderboard({
   if (!useMock && rows == null) {
     return (
       <Box sx={{ maxWidth: 1100, mx: "auto", width: "100%", p: 2 }}>
-        <Typography variant="body2" sx={{ color: "var(--textSecondary)" }}>
+        <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>
           {loadingText ?? "Loading leaderboard..."}
         </Typography>
       </Box>
@@ -145,7 +146,7 @@ export default function Leaderboard({
   if (!useMock && data.length === 0) {
     return (
       <Box sx={{ maxWidth: 1100, mx: "auto", width: "100%", p: 2 }}>
-        <Typography variant="body2" sx={{ color: "var(--textSecondary)" }}>
+        <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>
           {emptyText ?? "No leaderboard data."}
         </Typography>
       </Box>
@@ -156,7 +157,7 @@ export default function Leaderboard({
     <Box sx={{ maxWidth: 1100, mx: "auto", width: "100%" }}>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5, gap: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Typography variant="caption" sx={{ color: "var(--textSecondary)" }}>
+          <Typography variant="caption" sx={{ color: themeVar("mutedForeground") }}>
             Showing {start + 1}–{end} of {filtered.length}
           </Typography>
         </Box>
@@ -168,10 +169,10 @@ export default function Leaderboard({
               minWidth: 160,
               borderRadius: 1.5,
               // Subtle glassy card with depth
-              background: "color-mix(in oklab, var(--card), transparent 15%)",
-              border: "1px solid color-mix(in oklab, var(--border), transparent 35%)",
+              background: `color-mix(in oklab, ${themeVar("card")}, transparent 15%)`,
+              border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 35%)`,
               boxShadow:
-                "0 2px 8px color-mix(in oklab, var(--foreground), transparent 92%), 0 0 24px color-mix(in oklab, var(--primary), transparent 92%)",
+                `0 2px 8px color-mix(in oklab, ${themeVar("foreground")}, transparent 92%), 0 0 24px color-mix(in oklab, ${themeVar("primary")}, transparent 92%)`,
               backdropFilter: "blur(6px)",
               position: 'relative',
               '&::before': {
@@ -180,14 +181,14 @@ export default function Leaderboard({
                 inset: 0,
                 borderRadius: 'inherit',
                 pointerEvents: 'none',
-                background: 'linear-gradient(90deg, var(--primary), var(--secondary))',
+                background: `linear-gradient(90deg, ${themeVar("primary")}, ${themeVar("secondary")})`,
                 opacity: 0.12,
                 zIndex: 0,
               },
               '&:hover': {
                 boxShadow:
-                  "0 4px 14px color-mix(in oklab, var(--foreground), transparent 90%), 0 0 28px color-mix(in oklab, var(--primary), transparent 88%)",
-                borderColor: "color-mix(in oklab, var(--primary), transparent 65%)",
+                  `0 4px 14px color-mix(in oklab, ${themeVar("foreground")}, transparent 90%), 0 0 28px color-mix(in oklab, ${themeVar("primary")}, transparent 88%)`,
+                borderColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 65%)`,
               },
               '& .MuiOutlinedInput-notchedOutline': {
                 border: 'none',
@@ -202,21 +203,21 @@ export default function Leaderboard({
               sx={{
                 height: 34,
                 px: 1.25,
-                color: 'var(--textPrimary)',
+                color: themeVar("foreground"),
                 '& .MuiSelect-icon': {
-                  color: 'color-mix(in oklab, var(--textSecondary), transparent 10%)',
+                  color: `color-mix(in oklab, ${themeVar("mutedForeground")}, transparent 10%)`,
                 },
                 '&.Mui-focused': {
-                  boxShadow: '0 0 0 2px color-mix(in oklab, var(--primary), transparent 65%) inset',
+                  boxShadow: `0 0 0 2px color-mix(in oklab, ${themeVar("primary")}, transparent 65%) inset`,
                   borderRadius: 1.5,
                 },
               }}
               renderValue={(value) => (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                  <Box sx={{ display: 'grid', placeItems: 'center', color: 'color-mix(in oklab, var(--textSecondary), transparent 10%)' }}>
+                  <Box sx={{ display: 'grid', placeItems: 'center', color: `color-mix(in oklab, ${themeVar("mutedForeground")}, transparent 10%)` }}>
                     <Globe size={14} />
                   </Box>
-                  <Typography variant="caption" sx={{ color: 'var(--textPrimary)', fontWeight: 600 }}>
+                  <Typography variant="caption" sx={{ color: themeVar("foreground"), fontWeight: 600 }}>
                     {value === 'all' ? 'All regions' : String(value)}
                   </Typography>
                 </Box>
@@ -227,14 +228,14 @@ export default function Leaderboard({
                   sx: {
                     mt: 0.5,
                     borderRadius: 1.25,
-                    border: '1px solid color-mix(in oklab, var(--border), transparent 30%)',
-                    background: 'color-mix(in oklab, var(--card), transparent 0%)',
+                    border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 30%)`,
+                    background: themeVar("card"),
                     boxShadow:
-                      '0 8px 24px color-mix(in oklab, var(--foreground), transparent 90%), 0 0 24px color-mix(in oklab, var(--secondary), transparent 90%)',
+                      `0 8px 24px color-mix(in oklab, ${themeVar("foreground")}, transparent 90%), 0 0 24px color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)`,
                     overflow: 'hidden',
                     '& .MuiMenuItem-root': {
                       fontSize: 13,
-                      color: 'var(--textPrimary)',
+                      color: themeVar("foreground"),
                       position: 'relative',
                       overflow: 'hidden',
                       transition: 'transform .18s ease, background-color .18s ease, box-shadow .18s ease',
@@ -251,32 +252,32 @@ export default function Leaderboard({
                         pointerEvents: 'none',
                       },
                       '&.Mui-selected': {
-                        backgroundColor: 'color-mix(in oklab, var(--primary), transparent 82%)',
-                        color: 'var(--textPrimary)',
-                        boxShadow: 'inset 3px 0 0 0 color-mix(in oklab, var(--primary), transparent 30%)',
+                        backgroundColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 82%)`,
+                        color: themeVar("foreground"),
+                        boxShadow: `inset 3px 0 0 0 color-mix(in oklab, ${themeVar("primary")}, transparent 30%)`,
                       },
                       '&.Mui-selected:hover': {
-                        backgroundColor: 'color-mix(in oklab, var(--primary), transparent 78%)',
-                        color: 'var(--textPrimary)',
+                        backgroundColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 78%)`,
+                        color: themeVar("foreground"),
                       },
                       '&:hover': {
-                        backgroundColor: 'color-mix(in oklab, var(--foreground), transparent 82%)',
-                        color: 'var(--textPrimary)',
+                        backgroundColor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 82%)`,
+                        color: themeVar("foreground"),
                         transform: 'translateX(2px)',
-                        boxShadow: 'inset 3px 0 0 0 color-mix(in oklab, var(--primary), transparent 35%), 0 2px 6px color-mix(in oklab, var(--foreground), transparent 90%)',
+                        boxShadow: `inset 3px 0 0 0 color-mix(in oklab, ${themeVar("primary")}, transparent 35%), 0 2px 6px color-mix(in oklab, ${themeVar("foreground")}, transparent 90%)`,
                         '&::before': {
                           transform: 'translateX(0)'
                         }
                       },
                       '&:active': {
                         transform: 'translateX(1px) scale(0.995)',
-                        backgroundColor: 'color-mix(in oklab, var(--foreground), transparent 78%)',
-                        boxShadow: 'inset 3px 0 0 0 color-mix(in oklab, var(--primary), transparent 45%)',
+                        backgroundColor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 78%)`,
+                        boxShadow: `inset 3px 0 0 0 color-mix(in oklab, ${themeVar("primary")}, transparent 45%)`,
                       },
                       '&.Mui-focusVisible': {
-                        backgroundColor: 'color-mix(in oklab, var(--secondary), transparent 82%)',
-                        boxShadow: 'inset 3px 0 0 0 color-mix(in oklab, var(--secondary), transparent 35%)',
-                        color: 'var(--textPrimary)',
+                        backgroundColor: `color-mix(in oklab, ${themeVar("secondary")}, transparent 82%)`,
+                        boxShadow: `inset 3px 0 0 0 color-mix(in oklab, ${themeVar("secondary")}, transparent 35%)`,
+                        color: themeVar("foreground"),
                       },
                     },
                   },
@@ -312,7 +313,7 @@ export default function Leaderboard({
             inset: 0,
             pointerEvents: "none",
             borderRadius: "inherit",
-            background: "linear-gradient(90deg, color-mix(in oklab, var(--primary), transparent 0%), color-mix(in oklab, var(--secondary), transparent 0%))",
+            background: `linear-gradient(90deg, color-mix(in oklab, ${themeVar("primary")}, transparent 0%), color-mix(in oklab, ${themeVar("secondary")}, transparent 0%))`,
             filter: "blur(10px)",
             opacity: 0.7,
             zIndex: 0,
@@ -329,7 +330,7 @@ export default function Leaderboard({
             inset: 0,
             pointerEvents: "none",
             borderRadius: "inherit",
-            background: "linear-gradient(90deg, var(--primary), var(--secondary))",
+            background: `linear-gradient(90deg, ${themeVar("primary")}, ${themeVar("secondary")})`,
             zIndex: 1,
             padding: "1px",
             WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
@@ -341,15 +342,15 @@ export default function Leaderboard({
         <Table size="small" sx={{ minWidth: 700 }} aria-label={`${game} leaderboard`}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ width: 90, fontWeight: 800, color: "var(--textSecondary)" }}>Rank</TableCell>
-              <TableCell sx={{ fontWeight: 800, color: "var(--textSecondary)" }}>Player</TableCell>
-              <TableCell sx={{ width: 120, fontWeight: 800, color: "var(--textSecondary)" }} align="right">
+              <TableCell sx={{ width: 90, fontWeight: 800, color: themeVar("mutedForeground") }}>Rank</TableCell>
+              <TableCell sx={{ fontWeight: 800, color: themeVar("mutedForeground") }}>Player</TableCell>
+              <TableCell sx={{ width: 120, fontWeight: 800, color: themeVar("mutedForeground") }} align="right">
                 LP
               </TableCell>
-              <TableCell sx={{ width: 140, fontWeight: 800, color: "var(--textSecondary)" }} align="right">
+              <TableCell sx={{ width: 140, fontWeight: 800, color: themeVar("mutedForeground") }} align="right">
                 Win %
               </TableCell>
-              <TableCell sx={{ width: 120, fontWeight: 800, color: "var(--textSecondary)" }} align="right">
+              <TableCell sx={{ width: 120, fontWeight: 800, color: themeVar("mutedForeground") }} align="right">
                 Region
               </TableCell>
             </TableRow>
@@ -375,10 +376,10 @@ export default function Leaderboard({
                     : undefined,
                 }}
               >
-                <TableCell component="th" scope="row" sx={{ fontWeight: 700, color: "var(--textPrimary)" }}>
+                <TableCell component="th" scope="row" sx={{ fontWeight: 700, color: themeVar("foreground") }}>
                   {row.rank}
                 </TableCell>
-                <TableCell sx={{ color: "var(--textPrimary)" }}>
+                <TableCell sx={{ color: "var(--foreground)" }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
                     <Box
                       component="img"
@@ -401,11 +402,11 @@ export default function Leaderboard({
                     )}
                   </Box>
                 </TableCell>
-                <TableCell align="right" sx={{ color: "var(--textPrimary)" }}>{row.lp}</TableCell>
-                <TableCell align="right" sx={{ color: "var(--textPrimary)" }}>
+                <TableCell align="right" sx={{ color: themeVar("foreground") }}>{row.lp}</TableCell>
+                <TableCell align="right" sx={{ color: themeVar("foreground") }}>
                   {(((row.wins / Math.max(1, row.wins + row.losses)) * 100)).toFixed(1)}%
                 </TableCell>
-                <TableCell align="right" sx={{ color: "var(--textPrimary)" }}>{row.region}</TableCell>
+                <TableCell align="right" sx={{ color: themeVar("foreground") }}>{row.region}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -433,13 +434,13 @@ export default function Leaderboard({
         maxWidth="sm"
         PaperProps={{
           sx: {
-            background: 'color-mix(in oklab, var(--card), transparent 0%)',
-            border: '1px solid color-mix(in oklab, var(--border), transparent 30%)',
-            boxShadow: '0 12px 32px color-mix(in oklab, var(--foreground), transparent 85%)',
+            background: themeVar("card"),
+            border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 30%)`,
+            boxShadow: `0 12px 32px color-mix(in oklab, ${themeVar("foreground")}, transparent 85%)`,
           },
         }}
       >
-        <DialogTitle sx={{ fontWeight: 900, color: 'var(--textLight)' }}>
+        <DialogTitle sx={{ fontWeight: 900, color: themeVar("foreground") }}>
           {selectedRow?.player}
         </DialogTitle>
         <DialogContent>
@@ -469,7 +470,7 @@ export default function Leaderboard({
                 <Stat label="Win %" value={`${((selectedRow.wins / Math.max(1, selectedRow.wins + selectedRow.losses)) * 100).toFixed(1)}%`} />
               </Box>
 
-              <Typography variant="caption" sx={{ color: 'var(--textSecondary)' }}>
+              <Typography variant="caption" sx={{ color: 'var(--muted-foreground)' }}>
                 This is mock profile data for preview purposes.
               </Typography>
             </Box>
@@ -490,8 +491,10 @@ function Stat({ label, value }: { label: string; value: string }) {
         background: 'color-mix(in oklab, var(--card), transparent 6%)',
       }}
     >
-      <Typography variant="caption" sx={{ color: 'var(--textSecondary)' }}>{label}</Typography>
+      <Typography variant="caption" sx={{ color: 'var(--muted-foreground)' }}>{label}</Typography>
       <Typography variant="body2" sx={{ fontWeight: 800, lineHeight: 1 }}>{value}</Typography>
     </Box>
   );
 }
+
+

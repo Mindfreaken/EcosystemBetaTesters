@@ -92,7 +92,7 @@ export default function SettingsContent() {
         {/* Appearance card */}
         <MuiCard variant="interactive" sx={{ p: 2.5 }}>
           <Box sx={{ fontWeight: 700, mb: 1, color: "var(--textLight)" }}>Appearance</Box>
-          <Box sx={{ color: "var(--textSecondary)", mb: 1.5 }}>
+          <Box sx={{ color: "var(--muted-foreground)", mb: 1.5 }}>
             Choose accent colors and configure your theme.
           </Box>
           <UiButton variant="primary" pill onClick={() => setView("theme")}>
@@ -103,7 +103,7 @@ export default function SettingsContent() {
         {/* Account card */}
         <MuiCard variant="interactive" sx={{ p: 2.5 }}>
           <Box sx={{ fontWeight: 700, mb: 1, color: "var(--textLight)" }}>Account</Box>
-          <Box sx={{ color: "var(--textSecondary)", mb: 1.5 }}>
+          <Box sx={{ color: "var(--muted-foreground)", mb: 1.5 }}>
             Manage profile, privacy, and connected apps.
           </Box>
           <UiButton variant="primary" pill style={{ marginRight: 12 }} onClick={() => setShowClerkProfile(true)}>
@@ -117,12 +117,12 @@ export default function SettingsContent() {
         {/* Voice & Video settings card */}
         <MuiCard variant="interactive" sx={{ p: 2.5 }}>
           <Box sx={{ fontWeight: 700, mb: 1, color: "var(--textLight)" }}>Voice & Video</Box>
-          <Box sx={{ color: "var(--textSecondary)", mb: 1.5 }}>
+          <Box sx={{ color: "var(--muted-foreground)", mb: 1.5 }}>
             Configure your microphone and camera preferences.
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box>
-              <Typography variant="caption" sx={{ color: "var(--textSecondary)", display: 'block', mb: 0.5 }}>Microphone</Typography>
+              <Typography variant="caption" sx={{ color: "var(--muted-foreground)", display: 'block', mb: 0.5 }}>Microphone</Typography>
               <ConvexMediaDeviceSelect
                 kind="audioinput"
                 value={settings?.preferredMicrophoneId}
@@ -130,7 +130,7 @@ export default function SettingsContent() {
               />
             </Box>
             <Box>
-              <Typography variant="caption" sx={{ color: "var(--textSecondary)", display: 'block', mb: 0.5 }}>Camera</Typography>
+              <Typography variant="caption" sx={{ color: "var(--muted-foreground)", display: 'block', mb: 0.5 }}>Camera</Typography>
               <ConvexMediaDeviceSelect
                 kind="videoinput"
                 value={settings?.preferredCameraId}
@@ -138,7 +138,7 @@ export default function SettingsContent() {
               />
             </Box>
             <Box>
-              <Typography variant="caption" sx={{ color: "var(--textSecondary)", display: 'block', mb: 0.5 }}>Output (Speakers)</Typography>
+              <Typography variant="caption" sx={{ color: "var(--muted-foreground)", display: 'block', mb: 0.5 }}>Output (Speakers)</Typography>
               <ConvexMediaDeviceSelect
                 kind="audiooutput"
                 value={settings?.preferredSpeakerId}
@@ -184,7 +184,7 @@ export default function SettingsContent() {
                     rootBox: { background: "transparent" },
                     card: { background: "transparent", boxShadow: "none", border: "none" },
                     // Make left nav opaque (app card styling)
-                    navbar: { background: "var(--card)", borderRight: "1px solid var(--card-border)" },
+                    navbar: { background: "var(--card)", borderRight: "1px solid var(--border)" },
                     pageScrollBox: { background: "transparent" },
                     header: { background: "transparent" },
                     profileSection__avatar: { display: "none" },
@@ -200,3 +200,5 @@ export default function SettingsContent() {
     </ContentTemplate >
   );
 }
+
+

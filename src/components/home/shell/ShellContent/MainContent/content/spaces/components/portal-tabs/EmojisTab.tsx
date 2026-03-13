@@ -15,6 +15,7 @@ import { Plus, Trash2, Smile } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Doc, Id } from "convex/_generated/dataModel";
+import { useToast } from "@/hooks/use-toast";
 
 interface EmojisTabProps {
     space: Doc<"spaces">;
@@ -22,6 +23,7 @@ interface EmojisTabProps {
 }
 
 export default function EmojisTab({ space, role }: EmojisTabProps) {
+    const { toast } = useToast();
     const customEmojis = useQuery(api.spaces.emojis.getSpaceCustomEmojis, { spaceId: space._id });
     const generateUploadUrl = useMutation(api.spaces.emojis.generateEmojiUploadUrl);
     const saveCustomEmoji = useMutation(api.spaces.emojis.saveCustomEmoji);
@@ -63,9 +65,17 @@ export default function EmojisTab({ space, role }: EmojisTabProps) {
             });
             setEmojiName("");
             if (fileInputRef.current) fileInputRef.current.value = "";
+            toast({
+                title: "Emoji Uploaded",
+                description: `:${emojiName}: is now available in this space.`,
+            });
         } catch (err: any) {
             console.error(err);
-            alert(err.message || "Failed to upload emoji.");
+            toast({
+                title: "Upload Failed",
+                description: err.message || "Failed to upload emoji.",
+                variant: "destructive",
+            });
         } finally {
             setUploadingEmoji(false);
         }
@@ -88,23 +98,23 @@ export default function EmojisTab({ space, role }: EmojisTabProps) {
     const canEditEmojis = role === "owner" || role === "admin";
 
     if (!canEditEmojis) {
-        return <Typography sx={{ color: themeVar("textSecondary"), p: 4 }}>You do not have permission to manage custom emojis.</Typography>;
+        return <Typography sx={{ color: themeVar("mutedForeground"), p: 4 }}>You do not have permission to manage custom emojis.</Typography>;
     }
 
     return (
         <Box sx={{ maxWidth: 800 }}>
             <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", mb: 4 }}>
                 <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textSecondary"), mb: 1, display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("mutedForeground"), mb: 1, display: "flex", alignItems: "center", gap: 1 }}>
                         <Smile size={16} /> CUSTOM EMOJIS
                     </Typography>
-                    <Typography variant="body2" sx={{ color: themeVar("textSecondary") }}>
+                    <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>
                         Upload custom emojis for members to use in this space. Max size 256KB.
                     </Typography>
                 </Box>
             </Box>
 
-            <Box sx={{ p: 3, mb: 4, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
+            <Box sx={{ p: 3, mb: 4, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
                 <Stack direction="row" spacing={2} alignItems="center">
                     <TextField
                         size="small"
@@ -112,9 +122,9 @@ export default function EmojisTab({ space, role }: EmojisTabProps) {
                         value={emojiName}
                         onChange={(e) => setEmojiName(e.target.value.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase())}
                         placeholder="e.g. pog"
-                        InputLabelProps={{ sx: { color: themeVar("textSecondary"), "&.Mui-focused": { color: themeVar("primary") } } }}
+                        InputLabelProps={{ sx: { color: themeVar("mutedForeground"), "&.Mui-focused": { color: themeVar("primary") } } }}
                         InputProps={{
-                            sx: { color: themeVar("textLight"), bgcolor: "rgba(0,0,0,0.2)", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" }, "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") } }
+                            sx: { color: themeVar("foreground"), bgcolor: "rgba(0,0,0,0.2)", "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" }, "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") } }
                         }}
                         sx={{ width: 200 }}
                     />
@@ -146,13 +156,13 @@ export default function EmojisTab({ space, role }: EmojisTabProps) {
                             alt={emoji.name}
                             sx={{ width: 48, height: 48, objectFit: "contain" }}
                         />
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: themeVar("textSecondary") }}>:{emoji.name}:</Typography>
+                        <Typography variant="caption" sx={{ fontWeight: 700, color: themeVar("mutedForeground") }}>:{emoji.name}:</Typography>
 
                         <IconButton
                             className="delete-btn"
                             size="small"
                             onClick={() => handleDeleteEmoji(emoji._id, emoji.name)}
-                            sx={{ position: "absolute", top: 4, right: 4, opacity: 0, transition: "opacity 0.2s", color: themeVar("danger"), bgcolor: "rgba(0,0,0,0.5)", "&:hover": { bgcolor: "rgba(0,0,0,0.8)" } }}
+                            sx={{ position: "absolute", top: 4, right: 4, opacity: 0, transition: "opacity 0.2s", color: themeVar("destructive"), bgcolor: "rgba(0,0,0,0.5)", "&:hover": { bgcolor: "rgba(0,0,0,0.8)" } }}
                         >
                             <Trash2 size={12} />
                         </IconButton>
@@ -161,18 +171,20 @@ export default function EmojisTab({ space, role }: EmojisTabProps) {
             </Box>
 
             {customEmojis?.length === 0 && (
-                <Typography variant="body2" sx={{ textAlign: "center", color: themeVar("textSecondary"), py: 4, fontStyle: "italic" }}>
+                <Typography variant="body2" sx={{ textAlign: "center", color: themeVar("mutedForeground"), py: 4, fontStyle: "italic" }}>
                     No custom emojis uploaded yet.
                 </Typography>
             )}
 
-            <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))} PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: "none" } }}>
+            <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))} PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none" } }}>
                 <DialogTitle>{confirmDialog.title}</DialogTitle>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))} sx={{ color: themeVar("textSecondary") }}>Cancel</Button>
-                    <Button variant="contained" onClick={confirmDialog.onConfirm} sx={{ bgcolor: confirmDialog.isDanger ? themeVar("danger") : themeVar("primary"), color: "white" }}>{confirmDialog.confirmLabel}</Button>
+                    <Button onClick={() => setConfirmDialog(prev => ({ ...prev, open: false }))} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>
+                    <Button variant="contained" onClick={confirmDialog.onConfirm} sx={{ bgcolor: confirmDialog.isDanger ? themeVar("destructive") : themeVar("primary"), color: "white" }}>{confirmDialog.confirmLabel}</Button>
                 </DialogActions>
             </Dialog>
         </Box>
     );
 }
+
+

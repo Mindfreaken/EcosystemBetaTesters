@@ -13,7 +13,7 @@
   box-sizing: border-box;
   font-size: 14px; /* lock size to avoid baseline-induced growth */
   line-height: 1;  /* keep tight line height */
-  --glow-color: rgba(255, 255, 255, 0.2);
+  --glow-color: color-mix(in oklab, var(--foreground), transparent 80%);
   --glow-pos-x: 50%;
   --glow-pos-y: 50%;
 }
@@ -33,7 +33,7 @@
     color-mix(in oklab, var(--primary), transparent 80%)
   ) !important;
   border: 1px solid color-mix(in oklab, var(--border), transparent 20%) !important;
-  color: var(--text) !important;
+  color: var(--foreground) !important;
 }
 
 .glow-pilled-button:active {
@@ -78,3 +78,6 @@
 /* ensure nested SVGs don't expand with global baselines */
 .button-icon :global(svg) { font-size: 18px; width: 18px; height: 18px; }
 .button-label { flex: 1; white-space: nowrap; }
+
+
+

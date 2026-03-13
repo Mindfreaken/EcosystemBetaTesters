@@ -87,7 +87,7 @@ export const createEvent = mutation({
                 avatarUrl: "/avatars/default/default_001.jpg",
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
-                isAdmin: true,
+                overseeradmin: true,
                 isBanned: false,
                 storageStatus: 'free',
                 totalStorageAllocatedGB: 0,

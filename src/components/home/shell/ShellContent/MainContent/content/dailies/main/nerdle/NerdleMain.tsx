@@ -11,13 +11,14 @@ import { api } from "convex/_generated/api";
 import ContentTemplate from "../../../_shared/ContentTemplate";
 import ActionCard from "../../../_shared/ActionCard";
 import { themeVar } from "@/theme/registry";
+import { useShellView } from "../../../../../viewContext";
 
 // Nerdle variants
 type NerdleVariant = "valorant" | "minecraft";
 
 export default function NerdleMain() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [variant, setVariant] = useState<NerdleVariant | null>(null);
+  const { nerdleVariant: variant, setNerdleVariant: setVariant } = useShellView();
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
 
   const [todayLocal, setTodayLocal] = useState<string>(() => {
@@ -71,38 +72,9 @@ export default function NerdleMain() {
   return (
     <Box sx={{ flex: 1, height: "100%", display: "flex", flexDirection: "column" }}>
       {!variant ? (
-        <ContentTemplate
-          title="Nerdle"
-          subtitle="Choose a themed word puzzle to begin your daily challenge."
-        >
+        <ContentTemplate>
           <Box sx={{ maxWidth: 1000, mx: "auto", mt: 4 }}>
-            {/* Header Section */}
-            <Box sx={{ textAlign: "center", mb: 6 }}>
-              <Typography
-                variant="h3"
-                sx={{
-                  fontWeight: 900,
-                  color: themeVar("textLight"),
-                  mb: 2,
-                  letterSpacing: "-0.02em",
-                  textShadow: `0 0 20px color-mix(in oklab, ${themeVar("primary")}, transparent 70%)`,
-                }}
-              >
-                Choose your Nerdle.
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  color: themeVar("textSecondary"),
-                  maxWidth: 600,
-                  mx: "auto",
-                  fontSize: "1.1rem",
-                  lineHeight: 1.6,
-                }}
-              >
-                Pick a themed word puzzle to begin. Agents, mobs, maps, or blocks—your logic is the key to victory.
-              </Typography>
-            </Box>
+            {/* Variant Cards */}
 
             {/* Variant Cards */}
             <Box
@@ -145,7 +117,7 @@ export default function NerdleMain() {
               title="Global Leaderboard"
               description="See how you stack up this season across all variants."
               icon={<Trophy />}
-              colorKey="highlight"
+              colorKey="chart3"
               onClick={() => setLeaderboardOpen(true)}
               extraContent={
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -179,3 +151,5 @@ export default function NerdleMain() {
     </Box>
   );
 }
+
+

@@ -2,7 +2,7 @@
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--primary) var(--backgroundLight);
+  scrollbar-color: var(--primary) var(--muted);
 }
 
 /* WebKit */
@@ -12,17 +12,19 @@
 }
 
 *::-webkit-scrollbar-track {
-  background: var(--backgroundLight);
+  background: var(--muted);
   border-radius: 10px;
 }
 
 *::-webkit-scrollbar-thumb {
   background-color: var(--primary);
   border-radius: 10px;
-  border: 2px solid var(--backgroundLight);
+  border: 2px solid var(--muted);
 }
 
 *::-webkit-scrollbar-thumb:hover {
   /* Slightly brighten the primary on hover */
   background-color: color-mix(in oklab, var(--primary), white 15%);
 }
+
+

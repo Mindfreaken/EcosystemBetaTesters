@@ -7,7 +7,7 @@ interface ActionCardProps {
     title: string;
     description: string;
     icon: React.ReactNode;
-    colorKey: "primary" | "secondary" | "highlight" | "warning";
+    colorKey: "primary" | "secondary" | "chart3" | "chart4";
     onClick?: () => void;
     extraContent?: React.ReactNode;
     disabled?: boolean;
@@ -89,7 +89,7 @@ export default function ActionCard({
                         sx={{
                             fontWeight: 800,
                             mb: 0.5,
-                            color: themeVar("textLight"),
+                            color: themeVar("foreground"),
                             fontSize: "1.1rem",
                             lineHeight: 1.2,
                             display: "-webkit-box",
@@ -103,7 +103,7 @@ export default function ActionCard({
                     <Typography
                         variant="body2"
                         sx={{
-                            color: themeVar("textSecondary"),
+                            color: themeVar("mutedForeground"),
                             fontSize: "0.85rem",
                             lineHeight: 1.4,
                             opacity: 0.9,
@@ -126,3 +126,5 @@ export default function ActionCard({
         </Box>
     );
 }
+
+

@@ -47,7 +47,7 @@ export default function RoleCard({ role }: { role: RoleSummary }) {
       >
         {/* Row 1: role label, champ image, champ name */}
         <Box sx={{ gridColumn: '1 / 2', gridRow: '1 / 2', justifySelf: 'start' }}>
-          <Typography variant="body2" sx={{ fontWeight: 800, color: 'var(--textPrimary)', lineHeight: 1 }}>{role.roleLabel}</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 800, color: 'var(--foreground)', lineHeight: 1 }}>{role.roleLabel}</Typography>
         </Box>
         <Box sx={{ gridColumn: '2 / 3', gridRow: '1 / 2', position: 'relative', width: 44, height: 44, justifySelf: 'center' }}>
           <Box
@@ -75,7 +75,7 @@ export default function RoleCard({ role }: { role: RoleSummary }) {
           </Box>
         </Box>
         <Box sx={{ gridColumn: '3 / 4', gridRow: '1 / 2', justifySelf: 'end', textAlign: 'right' }}>
-          <Typography variant="caption" sx={{ color: 'var(--textSecondary)' }}>{role.champ.name}</Typography>
+          <Typography variant="caption" sx={{ color: 'var(--muted-foreground)' }}>{role.champ.name}</Typography>
         </Box>
 
         {/* Row 2: WR and KDA */}
@@ -97,3 +97,5 @@ export default function RoleCard({ role }: { role: RoleSummary }) {
     </Paper>
   );
 }
+
+

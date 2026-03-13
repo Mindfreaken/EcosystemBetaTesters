@@ -54,32 +54,32 @@ export default function PollsChannel({ channel, spaceId }: PollsChannelProps) {
                 }}>
                     <BarChart3 size={24} style={{ color: themeVar("primary") }} />
                 </Box>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: themeVar("textLight") }}>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: themeVar("foreground") }}>
                     #{channel.name}
                 </Typography>
-                <Typography variant="body2" sx={{ color: themeVar("textSecondary"), display: "block", mt: 0.5 }}>
+                <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), display: "block", mt: 0.5 }}>
                     {channel.description || "Cast your votes on community polls."}
                 </Typography>
             </Box>
 
             {!polls ? (
-                <Typography sx={{ color: themeVar("textSecondary") }}>Loading polls...</Typography>
+                <Typography sx={{ color: themeVar("mutedForeground") }}>Loading polls...</Typography>
             ) : polls.length === 0 ? (
                 <Box sx={{ textAlign: "center", py: 8 }}>
                     <BarChart3 size={48} style={{ color: "rgba(255,255,255,0.1)", marginBottom: 16 }} />
-                    <Typography variant="h6" sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}>No Active Polls</Typography>
+                    <Typography variant="h6" sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>No Active Polls</Typography>
                     <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.4)" }}>Check back later for new topics to vote on.</Typography>
                 </Box>
             ) : (
                 <Stack spacing={3} sx={{ maxWidth: 800 }}>
                     {polls.map(poll => (
-                        <Box key={poll._id} sx={{ p: 3, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
+                        <Box key={poll._id} sx={{ p: 3, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
                             <Box sx={{ mb: 2 }}>
-                                <Typography sx={{ fontWeight: 800, color: themeVar("textLight"), fontSize: "1.2rem" }}>{poll.question}</Typography>
-                                <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", mt: 0.5 }}>
+                                <Typography sx={{ fontWeight: 800, color: themeVar("foreground"), fontSize: "1.2rem" }}>{poll.question}</Typography>
+                                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "block", mt: 0.5 }}>
                                     Created by {poll.creator?.displayName} • {poll.totalVotes} votes
                                     {poll.expiresAt && (
-                                        <Box component="span" sx={{ ml: 1, px: 0.8, py: 0.2, bgcolor: poll.expiresAt > Date.now() ? "rgba(255,255,255,0.05)" : "rgba(255,0,0,0.1)", color: poll.expiresAt > Date.now() ? themeVar("textSecondary") : themeVar("danger"), borderRadius: 1, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                        <Box component="span" sx={{ ml: 1, px: 0.8, py: 0.2, bgcolor: poll.expiresAt > Date.now() ? "rgba(255,255,255,0.05)" : "rgba(255,0,0,0.1)", color: poll.expiresAt > Date.now() ? themeVar("mutedForeground") : themeVar("destructive"), borderRadius: 1, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                                             {formatTimeLeft(poll.expiresAt)}
                                         </Box>
                                     )}
@@ -124,10 +124,10 @@ export default function PollsChannel({ channel, spaceId }: PollsChannelProps) {
                                             <Box sx={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${percentage}%`, bgcolor: isMyVote ? `color-mix(in oklab, ${themeVar("primary")}, transparent 70%)` : "rgba(255,255,255,0.03)", transition: "width 0.4s cubic-bezier(0.4, 0, 0.2, 1)", zIndex: 0 }} />
 
                                             <Box sx={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                <Typography variant="body2" sx={{ fontWeight: isMyVote ? 800 : 500, color: isMyVote ? themeVar("primary") : themeVar("textLight") }}>
+                                                <Typography variant="body2" sx={{ fontWeight: isMyVote ? 800 : 500, color: isMyVote ? themeVar("primary") : themeVar("foreground") }}>
                                                     {option}
                                                 </Typography>
-                                                <Typography variant="caption" sx={{ fontWeight: 800, color: isMyVote ? themeVar("primary") : themeVar("textSecondary") }}>
+                                                <Typography variant="caption" sx={{ fontWeight: 800, color: isMyVote ? themeVar("primary") : themeVar("mutedForeground") }}>
                                                     {Math.round(percentage)}% ({voteCount})
                                                 </Typography>
                                             </Box>
@@ -142,3 +142,5 @@ export default function PollsChannel({ channel, spaceId }: PollsChannelProps) {
         </Box>
     );
 }
+
+

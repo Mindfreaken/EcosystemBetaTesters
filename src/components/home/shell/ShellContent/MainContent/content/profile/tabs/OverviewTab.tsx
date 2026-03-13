@@ -6,8 +6,8 @@ import Typography from "@mui/material/Typography";
 
 export default function OverviewTab() {
   return (
-    <Box sx={{ textAlign: "center", color: "var(--textSecondary)", py: 6 }}>
-      <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--textLight)", mb: 0.5 }}>
+    <Box sx={{ textAlign: "center", color: "var(--muted-foreground)", py: 6 }}>
+      <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--foreground)", mb: 0.5 }}>
         Overview functionality coming soon
       </Typography>
       <Typography variant="body2">
@@ -16,3 +16,5 @@ export default function OverviewTab() {
     </Box>
   );
 }
+
+

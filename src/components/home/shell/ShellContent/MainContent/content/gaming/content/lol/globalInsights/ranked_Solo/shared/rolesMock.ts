@@ -160,3 +160,5 @@ export const ROLE_STAT_MULTIPLIERS: Record<RoleKey, {
   bot:    { csPerMin: 1.10, gpm: 1.15, dpm: 1.10, vision: 0.90, objDmg: 0.90, winBias: 0.01 },
   sup:    { csPerMin: 0.60, gpm: 0.80, dpm: 0.70, vision: 1.40, objDmg: 0.70, winBias: -0.01 },
 };
+
+

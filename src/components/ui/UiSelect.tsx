@@ -25,7 +25,7 @@ function cx(...parts: Array<string | undefined | false>) {
   return parts.filter(Boolean).join(" ");
 }
 
-const base = "w-full inline-flex items-center gap-2 rounded-md border text-[color:var(--text)] bg-[color:var(--backgroundAlt)] border-[color:var(--border)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--highlight)] disabled:opacity-60 disabled:cursor-not-allowed";
+const base = "w-full inline-flex items-center gap-2 rounded-md border text-[color:var(--foreground)] bg-[color:var(--muted)] border-[color:var(--border)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] disabled:opacity-60 disabled:cursor-not-allowed";
 
 const sizes = {
   sm: "h-9 px-3 text-[14px]",
@@ -39,7 +39,7 @@ export function UiSelect({ label, value, onChange, options, placeholder, size = 
   return (
     <label className="grid gap-1 w-full" htmlFor={htmlId}>
       {label && (
-        <span className="text-[12px] font-medium text-[color:var(--textSecondary)]">{label}</span>
+        <span className="text-[12px] font-medium text-[color:var(--muted-foreground)]">{label}</span>
       )}
       <div className={cx(base, sizes[size], className)}>
         <select
@@ -73,3 +73,5 @@ export function UiSelect({ label, value, onChange, options, placeholder, size = 
 }
 
 export default UiSelect;
+
+

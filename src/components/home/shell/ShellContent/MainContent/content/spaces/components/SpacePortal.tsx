@@ -32,10 +32,10 @@ interface SpacePortalProps {
 function StatCard({ label, value }: { label: string, value: string | number }) {
     return (
         <Box sx={{ minWidth: 120 }}>
-            <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", fontSize: "0.7rem", fontWeight: 800 }}>
+            <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "block", fontSize: "0.7rem", fontWeight: 800 }}>
                 {label.toUpperCase()}
             </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 900, color: themeVar("textLight") }}>
+            <Typography variant="h5" sx={{ fontWeight: 900, color: themeVar("foreground") }}>
                 {value}
             </Typography>
         </Box>
@@ -62,21 +62,21 @@ export default function SpacePortal({ space, role, userRole }: SpacePortalProps)
         moderator: {
             title: "Moderator Dashboard",
             icon: <ShieldAlert size={16} />,
-            color: themeVar("warning")
+            color: themeVar("chart4")
         }
     };
 
     const config = portalConfig[role];
 
     const isOwner = userRole === "owner";
-    const isAdmin = userRole === "admin";
+    const isSpaceAdmin = userRole === "admin";
     const isMod = userRole === "moderator";
 
-    const canEditGeneral = isOwner || isAdmin;
+    const canEditGeneral = isOwner || isSpaceAdmin;
     const canManageChannels = isOwner ||
-        (isAdmin && (space.adminCanEditChannels ?? true)) ||
+        (isSpaceAdmin && (space.adminCanEditChannels ?? true)) ||
         (isMod && (space.modCanEditChannels ?? false));
-    const canManageEmojis = isOwner || isAdmin;
+    const canManageEmojis = isOwner || isSpaceAdmin;
 
     return (
         <Box sx={{ flex: 1, overflowY: "auto", p: 4, bgcolor: themeVar("background") }}>
@@ -87,10 +87,10 @@ export default function SpacePortal({ space, role, userRole }: SpacePortalProps)
                         <Typography sx={{ display: "flex", alignItems: "center", gap: 1, color: config.color, fontWeight: 700, mb: 1, fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>
                             {config.icon} {config.title}
                         </Typography>
-                        <Typography variant="h4" sx={{ fontWeight: 900, color: themeVar("textLight") }}>
+                        <Typography variant="h4" sx={{ fontWeight: 900, color: themeVar("foreground") }}>
                             {space.name} {role.charAt(0).toUpperCase() + role.slice(1)} Portal
                         </Typography>
-                        <Typography sx={{ color: themeVar("textSecondary"), mt: 0.5 }}>
+                        <Typography sx={{ color: themeVar("mutedForeground"), mt: 0.5 }}>
                             Manage settings, members, and monitoring for this space.
                         </Typography>
                     </Box>
@@ -110,7 +110,7 @@ export default function SpacePortal({ space, role, userRole }: SpacePortalProps)
                     scrollButtons="auto"
                     sx={{
                         borderBottom: `1px solid ${themeVar("border")}`,
-                        "& .MuiTab-root": { color: themeVar("textSecondary"), fontWeight: 700, textTransform: "none", fontSize: "0.875rem", minWidth: 100 },
+                        "& .MuiTab-root": { color: themeVar("mutedForeground"), fontWeight: 700, textTransform: "none", fontSize: "0.875rem", minWidth: 100 },
                         "& .Mui-selected": { color: config.color },
                         "& .MuiTabs-indicator": { backgroundColor: config.color }
                     }}
@@ -119,7 +119,7 @@ export default function SpacePortal({ space, role, userRole }: SpacePortalProps)
                     {canEditGeneral && <Tab value="general" label="General" />}
                     <Tab value="members" label="Members" />
                     {canManageChannels && <Tab value="channels" label="Channels" />}
-                    {(isOwner || isAdmin) && <Tab value="schedule" label="Schedule" />}
+                    {(isOwner || isSpaceAdmin) && <Tab value="schedule" label="Schedule" />}
                     <Tab value="polls" label="Polls" />
                     <Tab value="bans" label="Bans & Timeouts" />
                     {canManageEmojis && <Tab value="emojis" label="Emojis" />}
@@ -130,7 +130,7 @@ export default function SpacePortal({ space, role, userRole }: SpacePortalProps)
                     {currentTab === "general" && canEditGeneral && <GeneralTab space={space} role={role} userRole={userRole} />}
                     {currentTab === "members" && <MembersTab space={space} role={role} userRole={userRole} />}
                     {currentTab === "channels" && canManageChannels && <ChannelsTab space={space} role={role} userRole={userRole} canManageChannels={canManageChannels} />}
-                    {currentTab === "schedule" && (isOwner || isAdmin) && <ScheduleTab space={space} role={role} />}
+                    {currentTab === "schedule" && (isOwner || isSpaceAdmin) && <ScheduleTab space={space} role={role} />}
                     {currentTab === "polls" && <PollsTab space={space} role={role} userRole={userRole} />}
                     {currentTab === "bans" && <BansTab space={space} role={role} />}
                     {currentTab === "emojis" && canManageEmojis && <EmojisTab space={space} role={role} />}
@@ -139,3 +139,5 @@ export default function SpacePortal({ space, role, userRole }: SpacePortalProps)
         </Box>
     );
 }
+
+

@@ -22,10 +22,10 @@ export default function HeaderContent({ onToggleLeft, headerRight, title = "EcoS
           size="small"
           onClick={onToggleLeft}
           sx={{
-            color: "var(--textSecondary)",
+            color: "var(--muted-foreground)",
             "&:hover": {
               backgroundColor: "color-mix(in oklab, var(--primary), transparent 88%)",
-              color: "var(--textPrimary)",
+              color: "var(--foreground)",
             },
           }}
         >
@@ -47,4 +47,6 @@ export default function HeaderContent({ onToggleLeft, headerRight, title = "EcoS
     </Box>
   );
 }
+
+
 

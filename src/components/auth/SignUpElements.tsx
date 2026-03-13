@@ -9,6 +9,7 @@ import { useAuth, useUser } from '@clerk/clerk-react'
 import Image from 'next/image'
 import { useConvex } from "convex/react";
 import { api } from "../../../convex/_generated/api";
+import { themeVar } from "@/theme/registry";
 
 // Elements-based Sign Up collecting: username, displayName, dateOfBirth
 // displayName and dateOfBirth are stored in publicMetadata
@@ -123,19 +124,18 @@ export default function SignUpElements({
 
   // Reuse landing theme vars for a cohesive look
   const colors = useMemo(() => ({
-    background: 'var(--background, #0a0a0a)',
-    backgroundDark: 'var(--backgroundDark, #000000)',
-    text: 'var(--text, #eaeaea)',
-    textSecondary: 'var(--textSecondary, #9ca3af)',
-    primary: 'var(--primary, #6c47ff)',
-    secondary: 'var(--secondary, #ff2d55)'
+    background: themeVar("background"),
+    text: themeVar("foreground"),
+    textSecondary: themeVar("mutedForeground"),
+    primary: themeVar("primary"),
+    secondary: themeVar("secondary")
   }), []);
 
   const inputClass = "themed-input w-full rounded-xl px-3 py-2 transition";
   const primaryBtnClass = "w-full rounded-xl text-sm font-medium h-11 px-4 shadow-md hover:opacity-95 transition";
 
   const getPasswordStrength = (value: string) => {
-    if (!value) return { label: "", percent: 0, color: "bg-white/10" };
+    if (!value) return { label: "", percent: 0, color: "bg-foreground/5" };
     const result = zxcvbn(value);
     const score = result.score; // 0 (worst) - 4 (best)
 
@@ -150,8 +150,7 @@ export default function SignUpElements({
   return (
     <div className={className} style={{ color: colors.text }}>
       <div
-        className="w-[380px] rounded-2xl border shadow-2xl px-6 py-6"
-        style={{ backgroundColor: 'var(--backgroundLight, #0f0f0f)', borderColor: 'var(--card-border)' }}
+        className="w-[380px] rounded-2xl border border-border shadow-2xl px-6 py-6 bg-card/60 backdrop-blur-xl"
       >
         <div className="mb-5 text-left">
           <div className="relative mb-3 h-11 w-11">
@@ -169,7 +168,7 @@ export default function SignUpElements({
                 backgroundImage: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
               }}
             >
-              <div className="h-full w-full rounded-full p-[2px]" style={{ backgroundColor: 'var(--backgroundLight, #0f0f0f)' }}>
+              <div className="h-full w-full rounded-full p-[2px] bg-muted/80">
                 <Image
                   src="/achievements/early_adopter_sticker.png"
                   alt="App badge"
@@ -217,7 +216,7 @@ export default function SignUpElements({
 
               {strength.label && (
                 <div className="space-y-1">
-                  <div className="mt-1 h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
+                  <div className="mt-1 h-1.5 w-full rounded-full bg-foreground/5 overflow-hidden">
                     <div
                       className={`h-full transition-all ${strength.color}`}
                       style={{ width: `${strength.percent}%` }}
@@ -301,7 +300,7 @@ export default function SignUpElements({
                 <input
                   id="terms"
                   type="checkbox"
-                  className="mt-1 h-4 w-4 rounded border-white/20 bg-black/40"
+                  className="mt-1 h-4 w-4 rounded border-border/50 bg-background/40"
                   checked={acceptedTerms}
                   onChange={(e) => setAcceptedTerms(e.target.checked)}
                 />
@@ -346,7 +345,7 @@ export default function SignUpElements({
                 </p>
                 <ClerkElements.Field name="code">
                   <ClerkElements.Label className="block text-sm">Verification code</ClerkElements.Label>
-                  <ClerkElements.Input className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 tracking-widest text-center text-white outline-none focus:border-white/20 focus:ring-2 focus:ring-indigo-500/60" />
+                  <ClerkElements.Input className="w-full rounded-xl bg-foreground/5 border border-border/50 px-3 py-2 tracking-widest text-center text-foreground outline-none focus:border-primary/50 transition-all" />
                   <ClerkElements.FieldError className="text-sm text-red-400" />
                 </ClerkElements.Field>
 
@@ -381,3 +380,5 @@ export default function SignUpElements({
     </div>
   );
 }
+
+

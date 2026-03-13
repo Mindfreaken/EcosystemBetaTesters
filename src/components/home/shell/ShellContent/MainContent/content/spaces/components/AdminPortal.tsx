@@ -10,3 +10,5 @@ interface AdminPortalProps {
 export default function AdminPortal({ space, userRole }: AdminPortalProps) {
     return <SpacePortal space={space} role="admin" userRole={userRole} />;
 }
+
+

@@ -123,3 +123,5 @@ const AddFriendModal: React.FC<AddFriendModalProps> = ({ show, onClose, onFriend
 };
 
 export default AddFriendModal;
+
+

@@ -130,14 +130,14 @@ export const setMemberRole = mutation({
         if (!requesterMembership) throw new Error("Unauthorized");
 
         const isOwner = requesterMembership.role === "owner";
-        const isAdmin = requesterMembership.role === "admin";
+        const isSpaceAdmin = requesterMembership.role === "admin";
 
-        if (!isOwner && !isAdmin) {
+        if (!isOwner && !isSpaceAdmin) {
             throw new Error("Unauthorized: Only owners and admins can manage roles.");
         }
 
         // Admins can only set moderator/member roles
-        if (isAdmin && (args.role === "admin" || args.role === "owner")) {
+        if (isSpaceAdmin && (args.role === "admin" || args.role === "owner")) {
             throw new Error("Unauthorized: Admins cannot promote users to Admin or Owner.");
         }
 

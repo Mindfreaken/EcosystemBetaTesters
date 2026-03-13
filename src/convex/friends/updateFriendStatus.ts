@@ -10,3 +10,5 @@ export function useUpdateFriendStatus() {
 		return await mutate(args);
 	};
 }
+
+

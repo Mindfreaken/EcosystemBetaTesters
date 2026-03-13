@@ -18,3 +18,5 @@ export function useGetFriendDetails(userIds: Id<"users">[] | undefined) {
 
   return result;
 }
+
+

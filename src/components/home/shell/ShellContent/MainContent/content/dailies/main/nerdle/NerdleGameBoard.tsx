@@ -537,7 +537,7 @@ export default function NerdleGameBoard({
         className="pointer-events-none absolute inset-0 opacity-70"
         style={{
           background: `radial-gradient(1200px 600px at 10% 0%, color-mix(in oklab, ${themeVar(themeColor ?? "primary")}, transparent 88%), transparent 65%), radial-gradient(900px 500px at 90% 10%, color-mix(in oklab, ${themeVar("secondary")}, transparent 88%), transparent 60%)`,
-          maskImage: "linear-gradient(to bottom, rgba(0,0,0,.85), rgba(0,0,0,.15))",
+          maskImage: `linear-gradient(to bottom, ${themeVar("foreground")}, transparent)`,
         }}
       />
 
@@ -569,10 +569,10 @@ export default function NerdleGameBoard({
             background: `linear-gradient(180deg, color-mix(in oklab, ${themeVar("card")}, transparent 85%), transparent)`
           }}
         >
-          <Typography variant="body2" sx={{ color: themeVar("textSecondary"), fontWeight: 600 }}>Tries left: <span style={{ color: themeVar("textLight") }}>{remainingTries}</span></Typography>
-          <Typography variant="body2" sx={{ color: themeVar("textSecondary"), fontWeight: 600 }}>Letters: <span style={{ color: themeVar("textLight") }}>{lettersOnlyCount}</span></Typography>
+          <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), fontWeight: 600 }}>Tries left: <span style={{ color: themeVar("foreground") }}>{remainingTries}</span></Typography>
+          <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), fontWeight: 600 }}>Letters: <span style={{ color: themeVar("foreground") }}>{lettersOnlyCount}</span></Typography>
           {typeof rolloverRemainingMs === "number" && (
-            <Typography variant="body2" sx={{ color: themeVar("textSecondary"), fontWeight: 600 }}>
+            <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), fontWeight: 600 }}>
               Next word in: <strong style={{ color: themeVar(themeColor ?? "primary") }}>{fmtCountdown(rolloverRemainingMs)}</strong>
             </Typography>
           )}
@@ -580,8 +580,8 @@ export default function NerdleGameBoard({
           {usedPrimaryHint && typeof wordId === 'number' && (
             (() => {
               const c = inferCategoryFromId(game, wordId); return c ? (
-                <Typography variant="body2" sx={{ color: themeVar("textSecondary"), fontWeight: 600 }}>
-                  Hint: <strong style={{ color: themeVar("highlight") }}>{c}</strong>
+                <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), fontWeight: 600 }}>
+                  Hint: <strong style={{ color: themeVar("chart3") }}>{c}</strong>
                 </Typography>
               ) : null;
             })()
@@ -595,10 +595,10 @@ export default function NerdleGameBoard({
                 onClick={() => setShowLeaderboard(true)}
                 sx={{
                   borderColor: themeVar("border"),
-                  color: themeVar("textLight"),
+                  color: themeVar("foreground"),
                   textTransform: "none",
                   fontWeight: 700,
-                  "&:hover": { borderColor: themeVar("highlight"), background: `color-mix(in oklab, ${themeVar("highlight")}, transparent 90%)` }
+                  "&:hover": { borderColor: themeVar("chart3"), background: `color-mix(in oklab, ${themeVar("chart3")}, transparent 90%)` }
                 }}
               >
                 View statistics
@@ -623,15 +623,15 @@ export default function NerdleGameBoard({
                       usePrimaryHint();
                     }}
                     sx={{
-                      borderColor: confirmHint ? themeVar("danger") : themeVar("border"),
-                      color: confirmHint ? themeVar("danger") : themeVar("textLight"),
+                      borderColor: confirmHint ? themeVar("destructive") : themeVar("border"),
+                      color: confirmHint ? themeVar("destructive") : themeVar("foreground"),
                       textTransform: "none",
                       fontWeight: 700,
                       "&:hover": {
-                        borderColor: confirmHint ? themeVar("danger") : themeVar("highlight"),
+                        borderColor: confirmHint ? themeVar("destructive") : themeVar("chart3"),
                         background: confirmHint
-                          ? `color-mix(in oklab, ${themeVar("danger")}, transparent 90%)`
-                          : `color-mix(in oklab, ${themeVar("highlight")}, transparent 90%)`
+                          ? `color-mix(in oklab, ${themeVar("destructive")}, transparent 90%)`
+                          : `color-mix(in oklab, ${themeVar("chart3")}, transparent 90%)`
                       }
                     }}
                   >
@@ -643,7 +643,7 @@ export default function NerdleGameBoard({
                     size="small"
                     variant="text"
                     onClick={() => setConfirmHint(false)}
-                    sx={{ color: themeVar("textSecondary"), textTransform: "none" }}
+                    sx={{ color: themeVar("mutedForeground"), textTransform: "none" }}
                   >
                     Cancel
                   </Button>
@@ -660,8 +660,8 @@ export default function NerdleGameBoard({
               px: 2,
               py: 0.5,
               borderRadius: 1,
-              bgcolor: `color-mix(in oklab, ${themeVar("danger")}, transparent 90%)`,
-              border: `1px solid ${themeVar("danger")}`,
+              bgcolor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 90%)`,
+              border: `1px solid ${themeVar("destructive")}`,
               animation: "shake 0.5s cubic-bezier(.36,.07,.19,.97) both",
               "@keyframes shake": {
                 "10%, 90%": { transform: "translate3d(-1px, 0, 0)" },
@@ -671,7 +671,7 @@ export default function NerdleGameBoard({
               },
             }}
           >
-            <Typography variant="caption" sx={{ color: themeVar("danger"), fontWeight: 800, letterSpacing: 1 }}>
+            <Typography variant="caption" sx={{ color: themeVar("destructive"), fontWeight: 800, letterSpacing: 1 }}>
               {validationError.toUpperCase()}
             </Typography>
           </Box>
@@ -784,7 +784,7 @@ export default function NerdleGameBoard({
         <Box sx={{ position: "fixed", inset: 0, zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", p: 2 }}>
           <Box
             onClick={() => setShowResults(false)}
-            sx={{ position: "absolute", inset: 0, bgcolor: "rgba(0,0,0,0.8)", backdropFilter: "blur(4px)" }}
+            sx={{ position: "absolute", inset: 0, bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`, backdropFilter: "blur(4px)" }}
           />
           <Box
             sx={{
@@ -796,7 +796,7 @@ export default function NerdleGameBoard({
               borderRadius: 4,
               p: 4,
               textAlign: "center",
-              boxShadow: `0 24px 48px -12px rgba(0,0,0,0.5)`,
+              boxShadow: `0 24px 48px -12px color-mix(in oklab, ${themeVar("foreground")}, transparent 80%)`,
               overflow: "hidden",
             }}
           >
@@ -809,7 +809,7 @@ export default function NerdleGameBoard({
                 transform: "translateX(-50%)",
                 width: 200,
                 height: 100,
-                background: themeVar(didWin ? (themeColor ?? "primary") : "danger"),
+                background: themeVar(didWin ? (themeColor ?? "primary") : "destructive"),
                 filter: "blur(60px)",
                 opacity: 0.3,
               }}
@@ -817,27 +817,27 @@ export default function NerdleGameBoard({
 
             <Typography
               variant="h4"
-              sx={{ fontWeight: 900, color: themeVar("textLight"), mb: 1, letterSpacing: "-0.01em" }}
+              sx={{ fontWeight: 900, color: themeVar("foreground"), mb: 1, letterSpacing: "-0.01em" }}
             >
               {didWin ? 'VICTORY' : 'DEFEAT'}
             </Typography>
-            <Typography variant="body2" sx={{ color: themeVar("textSecondary"), mb: 4 }}>
+            <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), mb: 4 }}>
               {didWin ? 'System successfully decrypted.' : 'Maximum attempts reached.'}
             </Typography>
 
             <Box sx={{ display: "grid", gap: 2, mb: 4 }}>
-              <Box sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 40%)`, border: `1px solid ${themeVar("border")}` }}>
-                <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", mb: 0.5, fontWeight: 700 }}>THE WORD WAS</Typography>
+              <Box sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 40%)`, border: `1px solid ${themeVar("border")}` }}>
+                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "block", mb: 0.5, fontWeight: 700 }}>THE WORD WAS</Typography>
                 <Typography variant="h5" sx={{ fontWeight: 800, color: themeVar(themeColor ?? "primary"), letterSpacing: 2 }}>{puzzle.answer.toUpperCase()}</Typography>
               </Box>
 
               <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
-                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 60%)`, border: `1px solid ${themeVar("border")}` }}>
-                  <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", mb: 0.5 }}>GUESSES</Typography>
+                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 60%)`, border: `1px solid ${themeVar("border")}` }}>
+                  <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "block", mb: 0.5 }}>GUESSES</Typography>
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>{guessCount}</Typography>
                 </Box>
-                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 60%)`, border: `1px solid ${themeVar("border")}` }}>
-                  <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", mb: 0.5 }}>TIME</Typography>
+                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 60%)`, border: `1px solid ${themeVar("border")}` }}>
+                  <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "block", mb: 0.5 }}>TIME</Typography>
                   <Typography variant="h6" sx={{ fontWeight: 800 }}>{fmtTime(elapsedMs)}</Typography>
                 </Box>
               </Box>
@@ -861,7 +861,7 @@ export default function NerdleGameBoard({
               <Button
                 fullWidth
                 onClick={() => setShowResults(false)}
-                sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}
+                sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}
               >
                 CLOSE
               </Button>
@@ -897,17 +897,17 @@ function Tile({
   let border = `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 22%)`;
 
   if (status === "correct") {
-    bg = `linear-gradient(180deg, color-mix(in oklab, #16a34a, transparent 75%), color-mix(in oklab, #16a34a, transparent 92%))`;
-    border = `1px solid color-mix(in oklab, #16a34a, transparent 15%)`;
+    bg = `linear-gradient(180deg, color-mix(in oklab, ${themeVar("chart2")}, transparent 75%), color-mix(in oklab, ${themeVar("chart2")}, transparent 92%))`;
+    border = `1px solid color-mix(in oklab, ${themeVar("chart2")}, transparent 15%)`;
   } else if (status === "present") {
-    bg = `linear-gradient(180deg, color-mix(in oklab, #f59e0b, transparent 75%), color-mix(in oklab, #f59e0b, transparent 92%))`;
-    border = `1px solid color-mix(in oklab, #f59e0b, transparent 15%)`;
+    bg = `linear-gradient(180deg, color-mix(in oklab, ${themeVar("chart3")}, transparent 75%), color-mix(in oklab, ${themeVar("chart3")}, transparent 92%))`;
+    border = `1px solid color-mix(in oklab, ${themeVar("chart3")}, transparent 15%)`;
   } else if (status === "absent") {
-    bg = `linear-gradient(180deg, color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 80%), transparent)`;
+    bg = `linear-gradient(180deg, color-mix(in oklab, ${themeVar("muted")}, transparent 80%), transparent)`;
     border = `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 35%)`;
   } else if (status === "hint") {
-    bg = `linear-gradient(180deg, color-mix(in oklab, #ef4444, transparent 75%), color-mix(in oklab, #ef4444, transparent 92%))`;
-    border = `1px solid color-mix(in oklab, #ef4444, transparent 15%)`;
+    bg = `linear-gradient(180deg, color-mix(in oklab, ${themeVar("destructive")}, transparent 75%), color-mix(in oklab, ${themeVar("destructive")}, transparent 92%))`;
+    border = `1px solid color-mix(in oklab, ${themeVar("destructive")}, transparent 15%)`;
   }
 
   const isHighlighted = isCursor && !status;
@@ -923,14 +923,14 @@ function Tile({
         placeItems: "center",
         fontWeight: 800,
         fontSize: "1.2rem",
-        color: themeVar("textLight"),
+        color: themeVar("foreground"),
         background: bg,
         border: isHighlighted
           ? `1px solid ${highlightColor}`
           : border,
         boxShadow: isHighlighted
           ? `0 0 0 1px ${highlightColor}, 0 0 20px color-mix(in oklab, ${highlightColor}, transparent 60%)`
-          : "inset 0 0 0 1px rgba(255,255,255,0.02)",
+          : `inset 0 0 0 1px color-mix(in oklab, ${themeVar("foreground")}, transparent 98%)`,
         transition: "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
         transform: isHighlighted ? "translateY(-2px) scale(1.05)" : "none",
         zIndex: isHighlighted ? 10 : 1,
@@ -957,20 +957,22 @@ function Key({
 }) {
   let bg = `linear-gradient(180deg, color-mix(in oklab, ${themeVar("card")}, transparent 80%), transparent)`;
   let border = `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 25%)`;
-  let color = themeVar("textSecondary");
+  let color = themeVar("mutedForeground");
 
   if (status === "correct") {
-    bg = `linear-gradient(180deg, #16a34a, color-mix(in oklab, #16a34a, transparent 30%))`;
-    border = `1px solid color-mix(in oklab, #16a34a, transparent 20%)`;
-    color = "#fff";
+    const c = themeVar("chart2");
+    bg = `linear-gradient(180deg, ${c}, color-mix(in oklab, ${c}, transparent 30%))`;
+    border = `1px solid color-mix(in oklab, ${c}, transparent 20%)`;
+    color = themeVar("foreground"); // or white if background is dark
   } else if (status === "present") {
-    bg = `linear-gradient(180deg, #f59e0b, color-mix(in oklab, #f59e0b, transparent 30%))`;
-    border = `1px solid color-mix(in oklab, #f59e0b, transparent 20%)`;
-    color = "#fff";
+    const c = themeVar("chart3");
+    bg = `linear-gradient(180deg, ${c}, color-mix(in oklab, ${c}, transparent 30%))`;
+    border = `1px solid color-mix(in oklab, ${c}, transparent 20%)`;
+    color = themeVar("foreground");
   } else if (status === "absent") {
     bg = `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`;
     border = `1px solid ${themeVar("border")}`;
-    color = `color-mix(in oklab, ${themeVar("text")}, transparent 60%)`;
+    color = `color-mix(in oklab, ${themeVar("foreground")}, transparent 60%)`;
   }
 
   const highlightColor = themeVar(themeColor);
@@ -984,7 +986,7 @@ function Key({
         placeItems: "center",
         fontSize: "0.85rem",
         fontWeight: 800,
-        color: status ? color : themeVar("textLight"),
+        color: status ? color : themeVar("foreground"),
         cursor: status === "absent" ? "not-allowed" : "pointer",
         userSelect: "none",
         background: bg,
@@ -1008,3 +1010,5 @@ function Key({
     </Box>
   );
 }
+
+

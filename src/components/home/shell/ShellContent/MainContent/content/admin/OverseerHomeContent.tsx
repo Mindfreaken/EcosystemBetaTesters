@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import { ArrowRight, Shield, Lock } from "lucide-react";
-import ContentTemplate from "../../_shared/ContentTemplate";
+import ContentTemplate from "../_shared/ContentTemplate";
 import { useRouter, useSearchParams } from "next/navigation";
 import { UiButton } from "@/components/ui/UiButton";
 import { MuiCard } from "@/components/ui/MuiCard";
@@ -35,12 +35,12 @@ export default function OverseerHomeContent() {
                         <Lock size={48} />
                     </Box>
                     <Typography variant="h4" sx={{ fontWeight: 800 }}>Restricted Access</Typography>
-                    <Typography variant="body1" sx={{ color: 'var(--textSecondary)', maxWidth: 400 }}>
+                    <Typography variant="body1" sx={{ color: 'var(--muted-foreground)', maxWidth: 400 }}>
                         The Overseer Hub is reserved for community moderators. If you believe you should have access, please contact support.
                     </Typography>
                     <UiButton onClick={() => {
                         const sp = new URLSearchParams(Array.from(searchParams?.entries?.() || []));
-                        sp.delete("ecoHubView");
+                        sp.delete("adminView");
                         router.replace(`/home?${sp.toString()}`);
                     }}>Return to Hub</UiButton>
                 </Box>
@@ -62,7 +62,7 @@ export default function OverseerHomeContent() {
                         <Shield size={32} color="var(--primary)" />
                         <Box>
                             <Typography variant="h5" sx={{ fontWeight: 700 }}>Overseer Dashboard</Typography>
-                            <Typography variant="body2" sx={{ color: "var(--textSecondary)" }}>
+                            <Typography variant="body2" sx={{ color: "var(--muted-foreground)" }}>
                                 Manage community reports, earn points, and help maintain a safe environment.
                             </Typography>
                         </Box>
@@ -77,13 +77,13 @@ export default function OverseerHomeContent() {
                 }}>
                     <MuiCard variant="interactive" onClick={() => {
                         const sp = new URLSearchParams(Array.from(searchParams?.entries?.() || []));
-                        sp.set("ecoHubView", "communityActions");
+                        sp.set("adminView", "communityActions");
                         router.replace(`/home?${sp.toString()}`);
                     }}>
                         <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
                             <Box>
                                 <Typography variant="h6" sx={{ fontWeight: 700 }}>Community Actions</Typography>
-                                <Typography variant="body2" sx={{ color: 'var(--textSecondary)' }}>View pending reports</Typography>
+                                <Typography variant="body2" sx={{ color: 'var(--muted-foreground)' }}>View pending reports</Typography>
                             </Box>
                             <ArrowRight size={20} />
                         </Stack>
@@ -93,3 +93,5 @@ export default function OverseerHomeContent() {
         </ContentTemplate>
     );
 }
+
+

@@ -18,7 +18,8 @@ import MusicContent from "./music/MusicContent";
 import ProfileContent from "./profile/ProfileContent";
 import GamingContent from "./gaming/GamingContent";
 import ThemeView from "./theme/ThemeView";
-import EcoSystemHubContent from "./EcoSystemHub/EcoSystemHubContent";
+import OverseerHomeContent from "./admin/OverseerHomeContent";
+import CommunityActionsContent from "./admin/CommunityActionsContent";
 import EsportsContent from "./esports/EsportsContent";
 import NotesContent from "./notes/NotesContent";
 import SpaceView from "./spaces/SpaceView";
@@ -30,7 +31,7 @@ export interface MainContentProps {
 }
 
 export default function MainContent({ children }: MainContentProps) {
-  const { view, selectedSpaceId } = useShellView();
+  const { view, selectedSpaceId, adminView } = useShellView();
   return (
     <Box
       sx={{
@@ -68,13 +69,16 @@ export default function MainContent({ children }: MainContentProps) {
         {view === "docs" && <DocsContent />}
         {view === "music" && <MusicContent />}
         {view === "profile" && <ProfileContent />}
-        {view === "ecosystemHub" && <EcoSystemHubContent />}
+        {view === "admin" && adminView === "communityActions" && <CommunityActionsContent />}
+        {view === "admin" && (adminView === null || adminView === "overseerHome") && <OverseerHomeContent />}
         {view === "esports" && <EsportsContent />}
         {view === "notes" && <NotesContent />}
       </Box>
     </Box>
   );
 }
+
+
 
 
 

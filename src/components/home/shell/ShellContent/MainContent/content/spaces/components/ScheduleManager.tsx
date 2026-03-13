@@ -111,7 +111,7 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
     return (
         <Box sx={{ maxWidth: 800 }}>
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textSecondary") }}>SCHEDULE / EVENTS</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("mutedForeground") }}>SCHEDULE / EVENTS</Typography>
                 <Button
                     size="small"
                     startIcon={<Plus size={14} />}
@@ -122,13 +122,13 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
                 </Button>
             </Box>
 
-            <Box sx={{ p: 4, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
+            <Box sx={{ p: 4, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
                 {events === undefined ? (
-                    <Typography sx={{ color: themeVar("textSecondary"), textAlign: "center" }}>Loading schedule...</Typography>
+                    <Typography sx={{ color: themeVar("mutedForeground"), textAlign: "center" }}>Loading schedule...</Typography>
                 ) : events.length === 0 ? (
                     <Box sx={{ textAlign: "center", py: 4 }}>
                         <CalendarIcon size={48} style={{ color: "rgba(255,255,255,0.1)", marginBottom: 16 }} />
-                        <Typography sx={{ color: themeVar("textSecondary"), display: "block" }}>No upcoming events.</Typography>
+                        <Typography sx={{ color: themeVar("mutedForeground"), display: "block" }}>No upcoming events.</Typography>
                     </Box>
                 ) : (
                     <Stack spacing={2}>
@@ -146,14 +146,14 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
                                 <Box key={event._id} sx={{ p: 2, borderRadius: 2, bgcolor: "rgba(0,0,0,0.2)", border: `1px solid ${themeVar("border")}`, display: "flex", justifyContent: "space-between", alignItems: "flex-start", opacity: isPast ? 0.6 : 1 }}>
                                     <Box>
                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                                            <Typography sx={{ fontWeight: 800, color: themeVar("textLight"), fontSize: "1.1rem" }}>{event.title}</Typography>
+                                            <Typography sx={{ fontWeight: 800, color: themeVar("foreground"), fontSize: "1.1rem" }}>{event.title}</Typography>
                                             {isPast && (
                                                 <Box sx={{ px: 1, py: 0.25, borderRadius: 1, bgcolor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>
                                                     <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.4)", fontWeight: 900 }}>FINISHED</Typography>
                                                 </Box>
                                             )}
                                         </Box>
-                                        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 1, color: themeVar("textSecondary") }}>
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 1, color: themeVar("mutedForeground") }}>
                                             <Typography variant="body2" sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                                                 <CalendarIcon size={14} /> {dateStr}
                                             </Typography>
@@ -162,16 +162,16 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
                                             </Typography>
                                         </Box>
                                         {event.description && (
-                                            <Typography variant="body2" sx={{ color: themeVar("textSecondary"), mt: 1, display: "flex", alignItems: "flex-start", gap: 0.5 }}>
+                                            <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), mt: 1, display: "flex", alignItems: "flex-start", gap: 0.5 }}>
                                                 <Info size={14} style={{ marginTop: 2, flexShrink: 0 }} /> {event.description}
                                             </Typography>
                                         )}
                                     </Box>
                                     <Box sx={{ display: "flex", gap: 0.5 }}>
-                                        <IconButton size="small" onClick={() => handleOpenEdit(event)} sx={{ color: themeVar("textSecondary"), "&:hover": { color: themeVar("textLight") } }}>
+                                        <IconButton size="small" onClick={() => handleOpenEdit(event)} sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("foreground") } }}>
                                             <Edit2 size={16} />
                                         </IconButton>
-                                        <IconButton size="small" onClick={() => setEventToDelete(event._id)} sx={{ color: themeVar("danger"), "&:hover": { bgcolor: "rgba(255,0,0,0.1)" } }}>
+                                        <IconButton size="small" onClick={() => setEventToDelete(event._id)} sx={{ color: themeVar("destructive"), "&:hover": { bgcolor: "rgba(255,0,0,0.1)" } }}>
                                             <Trash2 size={16} />
                                         </IconButton>
                                     </Box>
@@ -182,7 +182,7 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
                 )}
             </Box>
 
-            <Dialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: "none" } }}>
+            <Dialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none" } }}>
                 <DialogTitle sx={{ fontWeight: 900 }}>{editingEventId ? "Edit Event" : "Create Event"}</DialogTitle>
                 <DialogContent>
                     <Stack spacing={3} sx={{ mt: 1 }}>
@@ -191,8 +191,8 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
                             fullWidth
                             value={title}
                             onChange={e => setTitle(e.target.value)}
-                            InputLabelProps={{ sx: { color: themeVar("textSecondary") } }}
-                            InputProps={{ sx: { color: themeVar("textLight") } }}
+                            InputLabelProps={{ sx: { color: themeVar("mutedForeground") } }}
+                            InputProps={{ sx: { color: themeVar("foreground") } }}
                         />
                         <TextField
                             label="Description (Optional)"
@@ -201,8 +201,8 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
                             rows={3}
                             value={description}
                             onChange={e => setDescription(e.target.value)}
-                            InputLabelProps={{ sx: { color: themeVar("textSecondary") } }}
-                            InputProps={{ sx: { color: themeVar("textLight") } }}
+                            InputLabelProps={{ sx: { color: themeVar("mutedForeground") } }}
+                            InputProps={{ sx: { color: themeVar("foreground") } }}
                         />
                         <Stack direction="row" spacing={2}>
                             <TextField
@@ -211,8 +211,8 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
                                 fullWidth
                                 value={startTime}
                                 onChange={e => setStartTime(e.target.value)}
-                                InputLabelProps={{ shrink: true, sx: { color: themeVar("textSecondary") } }}
-                                InputProps={{ sx: { color: themeVar("textLight") } }}
+                                InputLabelProps={{ shrink: true, sx: { color: themeVar("mutedForeground") } }}
+                                InputProps={{ sx: { color: themeVar("foreground") } }}
                             />
                             <TextField
                                 label="End Time (Local)"
@@ -220,18 +220,18 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
                                 fullWidth
                                 value={endTime}
                                 onChange={e => setEndTime(e.target.value)}
-                                InputLabelProps={{ shrink: true, sx: { color: themeVar("textSecondary") } }}
-                                InputProps={{ sx: { color: themeVar("textLight") } }}
+                                InputLabelProps={{ shrink: true, sx: { color: themeVar("mutedForeground") } }}
+                                InputProps={{ sx: { color: themeVar("foreground") } }}
                             />
                         </Stack>
                         <FormControlLabel
                             control={<Checkbox checked={showInAnnouncements} onChange={e => setShowInAnnouncements(e.target.checked)} sx={{ color: themeVar("primary"), '&.Mui-checked': { color: themeVar("primary") } }} />}
-                            label={<Typography variant="body2" sx={{ color: themeVar("textSecondary"), display: "flex", alignItems: "center", gap: 1 }}><Megaphone size={14} /> Announce in #announcements</Typography>}
+                            label={<Typography variant="body2" sx={{ color: themeVar("mutedForeground"), display: "flex", alignItems: "center", gap: 1 }}><Megaphone size={14} /> Announce in #announcements</Typography>}
                         />
                     </Stack>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setIsCreateOpen(false)} sx={{ color: themeVar("textSecondary") }}>Cancel</Button>
+                    <Button onClick={() => setIsCreateOpen(false)} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>
                     <Button onClick={handleSave} variant="contained" disabled={!title.trim() || !startTime || !endTime} sx={{ bgcolor: themeVar("primary") }}>
                         {editingEventId ? "Save Changes" : "Create Event"}
                     </Button>
@@ -242,16 +242,16 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
             <Dialog
                 open={Boolean(eventToDelete)}
                 onClose={() => setEventToDelete(null)}
-                PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: "none", border: `1px solid ${themeVar("border")}`, borderRadius: 3 } }}
+                PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none", border: `1px solid ${themeVar("border")}`, borderRadius: 3 } }}
             >
                 <DialogTitle sx={{ fontWeight: 900 }}>Delete Event?</DialogTitle>
                 <DialogContent>
-                    <Typography variant="body2" sx={{ color: themeVar("textSecondary") }}>
+                    <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>
                         Are you sure you want to delete this scheduled event? This action cannot be undone.
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setEventToDelete(null)} sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}>Cancel</Button>
+                    <Button onClick={() => setEventToDelete(null)} sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>Cancel</Button>
                     <Button
                         onClick={handleDelete}
                         variant="contained"
@@ -265,3 +265,5 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
         </Box>
     );
 }
+
+

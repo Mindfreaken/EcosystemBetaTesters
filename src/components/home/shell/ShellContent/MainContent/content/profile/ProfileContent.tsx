@@ -24,17 +24,15 @@ export default function ProfileContent() {
           value={tab}
           onChange={(_, v) => setTab(v)}
           textColor="inherit"
-          TabIndicatorProps={{ style: { background: "var(--accent, #ff4060)" } }}
+          TabIndicatorProps={{ style: { background: "var(--primary)" } }}
           sx={{
-            
-            
             "& .MuiTab-root": {
               fontWeight: 700,
               textTransform: "uppercase",
               letterSpacing: ".06em",
-              color: "var(--textSecondary)",
+              color: "var(--muted-foreground)",
             },
-            "& .Mui-selected": { color: "var(--textLight)" },
+            "& .Mui-selected": { color: "var(--foreground)" },
           }}
         >
           <Tab label="Overview" />
@@ -54,3 +52,5 @@ export default function ProfileContent() {
     </Box>
   );
 }
+
+

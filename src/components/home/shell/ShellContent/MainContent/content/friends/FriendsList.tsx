@@ -15,6 +15,7 @@ import LockOpenIcon from "@mui/icons-material/LockOpen";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 import UiIconButton from "@/components/ui/UiIconButton";
 import UiButton from "@/components/ui/UiButton";
+import { themeVar } from "@/theme/registry";
 
 interface FriendsListProps {
   friends: Friend[];
@@ -68,15 +69,15 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
     <div className="friends-scroll flex flex-1 min-h-0 flex-col overflow-y-auto p-4">
       {/* Loading */}
       {isLoading && (
-        <div className="flex flex-1 flex-col items-center justify-center text-zinc-400">
-          <div className="mb-4 h-6 w-6 animate-spin rounded-full border-2 border-zinc-600 border-t-transparent" />
+        <div className="flex flex-1 flex-col items-center justify-center" style={{ color: themeVar("mutedForeground") }}>
+          <div className="mb-4 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" style={{ borderColor: themeVar("border") }} />
           <p className="text-base">Loading friends...</p>
         </div>
       )}
 
       {/* Empty states */}
       {!isLoading && displayedFriends.length === 0 && (
-        <div className="flex flex-1 flex-col items-center justify-center text-center text-zinc-400">
+        <div className="flex flex-1 flex-col items-center justify-center text-center" style={{ color: themeVar("mutedForeground") }}>
           {currentFilter === "all" && (
             <div>
               <PeopleIcon className="mb-4 !text-[3rem]" />
@@ -109,50 +110,70 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
         <div className="flex flex-col gap-3">
           {(currentFilter === "all" || currentFilter === "favorite") &&
             displayedFriends.map((friend) => (
-              <div
-                key={friend.id}
-                className={[
-                  "flex items-center rounded-xl p-4 transition",
-                  "bg-[var(--card)] border border-[var(--border)]",
-                  "shadow-[0_2px_8px_rgba(0,0,0,0.28)] hover:shadow-[0_6px_18px_rgba(0,0,0,0.32)]",
-                  "hover:bg-[var(--cardHover)]",
-                  friend.isFavorite ? "border-l-4 border-yellow-500" : "",
-                ].join(" ")}
-              >
-                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-zinc-800 text-zinc-200">
-                  {friend.avatarUrl ? (
-                    <img src={friend.avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
-                  ) : (
-                    <AccountBoxIcon className="!text-[2rem] text-zinc-500" />
-                  )}
-                </div>
+                  <div
+                    className={[
+                      "flex items-center rounded-xl p-4 transition",
+                      "bg-[var(--card)] border border-[var(--border)]",
+                    ].join(" ")}
+                    style={{
+                      backgroundColor: themeVar("card"),
+                      borderColor: themeVar("border"),
+                      boxShadow: `0 2px 8px color-mix(in oklab, ${themeVar("foreground")}, transparent 85%)`,
+                      borderLeft: friend.isFavorite ? `4px solid ${themeVar("chart3")}` : undefined,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = `color-mix(in oklab, ${themeVar("card")}, ${themeVar("foreground")} 3%)`;
+                      e.currentTarget.style.boxShadow = `0 6px 18px color-mix(in oklab, ${themeVar("foreground")}, transparent 80%)`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = themeVar("card");
+                      e.currentTarget.style.boxShadow = `0 2px 8px color-mix(in oklab, ${themeVar("foreground")}, transparent 85%)`;
+                    }}
+                  >
+                    <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full" style={{ backgroundColor: themeVar("muted"), color: themeVar("foreground") }}>
+                      {friend.avatarUrl ? (
+                        <img src={friend.avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+                      ) : (
+                        <AccountBoxIcon className="!text-[2rem]" style={{ color: themeVar("mutedForeground") }} />
+                      )}
+                    </div>
+    
+                    <div className="ml-4 flex-1">
+                      <div className="flex items-center gap-2 text-base font-semibold" style={{ color: themeVar("foreground") }}>
+                        {friend.displayName}
+                        {friend.isMuted && <VolumeOffIcon className="!text-sm" style={{ color: themeVar("mutedForeground") }} />}
+                      </div>
+                    </div>
 
-                <div className="ml-4 flex-1">
-                  <div className="flex items-center gap-2 text-base font-semibold text-zinc-100">
-                    {friend.displayName}
-                    {friend.isMuted && <VolumeOffIcon className="!text-sm text-zinc-500" />}
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <UiIconButton variant="primary" size="sm" onClick={() => onMessage(friend)} title="Message">
+                <div className="flex items-center gap-2.5">
+                  <UiIconButton 
+                    variant="primary" 
+                    size="sm" 
+                    onClick={() => onMessage(friend)} 
+                    title="Message"
+                    className="shadow-sm transition-transform active:scale-95"
+                  >
                     <ChatBubbleOutlineIcon className="!text-[1.1rem]" />
                   </UiIconButton>
-                  {/* Removed 'View Profile Card' button for All/Favorites */}
-                  {/* Collections button temporarily disabled
-                  <button
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
-                    onClick={() => onViewCollections(friend)}
-                    title="Collections"
+                  
+                  <UiIconButton 
+                    variant="secondary" 
+                    size="sm" 
+                    onClick={() => onViewFullProfile(friend)} 
+                    title="View Full Profile"
+                    className="shadow-sm transition-transform active:scale-95"
                   >
-                    <CollectionsBookmarkIcon className="!text-[1.1rem]" />
-                  </button>
-                  */}
-                  <UiIconButton variant="secondary" size="sm" onClick={() => onViewFullProfile(friend)} title="View Full Profile">
                     <PersonIcon className="!text-[1.1rem]" />
                   </UiIconButton>
-                  <UiIconButton variant="ghost" size="sm" onClick={() => onMoreActions(friend)} title="More">
-                    <MoreHorizIcon className="!text-[1.1rem]" />
+                  
+                  <UiIconButton 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => onMoreActions(friend)} 
+                    title="More"
+                    className="opacity-70 hover:opacity-100 transition-all"
+                  >
+                    <MoreHorizIcon className="!text-[1.2rem]" />
                   </UiIconButton>
                 </div>
               </div>
@@ -162,9 +183,23 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
             displayedFriends.map((friend) => (
               <div
                 key={friend.id}
-                className="mb-3 flex items-center rounded-xl p-4 bg-[var(--card)] border border-[var(--border)] shadow-[0_2px_8px_rgba(0,0,0,0.28)] hover:shadow-[0_6px_18px_rgba(0,0,0,0.32)] hover:bg-[var(--cardHover)] transition"
+                className="mb-3 flex items-center rounded-xl p-4 transition"
+                style={{
+                  backgroundColor: themeVar("card"),
+                  borderColor: themeVar("border"),
+                  borderWidth: 1,
+                  boxShadow: `0 2px 8px color-mix(in oklab, ${themeVar("foreground")}, transparent 85%)`,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = `color-mix(in oklab, ${themeVar("card")}, ${themeVar("foreground")} 3%)`;
+                  e.currentTarget.style.boxShadow = `0 6px 18px color-mix(in oklab, ${themeVar("foreground")}, transparent 80%)`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = themeVar("card");
+                  e.currentTarget.style.boxShadow = `0 2px 8px color-mix(in oklab, ${themeVar("foreground")}, transparent 85%)`;
+                }}
               >
-                <div className="h-12 w-12 overflow-hidden rounded-full bg-zinc-800">
+                <div className="h-12 w-12 overflow-hidden rounded-full" style={{ backgroundColor: themeVar("muted") }}>
                   <img
                     src={friend.avatarUrl || "/avatars/default/default_001.jpg"}
                     alt={`${friend.displayName}'s avatar`}
@@ -172,11 +207,11 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
                   />
                 </div>
                 <div className="ml-4 flex-1">
-                  <div className="flex items-center gap-2 text-base font-semibold text-zinc-100">
+                  <div className="flex items-center gap-2 text-base font-semibold" style={{ color: themeVar("foreground") }}>
                     {friend.displayName}
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2.5">
                   <UiIconButton variant="secondary" size="sm" title="View Profile Card" onClick={() => onViewProfileCard(friend)}>
                     <AccountBoxIcon className="!text-[1.1rem]" />
                   </UiIconButton>
@@ -192,12 +227,19 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
 
           {currentFilter === "blocked" &&
             displayedFriends.map((friend) => (
-              <div key={friend.id} className="flex items-center rounded-xl p-4 bg-[var(--card)] border border-[var(--border)] shadow-[0_2px_8px_rgba(0,0,0,0.28)] hover:shadow-[0_6px_18px_rgba(0,0,0,0.32)] hover:bg-[var(--cardHover)] transition">
-                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-zinc-800 text-zinc-200">
+              <div key={friend.id} className="flex items-center rounded-xl p-4 transition"
+                style={{
+                  backgroundColor: themeVar("card"),
+                  borderColor: themeVar("border"),
+                  borderWidth: 1,
+                  boxShadow: `0 2px 8px color-mix(in oklab, ${themeVar("foreground")}, transparent 85%)`,
+                }}
+              >
+                <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full" style={{ backgroundColor: themeVar("muted"), color: themeVar("foreground") }}>
                   <BlockIcon className="!text-[1.5rem]" />
                 </div>
                 <div className="ml-4 flex-1">
-                  <div className="flex items-center gap-2 text-base font-semibold text-zinc-100">
+                  <div className="flex items-center gap-2 text-base font-semibold" style={{ color: themeVar("foreground") }}>
                     {friend.displayName}
                   </div>
                 </div>
@@ -226,7 +268,7 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
       /* Scoped custom scrollbar styling for FriendsList */
       .friends-scroll {
         scrollbar-width: thin; /* Firefox */
-        scrollbar-color: #52525b transparent; /* thumb track */
+        scrollbar-color: ${themeVar("mutedForeground")} transparent; /* thumb track */
       }
       .friends-scroll::-webkit-scrollbar {
         width: 10px;
@@ -235,13 +277,13 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
         background: transparent;
       }
       .friends-scroll::-webkit-scrollbar-thumb {
-        background-color: #3f3f46; /* zinc-700 */
+        background-color: color-mix(in oklab, ${themeVar("muted")}, transparent 20%);
         border-radius: 8px;
         border: 2px solid transparent;
         background-clip: padding-box;
       }
       .friends-scroll:hover::-webkit-scrollbar-thumb {
-        background-color: #52525b; /* zinc-600 on hover */
+        background-color: ${themeVar("mutedForeground")};
       }
     `}</style>
     </>
@@ -251,3 +293,5 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
 FriendsList.displayName = "FriendsList";
 
 export default FriendsList;
+
+

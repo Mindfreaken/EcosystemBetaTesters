@@ -10,3 +10,5 @@ interface OwnerPortalProps {
 export default function OwnerPortal({ space, userRole }: OwnerPortalProps) {
     return <SpacePortal space={space} role="owner" userRole={userRole} />;
 }
+
+

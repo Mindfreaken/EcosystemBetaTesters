@@ -60,11 +60,11 @@ export const createCategory = mutation({
         if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
 
         const isOwner = myRole.role === "owner";
-        const isAdmin = myRole.role === "admin";
+        const isSpaceAdmin = myRole.role === "admin";
         const isMod = myRole.role === "moderator";
 
         const canEdit = isOwner ||
-            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isSpaceAdmin && (space.adminCanEditChannels ?? true)) ||
             (isMod && (space.modCanEditChannels ?? false));
 
         if (!canEdit) {
@@ -121,11 +121,11 @@ export const updateCategory = mutation({
         if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
 
         const isOwner = myRole.role === "owner";
-        const isAdmin = myRole.role === "admin";
+        const isSpaceAdmin = myRole.role === "admin";
         const isMod = myRole.role === "moderator";
 
         const canEdit = isOwner ||
-            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isSpaceAdmin && (space.adminCanEditChannels ?? true)) ||
             (isMod && (space.modCanEditChannels ?? false));
 
         if (!canEdit) {
@@ -169,11 +169,11 @@ export const deleteCategory = mutation({
         if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
 
         const isOwner = myRole.role === "owner";
-        const isAdmin = myRole.role === "admin";
+        const isSpaceAdmin = myRole.role === "admin";
         const isMod = myRole.role === "moderator";
 
         const canEdit = isOwner ||
-            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isSpaceAdmin && (space.adminCanEditChannels ?? true)) ||
             (isMod && (space.modCanEditChannels ?? false));
 
         if (!canEdit) {
@@ -229,11 +229,11 @@ export const createChannel = mutation({
         if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
 
         const isOwner = myRole.role === "owner";
-        const isAdmin = myRole.role === "admin";
+        const isSpaceAdmin = myRole.role === "admin";
         const isMod = myRole.role === "moderator";
 
         const canEdit = isOwner ||
-            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isSpaceAdmin && (space.adminCanEditChannels ?? true)) ||
             (isMod && (space.modCanEditChannels ?? false));
 
         if (!canEdit) {
@@ -297,11 +297,11 @@ export const updateChannel = mutation({
         if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
 
         const isOwner = myRole.role === "owner";
-        const isAdmin = myRole.role === "admin";
+        const isSpaceAdmin = myRole.role === "admin";
         const isMod = myRole.role === "moderator";
 
         const canEdit = isOwner ||
-            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isSpaceAdmin && (space.adminCanEditChannels ?? true)) ||
             (isMod && (space.modCanEditChannels ?? false));
 
         if (!canEdit) {
@@ -348,11 +348,11 @@ export const deleteChannel = mutation({
         if (!myRole) throw new Error("Unauthorized: You are not a member of this space.");
 
         const isOwner = myRole.role === "owner";
-        const isAdmin = myRole.role === "admin";
+        const isSpaceAdmin = myRole.role === "admin";
         const isMod = myRole.role === "moderator";
 
         const canEdit = isOwner ||
-            (isAdmin && (space.adminCanEditChannels ?? true)) ||
+            (isSpaceAdmin && (space.adminCanEditChannels ?? true)) ||
             (isMod && (space.modCanEditChannels ?? false));
 
         if (!canEdit) {

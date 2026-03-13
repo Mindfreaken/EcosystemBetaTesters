@@ -212,7 +212,7 @@ export default function LeftSidebarContent({ state }: LeftSidebarContentProps) {
                   position: "relative",
                   overflow: "hidden",
                   cursor: "pointer",
-                  color: "var(--textSecondary)",
+                  color: "var(--muted-foreground)",
                   borderLeft: "3px solid transparent",
                   transition: "transform .2s ease, box-shadow .2s ease, background-color .2s ease",
                   backgroundColor: "color-mix(in oklab, var(--card), transparent 92%)",
@@ -220,7 +220,7 @@ export default function LeftSidebarContent({ state }: LeftSidebarContentProps) {
                     transform: "translateX(4px) scale(1.01)",
                     backgroundColor: "color-mix(in oklab, var(--primary), transparent 92%)",
                     boxShadow: "0 4px 8px var(--shadow)",
-                    color: "var(--text)",
+                    color: "var(--foreground)",
                     borderLeftColor: "var(--primary)",
                   },
                   "&::before": {
@@ -297,7 +297,7 @@ export default function LeftSidebarContent({ state }: LeftSidebarContentProps) {
       )}
 
       {state === "collapsed" && (
-        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", "& .MuiIconButton-root": { color: "var(--textSecondary)", transition: "color 0.2s", "&:hover": { color: "var(--primary)" } } }}>
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", "& .MuiIconButton-root": { color: "var(--muted-foreground)", transition: "color 0.2s", "&:hover": { color: "var(--primary)" } } }}>
           <Box sx={{ display: "grid", gap: 1.5, mt: 1 }}>
             <IconButton
               size="small"
@@ -356,5 +356,7 @@ export default function LeftSidebarContent({ state }: LeftSidebarContentProps) {
     </>
   );
 }
+
+
 
 

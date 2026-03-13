@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import { useThemeManager } from "./ThemeProvider";
-import { availableThemes, ThemeType as RegistryThemeType } from "@/theme/registry";
+import { availableThemes, themeVar, ThemeType as RegistryThemeType } from "@/theme/registry";
 import { MuiCard } from "@/components/ui/MuiCard";
 
 export default function ThemeContent() {
@@ -27,7 +27,7 @@ export default function ThemeContent() {
   }>({ open: false, themeId: null, vote: null, dontShowAgain: false });
 
   const themeList = useMemo(() => themes, [themes]);
-  const [filter, setFilter] = useState<"all" | "dark" | "light" | "void" | "popular">("all");
+  const [filter, setFilter] = useState<"all" | "dark" | "light" | "void" | "popular" | "warm" | "cool">("all");
 
   const classify = (t: { id: string; name: string }) => {
     const name = t.name.toLowerCase();
@@ -35,7 +35,21 @@ export default function ThemeContent() {
     const isVoid = id.startsWith("voiddark") || name.includes("void");
     const isDark = name.includes("dark");
     const isLight = name.includes("light");
-    return { isVoid, isDark, isLight };
+    const isWarm = name.includes("sunset") || 
+                   name.includes("desert") || 
+                   name.includes("autumn") || 
+                   name.includes("pride") || 
+                   name.includes("night city") || 
+                   name.includes("miami");
+    const isCool = name.includes("arctic") ||
+                   name.includes("sea") ||
+                   name.includes("nebula") ||
+                   name.includes("teal") ||
+                   name.includes("blue") ||
+                   name.includes("futuristic") ||
+                   name.includes("haunted") ||
+                   isVoid;
+    return { isVoid, isDark, isLight, isWarm, isCool };
   };
 
   const filteredThemes = useMemo(() => {
@@ -43,6 +57,8 @@ export default function ThemeContent() {
     if (filter === "dark") list = list.filter((t) => classify(t).isDark && !classify(t).isLight);
     else if (filter === "light") list = list.filter((t) => classify(t).isLight);
     else if (filter === "void") list = list.filter((t) => classify(t).isVoid);
+    else if (filter === "warm") list = list.filter((t) => classify(t).isWarm);
+    else if (filter === "cool") list = list.filter((t) => classify(t).isCool);
     if (filter === "popular") {
       // Only include themes with at least one vote and positive score
       list = list.filter((t) => {
@@ -113,16 +129,20 @@ export default function ThemeContent() {
             { key: "all", label: "All" },
             { key: "dark", label: "Dark" },
             { key: "light", label: "Light" },
+            { key: "warm", label: "Warm" },
+            { key: "cool", label: "Cool" },
             { key: "void", label: "Void" },
             { key: "popular", label: "Most Popular" },
           ] as const).map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setFilter(key)}
-              className={`px-3 py-1 rounded-md text-sm border ${
-                filter === key
-                  ? "bg-[var(--buttonSecondary)] text-black border-[var(--border)]"
-                  : "bg-[var(--card)] text-[var(--textSecondary)] hover:bg-[var(--cardHover)] border-[var(--border)]"
+              style={{
+                backgroundColor: filter === key ? themeVar("secondary") : themeVar("card"),
+                color: filter === key ? "black" : themeVar("mutedForeground"),
+              }}
+              className={`px-3 py-1 rounded-md text-sm border border-[var(--border)] transition-colors ${
+                filter !== key ? "hover:bg-[var(--cardHover)]" : ""
               }`}
             >
               {label}
@@ -171,8 +191,8 @@ export default function ThemeContent() {
 
                 <div className="p-3 flex-1 flex flex-col gap-3">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="font-semibold text-[var(--textPrimary)] truncate">{t.name}</div>
-                    <div className="text-xs px-2 py-0.5 rounded-full border border-[var(--border)] text-[var(--textSecondary)]" title="Total sentiment (likes - dislikes)">
+                    <div className="font-semibold text-[var(--foreground)] truncate">{t.name}</div>
+                    <div className="text-xs px-2 py-0.5 rounded-full border border-[var(--border)] text-[var(--muted-foreground)]" title="Total sentiment (likes - dislikes)">
                       Score: {isLoadingVotes ? "…" : hasUserVotedForThis ? score : "?"}
                     </div>
                   </div>
@@ -185,11 +205,15 @@ export default function ThemeContent() {
                       Preview
                     </button>
                     <button
-                      className={`px-3 py-1 rounded-md text-sm ${
+                      className={`px-3 py-1 rounded-md text-sm transition-all ${
                         isActive
-                          ? "bg-[var(--buttonSecondary)] text-black"
-                          : "bg-[var(--buttonPrimary)] text-white"
+                          ? ""
+                          : ""
                       }`}
+                      style={{
+                        backgroundColor: isActive ? themeVar("secondary") : themeVar("primary"),
+                        color: isActive ? "black" : "white",
+                      }}
                       onClick={() => setAndSaveTheme(t.id)}
                       disabled={isSaving}
                     >
@@ -230,9 +254,9 @@ export default function ThemeContent() {
             <div className="fixed inset-0 z-[100] flex items-center justify-center">
               <div className="absolute inset-0 bg-black/60" onClick={() => setConfirmState({ open: false, themeId: null, vote: null, dontShowAgain: false })} />
               <div role="dialog" aria-modal="true" className="relative w-[min(92vw,420px)] rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 shadow-xl">
-                <div className="font-semibold text-[var(--textPrimary)] mb-2">Confirm your vote</div>
-                <p className="text-sm text-[var(--textSecondary)] mb-3">Are you sure? You cannot change your vote after submitting.</p>
-                <label className="flex items-center gap-2 text-xs text-[var(--textSecondary)] mb-4 select-none">
+                <div className="font-semibold text-[var(--foreground)] mb-2">Confirm your vote</div>
+                <p className="text-sm text-[var(--muted-foreground)] mb-3">Are you sure? You cannot change your vote after submitting.</p>
+                <label className="flex items-center gap-2 text-xs text-[var(--muted-foreground)] mb-4 select-none">
                   <input
                     type="checkbox"
                     checked={confirmState.dontShowAgain}
@@ -262,3 +286,4 @@ export default function ThemeContent() {
     </div>
   );
 }
+

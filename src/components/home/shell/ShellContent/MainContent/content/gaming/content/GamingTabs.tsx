@@ -70,7 +70,7 @@ export default function GamingTabs({
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(1200px 200px at 50% -50%, color-mix(in oklab, var(--primaryLight), transparent 95%), transparent 60%)",
+            "radial-gradient(1200px 200px at 50% -50%, color-mix(in oklab, var(--primary), transparent 95%), transparent 60%)",
           opacity: 0.4,
           pointerEvents: "none",
         },
@@ -110,3 +110,5 @@ export default function GamingTabs({
     </Box>
   );
 }
+
+

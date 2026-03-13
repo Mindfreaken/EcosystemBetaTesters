@@ -16,7 +16,7 @@ import { getChampPoolForRole, ROLE_STAT_MULTIPLIERS } from "../shared/rolesMock"
 const dividerColor = "color-mix(in oklab, var(--border), transparent 50%)"
 const chipNeutralSx = {
   height: 24,
-  color: "var(--textPrimary)",
+  color: "var(--foreground)",
   borderColor: "color-mix(in oklab, var(--border), transparent 35%)",
   backgroundColor: "transparent",
   border: "1px solid",
@@ -270,10 +270,10 @@ export default function RecentMatches({ region, queue, puuid, role = "all" as Ro
   }, [matches])
 
   if (loading) {
-    return <Typography variant="body2" sx={{ color: "var(--textSecondary)", mt: 1 }}>Loading recent matches…</Typography>
+    return <Typography variant="body2" sx={{ color: "var(--muted-foreground)", mt: 1 }}>Loading recent matches…</Typography>
   }
   if (empty || !matches) {
-    return <Typography variant="body2" sx={{ color: "var(--textSecondary)", mt: 1 }}>No recent ranked matches.</Typography>
+    return <Typography variant="body2" sx={{ color: "var(--muted-foreground)", mt: 1 }}>No recent ranked matches.</Typography>
   }
 
   const groups = groupByDay(matches)
@@ -338,7 +338,7 @@ function GroupHeader({
           <Box component="span" sx={{ color: "#18c964" }}>
             {wl.w} W
           </Box>
-          <Box component="span" sx={{ color: "var(--textSecondary)", mx: 1 }}>
+          <Box component="span" sx={{ color: "var(--muted-foreground)", mx: 1 }}>
             {" "}
             //{" "}
           </Box>
@@ -359,7 +359,7 @@ function GroupHeader({
 function HeaderStat({ label, value }: { label: string; value: string }) {
   return (
     <Box sx={{ display: "grid", gap: 0, justifyItems: "center" }}>
-      <Typography variant="caption" sx={{ color: "var(--textSecondary)", fontSize: 12 }}>
+      <Typography variant="caption" sx={{ color: "var(--muted-foreground)", fontSize: 12 }}>
         {label}
       </Typography>
       <Typography variant="body1" sx={{ fontWeight: 900, fontSize: 18, color: "#fff" }}>
@@ -409,7 +409,7 @@ function MatchRow({ m, champAvg }: { m: Match; champAvg: ChampAverages }) {
       >
         {/* Left meta */}
         <Box sx={{ display: "grid", gap: 0.375, alignContent: "start" }}>
-          <Typography variant="body2" sx={{ color: "var(--textSecondary)", fontSize: 13 }}>
+          <Typography variant="body2" sx={{ color: "var(--muted-foreground)", fontSize: 13 }}>
             {timeAgo(m.timestamp)}{m.durationSec ? ` // ${formatDuration(m.durationSec)}` : ""}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -470,7 +470,7 @@ function MatchRow({ m, champAvg }: { m: Match; champAvg: ChampAverages }) {
             >{`${(kdaOf(m.k, m.d, m.a)).toFixed(2)} KDA`}</Typography>
             <Typography
               variant="caption"
-              sx={{ color: "var(--textSecondary)", fontSize: 12, lineHeight: 1 }}
+              sx={{ color: "var(--muted-foreground)", fontSize: 12, lineHeight: 1 }}
             >{`${m.k} // ${m.d} // ${m.a}`}</Typography>
           </Box>
           {/* Right: CS/min with above/below champ avg indicator */}
@@ -608,7 +608,7 @@ function StatWithIndicator({
   const close = Math.abs(pct) < 3 // within ±3% treated as neutral
   const up = pct > 0 && !close
   const down = pct < 0 && !close
-  const tint = up ? "#18c964" : down ? "#ff6b6b" : "var(--textSecondary)"
+  const tint = up ? "#18c964" : down ? "#ff6b6b" : "var(--muted-foreground)"
   const symbol = up ? "↑" : down ? "↓" : "•"
   const percentStr = `${Math.abs(pct).toFixed(0)}%`
   const directionStr = up ? "above" : down ? "below" : "about"
@@ -618,7 +618,7 @@ function StatWithIndicator({
 
   return (
     <Box sx={{ display: "grid", justifyItems: "center", textAlign: "center", gap: 0.25 }} title={title}>
-      <Typography variant="caption" sx={{ color: "var(--textSecondary)", fontSize: 12, lineHeight: 1 }}>
+      <Typography variant="caption" sx={{ color: "var(--muted-foreground)", fontSize: 12, lineHeight: 1 }}>
         {label}
       </Typography>
       <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -716,3 +716,5 @@ function prettyName(id: string) {
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ")
 }
+
+

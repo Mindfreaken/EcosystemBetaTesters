@@ -6,6 +6,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { themeVar } from "@/theme/registry";
 
 const roles = [
   { key: "overview", label: "General Overview" },
@@ -67,8 +68,8 @@ export default function RoleTabs({ value, onChange }: { value?: RoleTabKey; onCh
           height: 24, // reduced from 32 (~25%)
           borderRadius: 999,
           background:
-            "linear-gradient(180deg, color-mix(in oklab, #ffffff, transparent 88%), color-mix(in oklab, var(--primaryLight), transparent 82%))",
-          border: "1px solid color-mix(in oklab, var(--border), transparent 28%)",
+            `linear-gradient(180deg, color-mix(in oklab, ${themeVar("foreground")}, transparent 88%), color-mix(in oklab, ${themeVar("primary")}, transparent 82%))`,
+          border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 28%)`,
           backdropFilter: "blur(6px) saturate(1.2)",
           zIndex: 0,
           top: "50%",
@@ -101,7 +102,7 @@ export default function RoleTabs({ value, onChange }: { value?: RoleTabKey; onCh
             minHeight: 28, // reduced
             py: 0.25,
             px: 1,
-            color: "color-mix(in oklab, var(--foreground), transparent 30%)",
+            color: `color-mix(in oklab, ${themeVar("mutedForeground")}, transparent 10%)`,
             textTransform: "none",
             fontSize: 11,
             fontWeight: 700,
@@ -109,11 +110,11 @@ export default function RoleTabs({ value, onChange }: { value?: RoleTabKey; onCh
             zIndex: 1,
             transition: "color .2s ease",
             '&.Mui-selected': {
-              color: "var(--textPrimary)",
-              textShadow: "0 0 10px color-mix(in oklab, var(--highlight), transparent 60%)",
+              color: themeVar("foreground"),
+              textShadow: `0 0 10px color-mix(in oklab, ${themeVar("primary")}, transparent 60%)`,
             },
             ':hover': {
-              color: "var(--textPrimary)",
+              color: themeVar("foreground"),
             },
             '&:not(.Mui-selected):hover::after': {
               content: "''",
@@ -123,8 +124,8 @@ export default function RoleTabs({ value, onChange }: { value?: RoleTabKey; onCh
               bottom: 3,
               height: 2,
               borderRadius: 2,
-              background: "linear-gradient(90deg, color-mix(in oklab, var(--primaryLight), transparent 30%), color-mix(in oklab, var(--secondaryLight), transparent 40%))",
-              boxShadow: "0 0 10px color-mix(in oklab, var(--highlight), transparent 70%)",
+              background: `linear-gradient(90deg, color-mix(in oklab, ${themeVar("primary")}, transparent 30%), color-mix(in oklab, ${themeVar("secondary")}, transparent 40%))`,
+              boxShadow: `0 0 10px color-mix(in oklab, ${themeVar("primary")}, transparent 70%)`,
             },
           }}
         />
@@ -132,3 +133,5 @@ export default function RoleTabs({ value, onChange }: { value?: RoleTabKey; onCh
     </Tabs>
   );
 }
+
+

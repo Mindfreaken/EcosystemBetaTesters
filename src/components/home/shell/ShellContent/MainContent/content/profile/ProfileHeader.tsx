@@ -33,10 +33,10 @@ export default function ProfileHeader() {
           borderRadius: 0,
           overflow: "hidden",
           backgroundImage:
-            `linear-gradient(120deg, rgba(255,64,96,0.25), rgba(255,166,0,0.15)), url('${coverUrl}')`,
+            `linear-gradient(120deg, color-mix(in oklab, var(--primary), transparent 75%), color-mix(in oklab, var(--secondary), transparent 85%)), url('${coverUrl}')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          border: "1px solid var(--border)",
+          borderBottom: "1px solid var(--border)",
         }}
       />
 
@@ -49,10 +49,10 @@ export default function ProfileHeader() {
             sx={{ width: 96, height: 96, border: "3px solid var(--background)", boxShadow: `0 8px 24px rgba(0,0,0,.35)` }}
           />
           <Box>
-            <Typography variant="h5" sx={{ fontWeight: 800, color: "var(--textLight)" }}>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: "var(--foreground)" }}>
               {displayName}
             </Typography>
-            <Typography variant="body2" sx={{ color: "var(--warning, #ff6b6b)" }}>
+            <Typography variant="body2" sx={{ color: "var(--primary)", opacity: 0.9 }}>
               {status}
             </Typography>
           </Box>
@@ -71,13 +71,13 @@ export default function ProfileHeader() {
       {/* Stats + Info row (skeleton layout for now) */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2, px: { xs: 2, sm: 3 }, mt: 2 }}>
         <MuiCard variant="interactive">
-          <Typography variant="overline" sx={{ color: "var(--textSecondary)", letterSpacing: ".12em" }}>
+          <Typography variant="overline" sx={{ color: "var(--muted-foreground)", letterSpacing: ".12em" }}>
             Bio
           </Typography>
           <Typography
             variant="body2"
             sx={{
-              color: "var(--textPrimary)",
+              color: "var(--foreground)",
               whiteSpace: "pre-wrap",
               wordBreak: "break-word",
               overflowWrap: "anywhere",
@@ -87,21 +87,21 @@ export default function ProfileHeader() {
           </Typography>
         </MuiCard>
         <MuiCard variant="interactive">
-          <Typography variant="overline" sx={{ color: "var(--textSecondary)", letterSpacing: ".12em" }}>
+          <Typography variant="overline" sx={{ color: "var(--muted-foreground)", letterSpacing: ".12em" }}>
             Stats
           </Typography>
           <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1, mt: 0.5 }}>
             <Box>
-              <Typography variant="caption" sx={{ color: "var(--textSecondary)" }}>Followers</Typography>
-              <Typography variant="subtitle2" sx={{ color: "var(--textLight)", fontWeight: 800 }}>{(overview as any)?.stats?.followers ?? 0}</Typography>
+              <Typography variant="caption" sx={{ color: "var(--muted-foreground)" }}>Followers</Typography>
+              <Typography variant="subtitle2" sx={{ color: "var(--foreground)", fontWeight: 800 }}>{(overview as any)?.stats?.followers ?? 0}</Typography>
             </Box>
             <Box>
-              <Typography variant="caption" sx={{ color: "var(--textSecondary)" }}>Following</Typography>
-              <Typography variant="subtitle2" sx={{ color: "var(--textLight)", fontWeight: 800 }}>{(overview as any)?.stats?.following ?? 0}</Typography>
+              <Typography variant="caption" sx={{ color: "var(--muted-foreground)" }}>Following</Typography>
+              <Typography variant="subtitle2" sx={{ color: "var(--foreground)", fontWeight: 800 }}>{(overview as any)?.stats?.following ?? 0}</Typography>
             </Box>
             <Box>
-              <Typography variant="caption" sx={{ color: "var(--textSecondary)" }}>XP</Typography>
-              <Typography variant="subtitle2" sx={{ color: "var(--textLight)", fontWeight: 800 }}>{(me as any)?.xp ?? 0}</Typography>
+              <Typography variant="caption" sx={{ color: "var(--muted-foreground)" }}>XP</Typography>
+              <Typography variant="subtitle2" sx={{ color: "var(--foreground)", fontWeight: 800 }}>{(me as any)?.xp ?? 0}</Typography>
             </Box>
           </Box>
         </MuiCard>
@@ -112,4 +112,6 @@ export default function ProfileHeader() {
     </Box>
   );
 }
+
+
 

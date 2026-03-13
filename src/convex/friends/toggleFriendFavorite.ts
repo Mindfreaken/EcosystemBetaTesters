@@ -10,3 +10,5 @@ export function useToggleFriendFavorite() {
 		return await mutate(args);
 	};
 }
+
+

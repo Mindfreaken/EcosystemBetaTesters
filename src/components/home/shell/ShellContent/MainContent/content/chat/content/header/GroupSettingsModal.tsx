@@ -21,6 +21,7 @@ import InputBase from "@mui/material/InputBase";
 import { X } from "lucide-react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import { themeVar } from "@/theme/registry";
 
 interface GroupSettingsModalProps {
   open: boolean;
@@ -136,15 +137,15 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
         slotProps={{
           backdrop: {
             sx: {
-              backgroundColor: 'color-mix(in oklab, var(--overlay), transparent 20%)',
+              backgroundColor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
               backdropFilter: 'blur(4px)',
             },
           },
           paper: {
             sx: {
-              background: 'color-mix(in oklab, var(--card), transparent 5%)',
-              border: '1px solid color-mix(in oklab, var(--border), transparent 35%)',
-              boxShadow: '0 6px 18px color-mix(in oklab, var(--shadow), transparent 40%)',
+              background: `color-mix(in oklab, ${themeVar("card")}, transparent 5%)`,
+              border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 35%)`,
+              boxShadow: `0 6px 18px color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
               borderRadius: '9px',
               overflow: 'hidden',
             },
@@ -154,7 +155,7 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
         <DialogTitle sx={{
           px: 1.8,
           py: 1.2,
-          color: 'var(--textPrimary)',
+          color: themeVar("foreground"),
           fontWeight: 700,
           letterSpacing: 0.2,
           fontSize: 17,
@@ -166,7 +167,7 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
           <IconButton
             size="small"
             onClick={onClose}
-            sx={{ color: 'var(--textSecondary)', ml: 1, '&:hover': { color: 'var(--textPrimary)', backgroundColor: 'transparent' } }}
+            sx={{ color: themeVar("mutedForeground"), ml: 1, '&:hover': { color: themeVar("foreground"), backgroundColor: 'transparent' } }}
           >
             <X size={16} />
           </IconButton>
@@ -180,9 +181,9 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
               variant="fullWidth"
               sx={{
                 minHeight: 36,
-                '& .MuiTab-root': { minHeight: 36, textTransform: 'none', color: 'var(--textSecondary)' },
-                '& .Mui-selected': { color: 'var(--textPrimary)' },
-                '& .MuiTabs-indicator': { backgroundColor: 'var(--primary)' },
+                '& .MuiTab-root': { minHeight: 36, textTransform: 'none', color: themeVar("mutedForeground") },
+                '& .Mui-selected': { color: themeVar("foreground") },
+                '& .MuiTabs-indicator': { backgroundColor: themeVar("primary") },
               }}
             >
               {isCreator && <Tab value="leader" label="Group leader" />}
@@ -194,7 +195,7 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
           {tab === 'leader' && isCreator && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Avatar src={avatarPreview} sx={{ width: 56, height: 56, border: '1px solid var(--borderLight)' }} />
+                <Avatar src={avatarPreview} sx={{ width: 56, height: 56, border: `1px solid ${themeVar("border")}` }} />
                 <Box>
                   <Button
                     variant="outlined"
@@ -203,11 +204,11 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
                     disabled={!isCreator || uploading}
                     sx={{
                       textTransform: 'none',
-                      borderColor: 'var(--borderLight)',
-                      color: 'var(--secondary)',
+                      borderColor: themeVar("border"),
+                      color: themeVar("secondary"),
                       '&:hover': {
-                        backgroundColor: 'color-mix(in oklab, var(--secondary), transparent 92%)',
-                        borderColor: 'var(--borderLight)',
+                        backgroundColor: `color-mix(in oklab, ${themeVar("secondary")}, transparent 92%)`,
+                        borderColor: themeVar("border"),
                       },
                     }}
                   >
@@ -218,11 +219,11 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
               </Box>
 
               <Box>
-                <Typography variant="caption" sx={{ display: 'block', mb: 0.5, color: 'var(--textSecondary)' }}>Group name</Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1, border: '1px solid color-mix(in oklab, var(--borderLight), transparent 15%)', borderRadius: 999, backgroundColor: 'color-mix(in oklab, var(--card), transparent 10%)' }}>
-                  <InputBase value={name} onChange={(e) => setName(e.target.value.slice(0, 25))} sx={{ flex: 1, color: 'var(--text)' }} inputProps={{ 'aria-label': 'group name', maxLength: 25 }} />
+                <Typography variant="caption" sx={{ display: 'block', mb: 0.5, color: themeVar("mutedForeground") }}>Group name</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 1, border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 15%)`, borderRadius: 999, backgroundColor: `color-mix(in oklab, ${themeVar("card")}, transparent 10%)` }}>
+                  <InputBase value={name} onChange={(e) => setName(e.target.value.slice(0, 25))} sx={{ flex: 1, color: themeVar("foreground") }} inputProps={{ 'aria-label': 'group name', maxLength: 25 }} />
                 </Box>
-                <Typography variant="caption" sx={{ mt: 0.5, color: nameError ? 'var(--danger, #ff5555)' : 'var(--textSecondary)' }}>
+                <Typography variant="caption" sx={{ mt: 0.5, color: nameError ? themeVar("destructive") : themeVar("mutedForeground") }}>
                   {nameError || `${name.length}/25 characters`}
                 </Typography>
               </Box>
@@ -233,9 +234,9 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
                   variant="outlined"
                   onClick={() => setConfirmDeleteOpen(true)}
                   sx={{
-                    borderColor: 'color-mix(in oklab, var(--danger, #ff5555), transparent 30%)',
-                    color: 'var(--danger, #ff5555)',
-                    '&:hover': { backgroundColor: 'color-mix(in oklab, var(--danger, #ff5555), transparent 92%)' },
+                    borderColor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 30%)`,
+                    color: themeVar("destructive"),
+                    '&:hover': { backgroundColor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 92%)` },
                   }}
                 >
                   Destroy group
@@ -251,9 +252,9 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
                 variant="outlined"
                 onClick={() => setConfirmLeaveOpen(true)}
                 sx={{
-                  borderColor: 'color-mix(in oklab, var(--danger, #ff5555), transparent 30%)',
-                  color: 'var(--danger, #ff5555)',
-                  '&:hover': { backgroundColor: 'color-mix(in oklab, var(--danger, #ff5555), transparent 92%)' },
+                  borderColor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 30%)`,
+                  color: themeVar("destructive"),
+                  '&:hover': { backgroundColor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 92%)` },
                   width: '100%',
                 }}
               >
@@ -266,11 +267,11 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
           <Button
             onClick={onClose}
             sx={{
-              color: 'var(--textSecondary)',
+              color: themeVar("mutedForeground"),
               fontSize: 13,
               px: 1.25,
               minWidth: 0,
-              '&:hover': { backgroundColor: 'color-mix(in oklab, var(--primary), transparent 90%)', color: 'var(--primary)' },
+              '&:hover': { backgroundColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)`, color: themeVar("primary") },
             }}
           >
             Close
@@ -281,14 +282,14 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
             disabled={!isCreator || disabledFields || savingName || name.trim() === initialName.trim() || tab !== 'leader'}
             startIcon={tab === 'leader' && savingName ? <CircularProgress size={14} /> : undefined}
             sx={{
-              backgroundColor: 'var(--primary)',
+              backgroundColor: themeVar("primary"),
               color: 'white',
               px: 1.25,
               py: 0.4,
               fontSize: 13,
-              boxShadow: '0 3px 8px color-mix(in oklab, var(--primary), transparent 80%)',
-              '&:hover': { backgroundColor: 'var(--buttonPrimaryHover)' },
-              '&:disabled': { backgroundColor: 'var(--disabled)', boxShadow: 'none', color: 'rgba(255,255,255,0.7)' },
+              boxShadow: `0 3px 8px color-mix(in oklab, ${themeVar("primary")}, transparent 80%)`,
+              '&:hover': { backgroundColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 10%)` },
+              '&:disabled': { backgroundColor: `${themeVar("foreground")}1a`, boxShadow: 'none', color: 'rgba(255,255,255,0.7)' },
               // Keep the button occupying space when not on leader tab
               visibility: tab === 'leader' && isCreator ? 'visible' : 'hidden',
             }}
@@ -305,15 +306,28 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
         maxWidth="xs"
         fullWidth
         slotProps={{
-          paper: { sx: { background: 'var(--card)', border: '1px solid color-mix(in oklab, var(--border), transparent 35%)' } },
+          backdrop: {
+            sx: {
+              backgroundColor: 'color-mix(in oklab, var(--overlay), transparent 20%)',
+              backdropFilter: 'blur(4px)',
+            },
+          },
+          paper: {
+            sx: {
+              background: `color-mix(in oklab, ${themeVar("card")}, transparent 5%)`,
+              border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 35%)`,
+              boxShadow: `0 6px 18px color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
+              borderRadius: '9px',
+            }
+          },
         }}
       >
-        <DialogTitle sx={{ color: 'var(--textPrimary)', fontWeight: 700, fontSize: 16 }}>Leave group?</DialogTitle>
-        <DialogContent sx={{ color: 'var(--textSecondary)' }}>
+        <DialogTitle sx={{ color: themeVar("foreground"), fontWeight: 700, fontSize: 16 }}>Leave group?</DialogTitle>
+        <DialogContent sx={{ color: themeVar("mutedForeground") }}>
           You can be added back later by a member.
         </DialogContent>
         <DialogActions sx={{ px: 1.8, py: 1.2, gap: 1 }}>
-          <Button onClick={() => setConfirmLeaveOpen(false)} sx={{ color: 'var(--textSecondary)' }}>Cancel</Button>
+          <Button onClick={() => setConfirmLeaveOpen(false)} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>
           <Button variant="outlined" color="error" onClick={handleLeave}>Leave</Button>
         </DialogActions>
       </Dialog>
@@ -323,14 +337,29 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
         onClose={() => setConfirmDeleteOpen(false)}
         maxWidth="xs"
         fullWidth
-        slotProps={{ paper: { sx: { background: 'var(--card)', border: '1px solid color-mix(in oklab, var(--border), transparent 35%)' } } }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backgroundColor: 'color-mix(in oklab, var(--overlay), transparent 20%)',
+              backdropFilter: 'blur(4px)',
+            },
+          },
+          paper: {
+            sx: {
+              background: `color-mix(in oklab, ${themeVar("card")}, transparent 5%)`,
+              border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 35%)`,
+              boxShadow: `0 6px 18px color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
+              borderRadius: '9px',
+            }
+          }
+        }}
       >
-        <DialogTitle sx={{ color: 'var(--textPrimary)', fontWeight: 700, fontSize: 16 }}>Destroy group?</DialogTitle>
-        <DialogContent sx={{ color: 'var(--textSecondary)' }}>
+        <DialogTitle sx={{ color: themeVar("foreground"), fontWeight: 700, fontSize: 16 }}>Destroy group?</DialogTitle>
+        <DialogContent sx={{ color: themeVar("mutedForeground") }}>
           This will permanently delete the group and all messages for all members. This action cannot be undone.
         </DialogContent>
         <DialogActions sx={{ px: 1.8, py: 1.2, gap: 1 }}>
-          <Button onClick={() => setConfirmDeleteOpen(false)} sx={{ color: 'var(--textSecondary)' }}>Cancel</Button>
+          <Button onClick={() => setConfirmDeleteOpen(false)} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>
           <Button variant="contained" color="error" onClick={async () => {
             try {
               await convex.mutation(api.chat.functions.chats.deleteChat as any, { chatId, currentUserId: meId } as any);
@@ -343,3 +372,5 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
     </>
   );
 }
+
+

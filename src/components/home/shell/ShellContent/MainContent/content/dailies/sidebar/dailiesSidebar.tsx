@@ -7,6 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import { Home as HomeIcon, Gamepad2, Puzzle, Sword } from "lucide-react";
 import SectionHeader from "../../chat/content/header/SectionHeader";
+import { themeVar } from "@/theme/registry";
 
 export interface DailiesSidebarProps {
   selectedId?: string | null;
@@ -43,7 +44,7 @@ export default function DailiesSidebar({ selectedId, onSelect, collapsed = false
               <HomeIcon size={16} />
             </IconButton>
             {/* Context icon for the section */}
-            <Gamepad2 size={16} color="var(--secondary)" />
+            <Gamepad2 size={16} color={themeVar("secondary")} />
           </Box>
         }
       />
@@ -60,11 +61,11 @@ export default function DailiesSidebar({ selectedId, onSelect, collapsed = false
                   sx={{
                     width: 36,
                     height: 36,
-                    color: active ? 'var(--primary)' : 'var(--secondary)',
-                    backgroundColor: active ? 'color-mix(in oklab, var(--primary), transparent 90%)' : 'transparent',
+                    color: active ? themeVar("primary") : themeVar("secondary"),
+                    backgroundColor: active ? `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` : 'transparent',
                     '&:hover': {
-                      backgroundColor: 'color-mix(in oklab, var(--primary), transparent 92%)',
-                      color: 'var(--textPrimary)'
+                      backgroundColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 92%)`,
+                      color: themeVar("foreground")
                     }
                   }}
                 >
@@ -92,19 +93,19 @@ export default function DailiesSidebar({ selectedId, onSelect, collapsed = false
                   overflow: "hidden",
                   cursor: "pointer",
                   color: active
-                    ? "var(--textPrimary)"
-                    : "color-mix(in oklab, var(--foreground), transparent 30%)",
-                  borderLeft: active ? "3px solid var(--primary)" : "3px solid transparent",
+                    ? themeVar("foreground")
+                    : `color-mix(in oklab, ${themeVar("foreground")}, transparent 30%)`,
+                  borderLeft: active ? `3px solid ${themeVar("primary")}` : "3px solid transparent",
                   transition: "transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease",
                   backgroundColor: active
-                    ? "color-mix(in oklab, var(--primary), transparent 90%)"
-                    : "color-mix(in oklab, var(--card), transparent 92%)",
+                    ? `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)`
+                    : `color-mix(in oklab, ${themeVar("card")}, transparent 92%)`,
                   "&:hover": {
                     transform: "translateX(4px) scale(1.01)",
-                    backgroundColor: "color-mix(in oklab, var(--primary), transparent 92%)",
-                    boxShadow: "0 4px 8px color-mix(in oklab, var(--foreground), transparent 95%)",
-                    color: "var(--textPrimary)",
-                    borderLeftColor: "var(--primary)",
+                    backgroundColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 92%)`,
+                    boxShadow: `0 4px 8px color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
+                    color: themeVar("foreground"),
+                    borderLeftColor: themeVar("primary"),
                   },
                   "&::before": {
                     content: "''",
@@ -114,7 +115,7 @@ export default function DailiesSidebar({ selectedId, onSelect, collapsed = false
                     width: "100%",
                     height: "100%",
                     background:
-                      "linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 100%)",
+                      `linear-gradient(135deg, transparent 0%, color-mix(in oklab, ${themeVar("foreground")}, transparent 92%) 100%)`,
                     transform: "translateX(-100%)",
                     transition: "transform .3s ease-out",
                   },
@@ -141,3 +142,5 @@ export default function DailiesSidebar({ selectedId, onSelect, collapsed = false
     </div>
   );
 }
+
+

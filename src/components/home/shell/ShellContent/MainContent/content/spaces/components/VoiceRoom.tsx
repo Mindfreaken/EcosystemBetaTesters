@@ -114,7 +114,7 @@ export default function VoiceRoom({ roomId, roomName, spaceId }: VoiceRoomProps)
                     p: 3
                 }}
             >
-                <Typography variant="h5" sx={{ color: "var(--text)" }}>
+                <Typography variant="h5" sx={{ color: "var(--foreground)" }}>
                     {roomName}
                 </Typography>
 
@@ -123,7 +123,7 @@ export default function VoiceRoom({ roomId, roomName, spaceId }: VoiceRoomProps)
                         <Typography variant="body1" sx={{ color: "var(--error, #ef4444)", fontWeight: 700, mb: 1 }}>
                             Access Restricted
                         </Typography>
-                        <Typography variant="body2" sx={{ color: "var(--textSecondary)" }}>
+                        <Typography variant="body2" sx={{ color: "var(--muted-foreground)" }}>
                             You are currently timed out in this space and cannot join voice channels until Your timeout expires.
                             {myFullMembership.timeoutUntil && (
                                 <Box component="span" sx={{ display: "block", mt: 1, fontWeight: 600 }}>
@@ -134,7 +134,7 @@ export default function VoiceRoom({ roomId, roomName, spaceId }: VoiceRoomProps)
                     </Box>
                 ) : (
                     <>
-                        <Typography variant="body1" sx={{ color: "var(--textSecondary)", textAlign: "center", maxWidth: 400 }}>
+                        <Typography variant="body1" sx={{ color: "var(--muted-foreground)", textAlign: "center", maxWidth: 400 }}>
                             Join this voice channel to talk with others in the space.
                         </Typography>
 
@@ -328,7 +328,7 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
                         pointerEvents: 'none', // let clicks pass through to the tile
                     }}>
                         {userProfile === undefined ? (
-                            <CircularProgress size={40} sx={{ color: "var(--textSecondary)" }} />
+                            <CircularProgress size={40} sx={{ color: "var(--muted-foreground)" }} />
                         ) : userProfile?.avatarUrl ? (
                             <Box
                                 component="img"
@@ -348,13 +348,13 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
                                     width: { xs: 80, sm: 100, md: 120 },
                                     height: { xs: 80, sm: 100, md: 120 },
                                     borderRadius: '50%',
-                                    backgroundColor: 'var(--card-border)',
+                                    backgroundColor: 'var(--border)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     fontSize: '2rem',
                                     fontWeight: 700,
-                                    color: 'var(--textSecondary)'
+                                    color: 'var(--muted-foreground)'
                                 }}
                             >
                                 {userProfile?.displayName?.charAt(0) || userProfile?.username?.charAt(0) || participant?.name?.charAt(0) || "?"}
@@ -482,8 +482,8 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
     return (
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", position: "relative" }}>
             {/* Header */}
-            <Box sx={{ p: 2, borderBottom: "1px solid var(--card-border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <Typography variant="h6" sx={{ color: "var(--text)" }}>{roomName}</Typography>
+            <Box sx={{ p: 2, borderBottom: "1px solid var(--border)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <Typography variant="h6" sx={{ color: "var(--foreground)" }}>{roomName}</Typography>
                 <Button
                     variant="outlined"
                     size="small"
@@ -529,7 +529,7 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
                 {connectionState === ConnectionState.Connecting ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
                         <CircularProgress sx={{ color: "var(--primary)" }} />
-                        <Typography variant="body2" sx={{ color: "var(--textSecondary)" }}>Connecting to LiveKit...</Typography>
+                        <Typography variant="body2" sx={{ color: "var(--muted-foreground)" }}>Connecting to LiveKit...</Typography>
                     </Box>
                 ) : (
                     <Box sx={{ height: "100%", position: "relative" }}>
@@ -579,3 +579,5 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
         </Box>
     );
 }
+
+

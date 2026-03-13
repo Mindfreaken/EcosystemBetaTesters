@@ -13,7 +13,6 @@ export const usersCoreTables = {
     phoneE164: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
     coverUrl: v.optional(v.string()),
-    isAdmin: v.optional(v.boolean()),
     ecosystemdevs: v.optional(v.boolean()),
     lastSeen: v.optional(v.number()),
     status: v.optional(v.string()),
@@ -34,6 +33,7 @@ export const usersCoreTables = {
     profileTypeId: v.optional(v.id("profileTypes")),
     // Overseer fields
     overseer: v.optional(v.boolean()),
+    overseeradmin: v.optional(v.boolean()),
     overseerPoints: v.optional(v.number()),
     // Suspension fields
     suspensionStatus: v.optional(v.string()), // 'suspensionStage1', 'suspensionStageActive', 'suspensionStageFalse', 'suspensionStageAppeal', 'suspensionStageAppealDenied', 'suspensionStageAppealWon'
@@ -46,5 +46,8 @@ export const usersCoreTables = {
     .index("by_display_name_lower", ["displayNameLower"])
     .index("by_email_lower", ["emailLower"])
     .index("by_phone_e164", ["phoneE164"])
-    .index("by_suspension_status", ["suspensionStatus"]),
+    .index("by_suspension_status", ["suspensionStatus"])
+    .searchIndex("search_username", {
+      searchField: "username",
+    }),
 } as const;

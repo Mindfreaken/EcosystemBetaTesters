@@ -50,6 +50,7 @@ import type * as http from "../http.js";
 import type * as hub_analytics_mutations from "../hub/analytics/mutations.js";
 import type * as hub_analytics_queries from "../hub/analytics/queries.js";
 import type * as hub_overseer from "../hub/overseer.js";
+import type * as lib_admin from "../lib/admin.js";
 import type * as lib_permissions_utils from "../lib/permissions_utils.js";
 import type * as lib_withStatus from "../lib/withStatus.js";
 import type * as riot_league_control from "../riot/league/control.js";
@@ -75,6 +76,7 @@ import type * as schema_community_patchnotes from "../schema/community/patchnote
 import type * as schema_dailies_dungeonDeal_dungeonDeal from "../schema/dailies/dungeonDeal/dungeonDeal.js";
 import type * as schema_dailies_nerdle_nerdle from "../schema/dailies/nerdle/nerdle.js";
 import type * as schema_dailies_nerdle_nerdleLeaderboard from "../schema/dailies/nerdle/nerdleLeaderboard.js";
+import type * as schema_reports_appeals from "../schema/reports/appeals.js";
 import type * as schema_reports_chatReports from "../schema/reports/chatReports.js";
 import type * as schema_reports_overseerVotes from "../schema/reports/overseerVotes.js";
 import type * as schema_riot_valorant_valorant from "../schema/riot/valorant/valorant.js";
@@ -208,6 +210,7 @@ declare const fullApi: ApiFromModules<{
   "hub/analytics/mutations": typeof hub_analytics_mutations;
   "hub/analytics/queries": typeof hub_analytics_queries;
   "hub/overseer": typeof hub_overseer;
+  "lib/admin": typeof lib_admin;
   "lib/permissions_utils": typeof lib_permissions_utils;
   "lib/withStatus": typeof lib_withStatus;
   "riot/league/control": typeof riot_league_control;
@@ -233,6 +236,7 @@ declare const fullApi: ApiFromModules<{
   "schema/dailies/dungeonDeal/dungeonDeal": typeof schema_dailies_dungeonDeal_dungeonDeal;
   "schema/dailies/nerdle/nerdle": typeof schema_dailies_nerdle_nerdle;
   "schema/dailies/nerdle/nerdleLeaderboard": typeof schema_dailies_nerdle_nerdleLeaderboard;
+  "schema/reports/appeals": typeof schema_reports_appeals;
   "schema/reports/chatReports": typeof schema_reports_chatReports;
   "schema/reports/overseerVotes": typeof schema_reports_overseerVotes;
   "schema/riot/valorant/valorant": typeof schema_riot_valorant_valorant;

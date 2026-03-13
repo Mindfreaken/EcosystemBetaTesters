@@ -10,8 +10,8 @@ export default function ValorantMyInsights({ onMockSignIn }: { onMockSignIn?: ()
   return (
     <Box sx={{ p: 2 }}>
       <MuiCard variant="interactive" size="lg" sx={{ maxWidth: 820, mx: "auto", textAlign: "center", display: 'grid', placeItems: 'center', gap: 1.25 }}>
-        <Typography variant="h6" sx={{ fontWeight: 900, color: "var(--textPrimary)" }}>Link Riot to view your insights</Typography>
-        <Typography variant="body2" sx={{ color: "var(--textSecondary)" }}>This is a demo. Clicking the button will mock sign-in and load your overview.</Typography>
+        <Typography variant="h6" sx={{ fontWeight: 900, color: "var(--foreground)" }}>Link Riot to view your insights</Typography>
+        <Typography variant="body2" sx={{ color: "var(--muted-foreground)" }}>This is a demo. Clicking the button will mock sign-in and load your overview.</Typography>
         <UiButton variant="outline" size="md" pill onClick={() => onMockSignIn?.()}>
           Sign in with Riot (Mock)
         </UiButton>
@@ -19,3 +19,5 @@ export default function ValorantMyInsights({ onMockSignIn }: { onMockSignIn?: ()
     </Box>
   );
 }
+
+

@@ -14,6 +14,7 @@ import GroupSettingsModal from "./content/header/GroupSettingsModal";
 import GlowPilledButton from "@/components/ui/GlowPilledButton";
 import compactPillStyles from "./content/header/GlowCompactPill.module.css";
 import { useShellView } from "../../../viewContext";
+import { themeVar } from "@/theme/registry";
 
 export default function ChatContent() {
   const [selected, setSelected] = useState<Pick<ChatListItem, "_id" | "name"> | null>(null);
@@ -80,8 +81,8 @@ export default function ChatContent() {
               minWidth: sidebarCollapsed ? 72 : 260,
               maxWidth: sidebarCollapsed ? 90 : 260,
               height: "100%",
-              borderRight: "1px solid var(--borderLight)",
-              backgroundColor: "color-mix(in oklab, var(--card), transparent 96%)",
+              borderRight: `1px solid ${themeVar("border")}`,
+              backgroundColor: `color-mix(in oklab, ${themeVar("card")}, transparent 96%)`,
               overflowX: "hidden",
             }}
           >
@@ -103,9 +104,9 @@ export default function ChatContent() {
                   aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                   onClick={() => setSidebarCollapsed((v) => !v)}
                   sx={{
-                    color: "var(--secondary)",
+                    color: themeVar("secondary"),
                     '&:hover': {
-                      backgroundColor: 'color-mix(in oklab, var(--secondary), transparent 90%)',
+                      backgroundColor: `color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)`,
                     },
                   }}
                 >
@@ -117,14 +118,14 @@ export default function ChatContent() {
                   <GlowPilledButton
                     aria-label="Group settings"
                     onClick={() => setSettingsOpen(true)}
-                    glowColor="color-mix(in oklab, var(--secondary), transparent 20%)"
+                    glowColor={`color-mix(in oklab, ${themeVar("secondary")}, transparent 20%)`}
                     icon={<Settings size={16} />}
                     label="Settings"
                     className={compactPillStyles.compactGlow}
                     style={{
-                      background: 'linear-gradient(90deg, color-mix(in oklab, var(--secondary), transparent 80%), color-mix(in oklab, var(--primary), transparent 80%))',
-                      color: 'var(--text)',
-                      border: '1px solid color-mix(in oklab, var(--border), transparent 20%)',
+                      background: `linear-gradient(90deg, color-mix(in oklab, ${themeVar("secondary")}, transparent 80%), color-mix(in oklab, ${themeVar("primary")}, transparent 80%))`,
+                      color: themeVar("foreground"),
+                      border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 20%)`,
                     }}
                   />
                 ) : null
@@ -146,5 +147,7 @@ export default function ChatContent() {
     </div>
   );
 }
+
+
 
 

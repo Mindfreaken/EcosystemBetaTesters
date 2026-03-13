@@ -833,3 +833,28 @@ export const getLatestMessageForUser = query({
     };
   },
 });
+
+// Get messages with their reactions joined
+export const getMessagesWithReactions = query({
+  args: { chatId: v.id("chats"), paginationOpts: paginationOptsValidator },
+  handler: async (ctx, { chatId, paginationOpts }) => {
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_chat_and_time", (q) => q.eq("chatId", chatId))
+      .filter((q) => q.eq(q.field("threadId"), undefined))
+      .order("desc")
+      .paginate(paginationOpts);
+
+    const pageWithReactions = await Promise.all(
+      messages.page.map(async (msg) => {
+        const reactions = await ctx.db
+          .query("messageReactions")
+          .withIndex("by_message", (q) => q.eq("messageId", msg._id))
+          .collect();
+        return { ...msg, reactions };
+      })
+    );
+
+    return { ...messages, page: pageWithReactions };
+  },
+});

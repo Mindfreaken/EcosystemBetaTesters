@@ -6,3 +6,4 @@ import FooterContent from "./content";
 export default function Footer() {
   return <FooterContent />;
 }
+

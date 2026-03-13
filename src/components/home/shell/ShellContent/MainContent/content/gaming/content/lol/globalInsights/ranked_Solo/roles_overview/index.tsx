@@ -22,7 +22,7 @@ export default function RolesOverview() {
       <Paper elevation={0} sx={{ ...cardSx, p: 1.5 }}>
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.5 }}>
           <Typography variant="subtitle2" sx={sectionLabelSx}>Roles Overview</Typography>
-          <Typography variant="caption" sx={{ color: "var(--textSecondary)" }}>
+          <Typography variant="caption" sx={{ color: "var(--muted-foreground)" }}>
             Role performance snapshot (WR · KDA)
           </Typography>
         </Box>
@@ -43,3 +43,5 @@ export default function RolesOverview() {
     </Box>
   );
 }
+
+

@@ -19,6 +19,7 @@ interface UserMembersPortalProps {
 
 export default function UserMembersPortal({ space }: UserMembersPortalProps) {
     const sId = space._id;
+    const me = useQuery(api.users.onboarding.queries.me, {});
     const leaderboard = useQuery(api.spaces.invites.getInviteLeaderboard, { spaceId: sId });
     const getOrCreateCode = useMutation(api.spaces.invites.getOrCreateMyInviteCode);
     const regenerateCode = useMutation(api.spaces.invites.regenerateMyInviteCode);
@@ -72,26 +73,56 @@ export default function UserMembersPortal({ space }: UserMembersPortalProps) {
                 {/* Header and Private Invite Code */}
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                     <Box>
-                        <Typography sx={{ display: "flex", alignItems: "center", gap: 1, color: themeVar("primary"), fontWeight: 700, mb: 1, fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                        <Typography component="div" sx={{ display: "flex", alignItems: "center", gap: 1, color: themeVar("primary"), fontWeight: 700, mb: 1, fontSize: "0.875rem", textTransform: "uppercase", letterSpacing: "0.1em" }}>
                             <Users size={16} /> Members Portal
                         </Typography>
-                        <Typography variant="h4" sx={{ fontWeight: 900, color: themeVar("textLight") }}>
+                        <Typography variant="h4" sx={{ fontWeight: 900, color: themeVar("foreground") }}>
                             Community Area
                         </Typography>
-                        <Typography sx={{ color: themeVar("textSecondary"), mt: 0.5 }}>
+                        <Typography sx={{ color: themeVar("mutedForeground"), mt: 0.5 }}>
                             Invite your friends and view the community leaderboard.
                         </Typography>
                     </Box>
 
+                    {/* Account Standing */}
+                    {me && (me.suspensionStatus || (me.isBanned)) && (
+                        <Box sx={{ 
+                            p: 2, 
+                            borderRadius: 2.5, 
+                            bgcolor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 95%)`, 
+                            border: `1px solid color-mix(in oklab, ${themeVar("destructive")}, transparent 80%)`,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1,
+                            minWidth: 200
+                        }}>
+                            <Typography variant="caption" sx={{ color: themeVar("destructive"), fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.5, fontSize: 10, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <ShieldAlert size={14} /> Account Standing
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 800, color: themeVar("foreground") }}>
+                                {me.isBanned ? 'Permanent Ban' : 
+                                 me.suspensionStatus === 'suspensionStage1' ? 'Formal Warning' :
+                                 me.suspensionStatus === 'suspensionStageActive' ? 'Active Suspension' :
+                                 me.suspensionStatus === 'suspensionStageProfileUpdate' ? 'Profile Review Required' :
+                                 'Moderation Action Pending'}
+                            </Typography>
+                            {me.bannedUntil && (
+                                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>
+                                    Until: {new Date(me.bannedUntil).toLocaleDateString()}
+                                </Typography>
+                            )}
+                        </Box>
+                    )}
+
                     {/* Invite Code - Top Right */}
                     <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 1 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("textSecondary"), display: "flex", alignItems: "center", gap: 1 }}>
+                        <Typography variant="caption" component="div" sx={{ fontWeight: 800, color: themeVar("mutedForeground"), display: "flex", alignItems: "center", gap: 1 }}>
                             <MailPlus size={14} /> YOUR PRIVATE INVITE CODE
                         </Typography>
                         {space.allowInvites === false ? (
-                            <Box sx={{ display: "flex", gap: 1, alignItems: "center", mt: 1, p: 1, borderRadius: 1.5, bgcolor: `color-mix(in oklab, ${themeVar("danger")}, transparent 90%)`, border: `1px solid ${themeVar("danger")}` }}>
-                                <ShieldAlert size={16} style={{ color: themeVar("danger") }} />
-                                <Typography variant="caption" sx={{ color: themeVar("danger"), fontWeight: 700 }}>Invites Disabled</Typography>
+                            <Box sx={{ display: "flex", gap: 1, alignItems: "center", mt: 1, p: 1, borderRadius: 1.5, bgcolor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 90%)`, border: `1px solid ${themeVar("destructive")}` }}>
+                                <ShieldAlert size={16} style={{ color: themeVar("destructive") }} />
+                                <Typography variant="caption" sx={{ color: themeVar("destructive"), fontWeight: 700 }}>Invites Disabled</Typography>
                             </Box>
                         ) : generating ? (
                             <CircularProgress size={20} sx={{ color: themeVar("primary") }} />
@@ -107,13 +138,13 @@ export default function UserMembersPortal({ space }: UserMembersPortalProps) {
                                         p: 0,
                                         width: 40,
                                         height: 40,
-                                        bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`,
-                                        color: themeVar("textSecondary"),
+                                        bgcolor: `color-mix(in oklab, ${themeVar("secondary")}, transparent 50%)`,
+                                        color: themeVar("mutedForeground"),
                                         borderRadius: 1.5,
                                         border: `1px solid ${themeVar("border")}`,
                                         "&:hover": {
-                                            bgcolor: `color-mix(in oklab, ${themeVar("textLight")}, transparent 90%)`,
-                                            color: themeVar("textLight")
+                                            bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 90%)`,
+                                            color: themeVar("foreground")
                                         }
                                     }}
                                     title="Regenerate Code"
@@ -126,7 +157,7 @@ export default function UserMembersPortal({ space }: UserMembersPortalProps) {
                                     borderRadius: 1.5,
                                     border: `1px solid ${themeVar("primary")}`,
                                 }}>
-                                    <Typography sx={{ fontFamily: "monospace", fontSize: "1.2rem", letterSpacing: "0.1em", fontWeight: 900, color: themeVar("textLight") }}>
+                                    <Typography sx={{ fontFamily: "monospace", fontSize: "1.2rem", letterSpacing: "0.1em", fontWeight: 900, color: themeVar("foreground") }}>
                                         {inviteCode}
                                     </Typography>
                                 </Box>
@@ -138,13 +169,13 @@ export default function UserMembersPortal({ space }: UserMembersPortalProps) {
                                         width: 40,
                                         height: 40,
                                         p: 0,
-                                        bgcolor: copied ? themeVar("success") : `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`,
-                                        color: copied ? "white" : themeVar("textSecondary"),
+                                        bgcolor: copied ? themeVar("chart2") : `color-mix(in oklab, ${themeVar("secondary")}, transparent 50%)`,
+                                        color: "white",
                                         borderRadius: 1.5,
                                         border: `1px solid ${themeVar("border")}`,
                                         "&:hover": {
-                                            bgcolor: copied ? themeVar("success") : `color-mix(in oklab, ${themeVar("textLight")}, transparent 90%)`,
-                                            color: themeVar("textLight")
+                                            bgcolor: copied ? themeVar("chart2") : `color-mix(in oklab, ${themeVar("foreground")}, transparent 90%)`,
+                                            color: themeVar("foreground")
                                         }
                                     }}
                                 >
@@ -156,19 +187,19 @@ export default function UserMembersPortal({ space }: UserMembersPortalProps) {
                 </Box>
 
                 {/* Leaderboard */}
-                <Box sx={{ p: 4, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
-                    <Typography variant="h6" sx={{ fontWeight: 800, color: themeVar("textLight"), mb: 3, display: "flex", alignItems: "center", gap: 1 }}>
-                        <Trophy size={20} style={{ color: themeVar("highlight") }} /> Invite Leaderboard
+                <Box sx={{ p: 4, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("secondary")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 800, color: themeVar("foreground"), mb: 3, display: "flex", alignItems: "center", gap: 1 }}>
+                        <Trophy size={20} style={{ color: themeVar("chart3") }} /> Invite Leaderboard
                     </Typography>
 
                     {leaderboard === undefined ? (
                         <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-                            <CircularProgress size={24} sx={{ color: themeVar("textSecondary") }} />
+                            <CircularProgress size={24} sx={{ color: themeVar("mutedForeground") }} />
                         </Box>
                     ) : leaderboard.length === 0 ? (
                         <Box sx={{ textAlign: "center", p: 4 }}>
                             <Trophy size={48} style={{ color: "rgba(255,255,255,0.05)", marginBottom: 16 }} />
-                            <Typography sx={{ color: themeVar("textSecondary") }}>No invites yet. Be the first to invite someone!</Typography>
+                            <Typography sx={{ color: themeVar("mutedForeground") }}>No invites yet. Be the first to invite someone!</Typography>
                         </Box>
                     ) : (
                         <Stack spacing={1.5}>
@@ -179,28 +210,28 @@ export default function UserMembersPortal({ space }: UserMembersPortalProps) {
                                     justifyContent: "space-between",
                                     p: 2,
                                     borderRadius: 2,
-                                    bgcolor: index === 0 ? `color-mix(in oklab, ${themeVar("highlight")}, transparent 90%)` : "rgba(0,0,0,0.2)",
-                                    border: index === 0 ? `1px solid color-mix(in oklab, ${themeVar("highlight")}, transparent 70%)` : `1px solid ${themeVar("border")}`
+                                    bgcolor: index === 0 ? `color-mix(in oklab, ${themeVar("chart3")}, transparent 90%)` : `color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
+                                    border: index === 0 ? `1px solid color-mix(in oklab, ${themeVar("chart3")}, transparent 70%)` : `1px solid ${themeVar("border")}`
                                 }}>
                                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                                         <Typography variant="h6" sx={{
                                             fontWeight: 900,
-                                            color: index === 0 ? themeVar("highlight") : index === 1 ? "#C0C0C0" : index === 2 ? "#CD7F32" : themeVar("textSecondary"),
+                                            color: index === 0 ? themeVar("chart3") : index === 1 ? "#C0C0C0" : index === 2 ? "#CD7F32" : themeVar("mutedForeground"),
                                             width: 24,
                                             textAlign: "center"
                                         }}>
                                             {index + 1}
                                         </Typography>
                                         <Avatar src={entry.avatarUrl} sx={{ width: 36, height: 36 }} />
-                                        <Typography sx={{ fontWeight: 800, color: themeVar("textLight"), fontSize: "1.1rem" }}>
+                                        <Typography sx={{ fontWeight: 800, color: themeVar("foreground"), fontSize: "1.1rem" }}>
                                             {entry.displayName}
                                         </Typography>
                                     </Box>
                                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                        <Typography variant="h5" sx={{ fontWeight: 900, color: index === 0 ? themeVar("highlight") : themeVar("primary") }}>
+                                        <Typography variant="h5" sx={{ fontWeight: 900, color: index === 0 ? themeVar("chart3") : themeVar("primary") }}>
                                             {entry.count}
                                         </Typography>
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 700, mt: 0.5 }}>
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 700, mt: 0.5 }}>
                                             INVITES
                                         </Typography>
                                     </Box>
@@ -213,3 +244,5 @@ export default function UserMembersPortal({ space }: UserMembersPortalProps) {
         </Box>
     );
 }
+
+

@@ -89,7 +89,7 @@ export default function CreateSpaceModal({ open, onClose, onSuccess }: CreateSpa
                 sx={{
                     px: 3,
                     py: 2.5,
-                    color: themeVar("textLight"),
+                    color: themeVar("foreground"),
                     fontWeight: 800,
                     fontSize: "1.25rem",
                     display: "flex",
@@ -103,8 +103,8 @@ export default function CreateSpaceModal({ open, onClose, onSuccess }: CreateSpa
                     size="small"
                     onClick={handleClose}
                     sx={{
-                        color: themeVar("textSecondary"),
-                        "&:hover": { color: themeVar("textLight"), background: "transparent" },
+                        color: themeVar("mutedForeground"),
+                        "&:hover": { color: themeVar("foreground"), background: "transparent" },
                     }}
                 >
                     <X size={20} />
@@ -112,7 +112,7 @@ export default function CreateSpaceModal({ open, onClose, onSuccess }: CreateSpa
             </DialogTitle>
 
             <DialogContent sx={{ p: 3, mt: 1 }}>
-                <Typography variant="body2" sx={{ color: themeVar("textSecondary"), mb: 3 }}>
+                <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), mb: 3 }}>
                     Spaces are dedicated homes for your community. You can configure everything from permissions to custom themes later.
                 </Typography>
 
@@ -132,7 +132,7 @@ export default function CreateSpaceModal({ open, onClose, onSuccess }: CreateSpa
                         InputProps={{
                             sx: {
                                 bgcolor: "rgba(0,0,0,0.2)",
-                                color: themeVar("textLight"),
+                                color: themeVar("foreground"),
                                 "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
                                 "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") }
                             }
@@ -162,7 +162,7 @@ export default function CreateSpaceModal({ open, onClose, onSuccess }: CreateSpa
                         InputProps={{
                             sx: {
                                 bgcolor: "rgba(0,0,0,0.2)",
-                                color: themeVar("textLight"),
+                                color: themeVar("foreground"),
                                 "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
                                 "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") }
                             }
@@ -175,42 +175,8 @@ export default function CreateSpaceModal({ open, onClose, onSuccess }: CreateSpa
                         }}
                     />
 
-                    <Box
-                        sx={{
-                            p: 2,
-                            borderRadius: 2,
-                            bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 40%)`,
-                            border: `1px solid ${themeVar("border")}`,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                        }}
-                    >
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                            {isPublic ? (
-                                <Globe size={18} style={{ color: themeVar("primary") }} />
-                            ) : (
-                                <Lock size={18} style={{ color: themeVar("warning") }} />
-                            )}
-                            <Box>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: themeVar("textLight") }}>
-                                    {isPublic ? "Public Space" : "Private Space"}
-                                </Typography>
-                                <Typography variant="caption" sx={{ color: themeVar("textSecondary") }}>
-                                    {isPublic ? "Anyone can find and join" : "Invite links only"}
-                                </Typography>
-                            </Box>
-                        </Box>
-                        <Switch
-                            checked={isPublic}
-                            onChange={(e) => setIsPublic(e.target.checked)}
-                            disabled={loading}
-                            color="primary"
-                        />
-                    </Box>
-
                     {error && (
-                        <Typography variant="caption" sx={{ color: themeVar("warning"), fontWeight: 600, textAlign: "center" }}>
+                        <Typography variant="caption" sx={{ color: themeVar("chart4"), fontWeight: 600, textAlign: "center" }}>
                             {error}
                         </Typography>
                     )}
@@ -222,10 +188,10 @@ export default function CreateSpaceModal({ open, onClose, onSuccess }: CreateSpa
                     onClick={handleClose}
                     disabled={loading}
                     sx={{
-                        color: themeVar("textSecondary"),
+                        color: themeVar("mutedForeground"),
                         fontWeight: 600,
                         textTransform: "none",
-                        "&:hover": { color: themeVar("textLight"), bgcolor: "transparent" },
+                        "&:hover": { color: themeVar("foreground"), bgcolor: "transparent" },
                     }}
                 >
                     Cancel
@@ -249,7 +215,7 @@ export default function CreateSpaceModal({ open, onClose, onSuccess }: CreateSpa
                         },
                         "&:disabled": {
                             bgcolor: themeVar("border"),
-                            color: themeVar("textSecondary"),
+                            color: themeVar("mutedForeground"),
                         }
                     }}
                 >
@@ -259,3 +225,5 @@ export default function CreateSpaceModal({ open, onClose, onSuccess }: CreateSpa
         </Dialog>
     );
 }
+
+

@@ -23,6 +23,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import { themeVar } from "@/theme/registry";
 import { Doc, Id } from "convex/_generated/dataModel";
+import { useToast } from "@/hooks/use-toast";
 import Popover from "@mui/material/Popover";
 import Tooltip from "@mui/material/Tooltip";
 import { EMOJI_CATEGORIES } from "@/constants/emojis";
@@ -38,6 +39,7 @@ interface ChannelChatProps {
 }
 
 export default function ChannelChat({ channel, userRole = "member" }: ChannelChatProps) {
+    const { toast } = useToast();
     const [input, setInput] = useState("");
     const listRef = useRef<HTMLDivElement | null>(null);
     const bottomRef = useRef<HTMLDivElement | null>(null);
@@ -104,12 +106,12 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
     // Evaluate if user can post in read-only channels based on space settings
     let isReadOnlyForMe = false;
     if (channel.isReadOnly) {
-        const isAdmin = userRole === "admin";
+        const isSpaceAdmin = userRole === "admin";
         const isMod = userRole === "moderator";
         const isOwner = userRole === "owner";
 
         const canPost = isOwner ||
-            (isAdmin && (space?.adminCanPostInReadOnly ?? false)) ||
+            (isSpaceAdmin && (space?.adminCanPostInReadOnly ?? false)) ||
             (isMod && (space?.modCanPostInReadOnly ?? false));
 
         isReadOnlyForMe = !canPost;
@@ -196,7 +198,11 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
             setModActionType(null);
         } catch (e: any) {
             console.error("Failed to execute moderation action", e);
-            alert(e.message);
+            toast({
+                title: "Action Failed",
+                description: e.message,
+                variant: "destructive",
+            });
         } finally {
             setIsProcessingMod(false);
         }
@@ -220,17 +226,17 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
             >
                 {!messages ? (
                     <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                        <Typography sx={{ color: themeVar("textSecondary") }}>Loading messages...</Typography>
+                        <Typography sx={{ color: themeVar("mutedForeground") }}>Loading messages...</Typography>
                     </Box>
                 ) : messages.length === 0 ? (
                     isDocumentChannel ? (
                         <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                            <Typography sx={{ color: themeVar("textSecondary") }}>No document content available.</Typography>
+                            <Typography sx={{ color: themeVar("mutedForeground") }}>No document content available.</Typography>
                         </Box>
                     ) : (
                         <Box sx={{ mt: "auto", mb: 4, px: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 1, opacity: 0.4 }}>
                             <Box sx={{ width: 40, height: 1, bgcolor: themeVar("border") }} />
-                            <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", fontSize: "0.65rem" }}>
+                            <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", fontSize: "0.65rem" }}>
                                 No messages yet
                             </Typography>
                         </Box>
@@ -240,7 +246,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                         {!isDocumentChannel && (
                             <Box sx={{ mb: 3, pt: 4, display: "flex", alignItems: "center", gap: 2, opacity: 0.35 }}>
                                 <Box sx={{ flex: 1, height: 1, bgcolor: themeVar("border") }} />
-                                <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", fontSize: "0.6rem", whiteSpace: "nowrap" }}>
+                                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", fontSize: "0.6rem", whiteSpace: "nowrap" }}>
                                     Start of {channel.name}
                                 </Typography>
                                 <Box sx={{ flex: 1, height: 1, bgcolor: themeVar("border") }} />
@@ -275,7 +281,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                     {!isDocumentChannel && (
                                         <Avatar
                                             src={m.sender?.avatarUrl}
-                                            sx={{ width: 40, height: 40, borderRadius: 2, bgcolor: themeVar("backgroundAlt") }}
+                                            sx={{ width: 40, height: 40, borderRadius: 2, bgcolor: themeVar("muted") }}
                                         >
                                             {m.sender?.displayName?.[0]}
                                         </Avatar>
@@ -284,18 +290,18 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                         {!isDocumentChannel && (
                                             <Box sx={{ display: "flex", alignItems: "baseline", gap: 1.5, mb: 0.5 }}>
                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                    <Typography sx={{ fontWeight: 800, color: isMine ? themeVar("primary") : themeVar("textLight"), fontSize: "0.95rem" }}>
+                                                    <Typography sx={{ fontWeight: 800, color: isMine ? themeVar("primary") : themeVar("foreground"), fontSize: "0.95rem" }}>
                                                         {m.sender?.displayName || "Unknown User"}
                                                     </Typography>
                                                     {m.sender?.timeoutUntil && m.sender.timeoutUntil > Date.now() && (
                                                         <Tooltip title="Timed Out" arrow>
-                                                            <Box sx={{ display: "flex", alignItems: "center", color: themeVar("warning") }}>
+                                                            <Box sx={{ display: "flex", alignItems: "center", color: themeVar("chart4") }}>
                                                                 <Clock size={14} />
                                                             </Box>
                                                         </Tooltip>
                                                     )}
                                                 </Box>
-                                                <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontSize: "0.75rem" }}>
+                                                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontSize: "0.75rem" }}>
                                                     {timeLabel}
                                                 </Typography>
                                             </Box>
@@ -335,7 +341,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                                                 ) : (
                                                                     <Typography sx={{ fontSize: "0.85rem" }}>{emoji}</Typography>
                                                                 )}
-                                                                <Typography sx={{ fontSize: "0.75rem", fontWeight: 700, color: hasReacted ? themeVar("primary") : themeVar("textSecondary") }}>
+                                                                <Typography sx={{ fontSize: "0.75rem", fontWeight: 700, color: hasReacted ? themeVar("primary") : themeVar("mutedForeground") }}>
                                                                     {userIds.length}
                                                                 </Typography>
                                                             </Box>
@@ -351,7 +357,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                         position: "absolute",
                                         top: -12,
                                         right: 16,
-                                        bgcolor: themeVar("backgroundAlt"),
+                                        bgcolor: themeVar("muted"),
                                         border: `1px solid ${themeVar("border")}`,
                                         borderRadius: 2,
                                         display: "flex",
@@ -361,14 +367,14 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                         p: 0.5,
                                         zIndex: 1
                                     }}>
-                                        <IconButton size="small" onClick={(e) => handleReactionClick(e, m._id)} sx={{ color: themeVar("textSecondary"), "&:hover": { color: themeVar("primary") } }}>
+                                        <IconButton size="small" onClick={(e) => handleReactionClick(e, m._id)} sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("primary") } }}>
                                             <Smile size={18} />
                                         </IconButton>
                                         {canMod && (
                                             <IconButton
                                                 size="small"
                                                 onClick={(e) => setModMenuAnchor({ el: e.currentTarget, msgId: m._id, userId: m.senderId, username: m.sender?.displayName || "User", avatarUrl: m.sender?.avatarUrl })}
-                                                sx={{ color: themeVar("textSecondary"), "&:hover": { color: themeVar("warning") } }}
+                                                sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("chart4") } }}
                                             >
                                                 <Shield size={18} />
                                             </IconButton>
@@ -377,7 +383,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                             <IconButton
                                                 size="small"
                                                 onClick={() => deleteMessage({ messageId: m._id })}
-                                                sx={{ color: themeVar("textSecondary"), "&:hover": { color: themeVar("danger") } }}
+                                                sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("destructive") } }}
                                             >
                                                 <Trash2 size={18} />
                                             </IconButton>
@@ -402,9 +408,9 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                             onClose={() => setModMenuAnchor(null)}
                             PaperProps={{
                                 sx: {
-                                    bgcolor: themeVar("backgroundAlt"),
+                                    bgcolor: themeVar("muted"),
                                     border: `1px solid ${themeVar("border")}`,
-                                    color: themeVar("textLight"),
+                                    color: themeVar("foreground"),
                                     minWidth: 160
                                 }
                             }}
@@ -418,7 +424,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                             <MenuItem onClick={() => { setModActionType("timeout"); setTimeoutHours(24); setModDialogOpen(true); setModMenuAnchor(prev => prev ? { ...prev, el: prev.el } : null); setAnchorEl(null); }} sx={{ gap: 1.5, fontSize: "0.875rem", "&:hover": { bgcolor: "rgba(255,255,255,0.05)" } }}>
                                 <Clock size={16} /> Timeout (24 Hours)
                             </MenuItem>
-                            <MenuItem onClick={() => { setModActionType("ban"); setModDialogOpen(true); setModMenuAnchor(prev => prev ? { ...prev, el: prev.el } : null); setAnchorEl(null); }} sx={{ gap: 1.5, fontSize: "0.875rem", color: themeVar("danger"), "&:hover": { bgcolor: "rgba(255,0,0,0.1)" } }}>
+                            <MenuItem onClick={() => { setModActionType("ban"); setModDialogOpen(true); setModMenuAnchor(prev => prev ? { ...prev, el: prev.el } : null); setAnchorEl(null); }} sx={{ gap: 1.5, fontSize: "0.875rem", color: themeVar("destructive"), "&:hover": { bgcolor: "rgba(255,0,0,0.1)" } }}>
                                 <Ban size={16} /> Ban User
                             </MenuItem>
                             <MenuItem onClick={() => { setModActionType("delete_messages"); setDeleteCount(5); setModDialogOpen(true); setModMenuAnchor(prev => prev ? { ...prev, el: prev.el } : null); setAnchorEl(null); }} sx={{ gap: 1.5, fontSize: "0.875rem", "&:hover": { bgcolor: "rgba(255,255,255,0.05)" } }}>
@@ -427,12 +433,12 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                         </Menu>
 
                         {/* Moderation Confirmation Dialog */}
-                        <Dialog open={modDialogOpen} onClose={() => !isProcessingMod && setModDialogOpen(false)} PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: 'none', border: `1px solid ${themeVar("border")}`, borderRadius: 4, minWidth: 400 } }}>
+                        <Dialog open={modDialogOpen} onClose={() => !isProcessingMod && setModDialogOpen(false)} PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: 'none', border: `1px solid ${themeVar("border")}`, borderRadius: 4, minWidth: 400 } }}>
                             <DialogTitle sx={{ fontWeight: 900 }}>
                                 {modActionType === "timeout" ? `Timeout ${modMenuAnchor?.username}` : modActionType === "ban" ? `Ban ${modMenuAnchor?.username}` : `Delete Messages from ${modMenuAnchor?.username}`}
                             </DialogTitle>
                             <DialogContent>
-                                <Typography variant="body2" sx={{ color: themeVar("textSecondary"), mb: 3 }}>
+                                <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), mb: 3 }}>
                                     {modActionType === "timeout"
                                         ? `Are you sure you want to timeout this user for ${timeoutHours} hour(s)? They will be unable to send messages during this time.`
                                         : modActionType === "ban"
@@ -442,31 +448,31 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
 
                                 <Box sx={{ mt: 2 }}>
                                     <FormControl component="fieldset">
-                                        <FormLabel component="legend" sx={{ color: themeVar("textLight"), fontWeight: 700, fontSize: '0.875rem', mb: 1 }}>CLEAN UP MESSAGES</FormLabel>
+                                        <FormLabel component="legend" sx={{ color: themeVar("foreground"), fontWeight: 700, fontSize: '0.875rem', mb: 1 }}>CLEAN UP MESSAGES</FormLabel>
                                         <RadioGroup value={deleteCount} onChange={(e) => setDeleteCount(e.target.value === "all" || e.target.value === "this" ? e.target.value : parseInt(e.target.value))}>
-                                            <FormControlLabel value={0} control={<Radio size="small" sx={{ color: themeVar("textSecondary"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Don't delete any</Typography>} />
-                                            <FormControlLabel value="this" control={<Radio size="small" sx={{ color: themeVar("textSecondary"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Just this message</Typography>} />
-                                            <FormControlLabel value={5} control={<Radio size="small" sx={{ color: themeVar("textSecondary"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Last 5 messages</Typography>} />
-                                            <FormControlLabel value={10} control={<Radio size="small" sx={{ color: themeVar("textSecondary"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Last 10 messages</Typography>} />
-                                            <FormControlLabel value={50} control={<Radio size="small" sx={{ color: themeVar("textSecondary"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Last 50 messages</Typography>} />
-                                            <FormControlLabel value={100} control={<Radio size="small" sx={{ color: themeVar("textSecondary"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Last 100 messages</Typography>} />
-                                            <FormControlLabel value="all" control={<Radio size="small" sx={{ color: themeVar("textSecondary"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">All messages</Typography>} />
+                                            <FormControlLabel value={0} control={<Radio size="small" sx={{ color: themeVar("mutedForeground"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Don't delete any</Typography>} />
+                                            <FormControlLabel value="this" control={<Radio size="small" sx={{ color: themeVar("mutedForeground"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Just this message</Typography>} />
+                                            <FormControlLabel value={5} control={<Radio size="small" sx={{ color: themeVar("mutedForeground"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Last 5 messages</Typography>} />
+                                            <FormControlLabel value={10} control={<Radio size="small" sx={{ color: themeVar("mutedForeground"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Last 10 messages</Typography>} />
+                                            <FormControlLabel value={50} control={<Radio size="small" sx={{ color: themeVar("mutedForeground"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Last 50 messages</Typography>} />
+                                            <FormControlLabel value={100} control={<Radio size="small" sx={{ color: themeVar("mutedForeground"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Last 100 messages</Typography>} />
+                                            <FormControlLabel value="all" control={<Radio size="small" sx={{ color: themeVar("mutedForeground"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">All messages</Typography>} />
                                         </RadioGroup>
                                     </FormControl>
 
                                     <Box sx={{ mt: 3 }}>
                                         <FormControl component="fieldset">
-                                            <FormLabel component="legend" sx={{ color: themeVar("textLight"), fontWeight: 700, fontSize: '0.875rem', mb: 1 }}>DELETION SCOPE</FormLabel>
+                                            <FormLabel component="legend" sx={{ color: themeVar("foreground"), fontWeight: 700, fontSize: '0.875rem', mb: 1 }}>DELETION SCOPE</FormLabel>
                                             <RadioGroup row value={deleteScope} onChange={(e) => setDeleteScope(e.target.value as any)}>
-                                                <FormControlLabel value="channel" control={<Radio size="small" sx={{ color: themeVar("textSecondary"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">This Channel</Typography>} />
-                                                <FormControlLabel value="space" control={<Radio size="small" sx={{ color: themeVar("textSecondary"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Whole Space</Typography>} />
+                                                <FormControlLabel value="channel" control={<Radio size="small" sx={{ color: themeVar("mutedForeground"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">This Channel</Typography>} />
+                                                <FormControlLabel value="space" control={<Radio size="small" sx={{ color: themeVar("mutedForeground"), '&.Mui-checked': { color: themeVar("primary") } }} />} label={<Typography variant="body2">Whole Space</Typography>} />
                                             </RadioGroup>
                                         </FormControl>
                                     </Box>
                                 </Box>
                             </DialogContent>
                             <DialogActions sx={{ p: 3, pt: 1 }}>
-                                <Button onClick={() => setModDialogOpen(false)} disabled={isProcessingMod} sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}>Cancel</Button>
+                                <Button onClick={() => setModDialogOpen(false)} disabled={isProcessingMod} sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>Cancel</Button>
                                 <Button
                                     onClick={handleModActionConfirm}
                                     disabled={isProcessingMod}
@@ -499,8 +505,8 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                             onClose={() => setExternalLink(null)}
                             PaperProps={{
                                 sx: {
-                                    bgcolor: themeVar("backgroundAlt"),
-                                    color: themeVar("textLight"),
+                                    bgcolor: themeVar("muted"),
+                                    color: themeVar("foreground"),
                                     backgroundImage: "none",
                                     border: `1px solid ${themeVar("border")}`,
                                     borderRadius: 4,
@@ -508,14 +514,14 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                 }
                             }}
                         >
-                            <DialogTitle sx={{ fontWeight: 900, display: "flex", alignItems: "center", gap: 1.5, color: themeVar("warning") }}>
+                            <DialogTitle sx={{ fontWeight: 900, display: "flex", alignItems: "center", gap: 1.5, color: themeVar("chart4") }}>
                                 <AlertTriangle size={24} /> Security Warning
                             </DialogTitle>
                             <DialogContent>
-                                <Typography variant="body1" sx={{ color: themeVar("textLight"), mb: 2, fontWeight: 700 }}>
+                                <Typography variant="body1" sx={{ color: themeVar("foreground"), mb: 2, fontWeight: 700 }}>
                                     You are leaving the application.
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: themeVar("textSecondary"), mb: 3 }}>
+                                <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), mb: 3 }}>
                                     This link is taking you to an external website. Always verify the destination URL is safe before proceeding.
                                 </Typography>
 
@@ -526,7 +532,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                     borderRadius: 2,
                                     wordBreak: "break-all"
                                 }}>
-                                    <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", mb: 0.5, fontWeight: 700, textTransform: "uppercase" }}>
+                                    <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "block", mb: 0.5, fontWeight: 700, textTransform: "uppercase" }}>
                                         Destination URL
                                     </Typography>
                                     <Typography variant="body2" sx={{ color: themeVar("primary"), fontFamily: "monospace" }}>
@@ -535,7 +541,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                 </Box>
                             </DialogContent>
                             <DialogActions sx={{ p: 3, pt: 1 }}>
-                                <Button onClick={() => setExternalLink(null)} sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}>
+                                <Button onClick={() => setExternalLink(null)} sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>
                                     Stay Here
                                 </Button>
                                 <Button
@@ -568,7 +574,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                         display: "flex",
                         alignItems: "center",
                         gap: 1.5,
-                        bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 30%)`,
+                        bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 30%)`,
                         borderRadius: 3,
                         px: 2,
                         py: 1,
@@ -598,7 +604,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                             variant="standard"
                             InputProps={{
                                 disableUnderline: true,
-                                sx: { color: themeVar("textLight"), fontSize: "0.95rem" }
+                                sx: { color: themeVar("foreground"), fontSize: "0.95rem" }
                             }}
                         />
                         <IconButton
@@ -606,14 +612,14 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                             onClick={handleSend}
                             disabled={!canSend}
                             sx={{
-                                color: canSend ? themeVar("primary") : themeVar("textSecondary"),
+                                color: canSend ? themeVar("primary") : themeVar("mutedForeground"),
                                 transition: "all 0.2s"
                             }}
                         >
                             <Send size={20} />
                         </IconButton>
                     </Box>
-                    <Typography variant="caption" sx={{ color: themeVar("textSecondary"), px: 2, mt: 1, display: "block", fontSize: 10, opacity: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), px: 2, mt: 1, display: "block", fontSize: 10, opacity: 0.5 }}>
                         Press Enter to send. Use Shift+Enter for new lines.
                     </Typography>
                 </Box>
@@ -644,7 +650,7 @@ function EmojiPickerPopover({
             transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             PaperProps={{
                 sx: {
-                    bgcolor: themeVar("backgroundAlt"),
+                    bgcolor: themeVar("muted"),
                     border: `1px solid ${themeVar("border")}`,
                     borderRadius: 4,
                     width: 320,
@@ -669,7 +675,7 @@ function EmojiPickerPopover({
                             minWidth: 44,
                             fontSize: "1.2rem",
                             p: 0,
-                            color: themeVar("textSecondary"),
+                            color: themeVar("mutedForeground"),
                             "&.Mui-selected": { color: themeVar("primary"), bgcolor: "rgba(255,255,255,0.05)" }
                         },
                         "& .MuiTabs-indicator": { height: 2, bgcolor: themeVar("primary") }
@@ -720,7 +726,7 @@ function EmojiPickerPopover({
             </Box>
 
             <Box sx={{ p: 1, bgcolor: "rgba(0,0,0,0.1)", borderTop: `1px solid ${themeVar("border")}`, textAlign: "center" }}>
-                <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}>
+                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>
                     {tabValue < EMOJI_CATEGORIES.length ? EMOJI_CATEGORIES[tabValue].name : "Custom Emojis"}
                 </Typography>
             </Box>
@@ -733,7 +739,7 @@ function MarkdownText({ content, onLinkClick }: { content: string, onLinkClick?:
     const parts = content.split(/(\*\*.*?\*\*|\*.*?\*|\[.*?\]\(.*?\))/g);
 
     return (
-        <Typography variant="body2" sx={{ color: themeVar("textLight"), whiteSpace: "pre-wrap", wordBreak: "break-word", lineHeight: 1.5 }}>
+        <Typography variant="body2" sx={{ color: themeVar("foreground"), whiteSpace: "pre-wrap", wordBreak: "break-word", lineHeight: 1.5 }}>
             {parts.map((part, i) => {
                 if (part.startsWith("**") && part.endsWith("**")) {
                     return <Box component="span" key={i} sx={{ fontWeight: 800 }}>{part.slice(2, -2)}</Box>;
@@ -750,7 +756,7 @@ function MarkdownText({ content, onLinkClick }: { content: string, onLinkClick?:
                         // Sanitize URL protocol
                         const isSafe = url.startsWith("http://") || url.startsWith("https://");
                         if (!isSafe) {
-                            return <Box component="span" key={i} sx={{ color: themeVar("textSecondary"), textDecoration: "line-through" }} title="Unsafe Link Blocked">{text}</Box>;
+                            return <Box component="span" key={i} sx={{ color: themeVar("mutedForeground"), textDecoration: "line-through" }} title="Unsafe Link Blocked">{text}</Box>;
                         }
 
                         return (
@@ -780,3 +786,5 @@ function MarkdownText({ content, onLinkClick }: { content: string, onLinkClick?:
         </Typography>
     );
 }
+
+

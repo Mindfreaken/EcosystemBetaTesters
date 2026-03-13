@@ -273,3 +273,5 @@ function SummaryCard({ title, value }: { title: string; value: number }) {
 }
 
 export default FriendsContent;
+
+

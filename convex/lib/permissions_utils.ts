@@ -32,7 +32,6 @@ export function isUserBlocked(user: Doc<"users">): boolean {
     if (!status) return false;
 
     const blockedStatuses: string[] = [
-        SUSPENSION_STAGES.STAGE_1,
         SUSPENSION_STAGES.ACTIVE,
         SUSPENSION_STAGES.APPEAL,
         SUSPENSION_STAGES.APPEAL_DENIED,

@@ -16,8 +16,8 @@ export default function AchievementsTab() {
 
   if (!me) {
     return (
-      <Box sx={{ textAlign: "center", color: "var(--textSecondary)", py: 6 }}>
-        <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--textLight)", mb: 0.5 }}>
+      <Box sx={{ textAlign: "center", color: "var(--muted-foreground)", py: 6 }}>
+        <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--foreground)", mb: 0.5 }}>
           Achievements
         </Typography>
         <Typography variant="body2">Loading your achievements…</Typography>
@@ -47,8 +47,8 @@ export default function AchievementsTab() {
   };
 
   return (
-    <Box sx={{ color: "var(--textSecondary)", py: 2 }}>
-      <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--textLight)", mb: 1 }}>
+    <Box sx={{ color: "var(--muted-foreground)", py: 2 }}>
+      <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--foreground)", mb: 1 }}>
         Achievements
       </Typography>
 
@@ -83,18 +83,18 @@ export default function AchievementsTab() {
                 boxShadow: isMythic ? `0 0 0 1px color-mix(in oklab, ${accent} 60%, transparent), 0 8px 24px color-mix(in oklab, ${accent} 28%, transparent)` : undefined,
               }}
             >
-              <Typography variant="subtitle2" sx={{ color: "var(--textLight)", fontWeight: 700, mb: 0.25 }}>
+              <Typography variant="subtitle2" sx={{ color: "var(--foreground)", fontWeight: 700, mb: 0.25 }}>
                 {a.name}
               </Typography>
-              <Typography variant="caption" sx={{ color: "var(--textSecondary)", wordBreak: "break-word", overflowWrap: "anywhere", whiteSpace: "pre-wrap", display: 'block' }}>
+              <Typography variant="caption" sx={{ color: "var(--muted-foreground)", wordBreak: "break-word", overflowWrap: "anywhere", whiteSpace: "pre-wrap", display: 'block' }}>
                 {a.description}
               </Typography>
               {a.earnedDate ? (
-                <Typography variant="caption" sx={{ color: "var(--textSecondary)", fontVariantNumeric: "tabular-nums", letterSpacing: ".02em", display: 'block', mt: 0.5 }}>
+                <Typography variant="caption" sx={{ color: "var(--muted-foreground)", fontVariantNumeric: "tabular-nums", letterSpacing: ".02em", display: 'block', mt: 0.5 }}>
                   {new Date(a.earnedDate).toLocaleString()}
                 </Typography>
               ) : null}
-              <Typography variant="caption" sx={{ color: "var(--textSecondary)", display: 'block', mt: 0.25 }}>
+              <Typography variant="caption" sx={{ color: "var(--muted-foreground)", display: 'block', mt: 0.25 }}>
                 {a.category} · {a.rarity}
               </Typography>
             </MuiCard>
@@ -104,3 +104,5 @@ export default function AchievementsTab() {
     </Box>
   );
 }
+
+

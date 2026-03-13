@@ -7,6 +7,7 @@ import { UiButton } from "@/components/ui/UiButton";
 import { MuiCard } from "@/components/ui/MuiCard";
 import { Lock, LogOut, Clock } from "lucide-react";
 import { useClerk } from "@clerk/clerk-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface BannedScreenProps {
     status: string;
@@ -33,6 +34,7 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
     const [appealLink, setAppealLink] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(status === "suspensionStageAppeal");
+    const { toast } = useToast();
 
     const submitAppeal = useMutation(api.users.suspensionFunctions.submitAppeal);
     const history = useQuery(api.users.suspensionFunctions.getMySuspensionHistory);
@@ -43,9 +45,17 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
         try {
             await submitAppeal({ reason: appealReason, proofLink: appealLink });
             setIsSubmitted(true);
+            toast({
+                title: "Appeal Submitted",
+                description: "Your appeal has been successfully received and is under review.",
+            });
         } catch (error) {
             console.error("Failed to submit appeal:", error);
-            alert("Failed to submit appeal. Please try again.");
+            toast({
+                title: "Submission Failed",
+                description: "Failed to submit appeal. Please try again.",
+                variant: "destructive",
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -55,7 +65,7 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
     const title = isBanned ? "BANNED" : "SUSPENDED";
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-[color:var(--background)] text-[color:var(--text)] p-4">
+        <div className="min-h-screen w-full flex items-center justify-center bg-[color:var(--background)] text-[color:var(--foreground)] p-4">
             <div className="w-full max-w-3xl space-y-4">
                 {/* Main Status Card */}
                 <MuiCard
@@ -87,7 +97,7 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                                 <p className="text-sm font-medium mb-1" style={{ color: "var(--textMuted)" }}>
                                     Current Status
                                 </p>
-                                <p className="text-lg font-semibold" style={{ color: "var(--text)" }}>
+                                <p className="text-lg font-semibold" style={{ color: "var(--foreground)" }}>
                                     {getStatusText(status)}
                                 </p>
                             </div>
@@ -103,7 +113,7 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                                     <p className="text-sm font-medium mb-1" style={{ color: "var(--danger)" }}>
                                         Reason
                                     </p>
-                                    <p className="text-sm" style={{ color: "var(--textSecondary)" }}>
+                                    <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
                                         {reason}
                                     </p>
                                 </div>
@@ -121,9 +131,9 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                         {/* Appeal Section */}
                         {(status === "suspensionStage1" || status === "suspensionStageActive") && !isSubmitted && (
                             <div className="space-y-4 pt-4 border-t" style={{ borderColor: "var(--border)" }}>
-                                <h3 className="font-semibold text-lg" style={{ color: "var(--text)" }}>Submit Appeal</h3>
+                                <h3 className="font-semibold text-lg" style={{ color: "var(--foreground)" }}>Submit Appeal</h3>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium" style={{ color: "var(--textSecondary)" }}>
+                                    <label className="text-sm font-medium" style={{ color: "var(--muted-foreground)" }}>
                                         Why should this suspension be lifted?
                                     </label>
                                     <textarea
@@ -132,15 +142,15 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                                         onChange={(e) => setAppealReason(e.target.value)}
                                         className="flex min-h-[80px] w-full rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                                         style={{
-                                            backgroundColor: "var(--backgroundAlt)",
+                                            backgroundColor: "var(--muted)",
                                             borderColor: "var(--border)",
                                             borderWidth: "1px",
-                                            color: "var(--text)",
+                                            color: "var(--foreground)",
                                         }}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium" style={{ color: "var(--textSecondary)" }}>
+                                    <label className="text-sm font-medium" style={{ color: "var(--muted-foreground)" }}>
                                         Proof Link (Optional)
                                     </label>
                                     <input
@@ -149,10 +159,10 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                                         value={appealLink}
                                         onChange={(e) => setAppealLink(e.target.value)}
                                         style={{
-                                            backgroundColor: "var(--backgroundAlt)",
+                                            backgroundColor: "var(--muted)",
                                             borderColor: "var(--border)",
                                             borderWidth: "1px",
-                                            color: "var(--text)"
+                                            color: "var(--foreground)"
                                         }}
                                     />
                                 </div>
@@ -176,7 +186,7 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                                 }}
                             >
                                 <p className="font-semibold mb-2" style={{ color: "var(--info)" }}>Appeal Submitted</p>
-                                <p className="text-sm" style={{ color: "var(--textSecondary)" }}>
+                                <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
                                     Our moderation team is reviewing your case. You will be notified when a decision is made.
                                 </p>
                             </div>
@@ -206,7 +216,7 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                     variant="elevated"
                 >
                     <div className="p-6">
-                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: "var(--text)" }}>
+                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: "var(--foreground)" }}>
                             <Clock className="w-5 h-5" />
                             Suspension History
                         </h2>
@@ -222,20 +232,20 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                                         key={index}
                                         className="p-3 rounded border-l-4"
                                         style={{
-                                            backgroundColor: "var(--backgroundAlt)",
+                                            backgroundColor: "var(--muted)",
                                             borderLeftColor: index === 0 ? "var(--danger)" : "var(--border)",
                                         }}
                                     >
                                         <div className="flex justify-between items-start mb-2">
                                             <div>
-                                                <p className="font-medium text-sm" style={{ color: "var(--text)" }}>
+                                                <p className="font-medium text-sm" style={{ color: "var(--foreground)" }}>
                                                     {log.previousStatus && (
                                                         <>
                                                             <span style={{ color: "var(--textMuted)" }}>{getStatusText(log.previousStatus)}</span>
                                                             {" → "}
                                                         </>
                                                     )}
-                                                    <span style={{ color: index === 0 ? "var(--danger)" : "var(--text)" }}>
+                                                    <span style={{ color: index === 0 ? "var(--danger)" : "var(--foreground)" }}>
                                                         {getStatusText(log.newStatus)}
                                                     </span>
                                                 </p>
@@ -244,7 +254,7 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                                                 {new Date(log.createdAt).toLocaleString()}
                                             </p>
                                         </div>
-                                        <p className="text-sm" style={{ color: "var(--textSecondary)" }}>
+                                        <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
                                             {log.reason}
                                         </p>
                                     </div>
@@ -257,3 +267,5 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
         </div>
     );
 }
+
+

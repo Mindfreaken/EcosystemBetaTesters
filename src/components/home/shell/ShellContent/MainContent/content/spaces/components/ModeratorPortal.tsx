@@ -10,3 +10,5 @@ interface ModeratorPortalProps {
 export default function ModeratorPortal({ space, userRole }: ModeratorPortalProps) {
     return <SpacePortal space={space} role="moderator" userRole={userRole} />;
 }
+
+

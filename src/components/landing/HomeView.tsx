@@ -28,11 +28,11 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
 
   const handleMouseOver = (e: React.MouseEvent<HTMLButtonElement>) => {
     const target = e.currentTarget;
-    target.style.backgroundColor = 'var(--primary)';
+    target.style.backgroundColor = `var(--primary)`;
     // Use color-mix to simulate transparency on the neon glow
     target.style.boxShadow = `0 0 20px color-mix(in oklab, var(--primary), transparent 50%), 0 0 10px color-mix(in oklab, var(--primary), transparent 75%) inset`;
-    target.style.textShadow = `0 0 8px var(--text)`;
-    target.style.color = 'var(--background)'; // Invert text against primary bg
+    target.style.textShadow = `0 0 8px var(--foreground)`;
+    target.style.color = `var(--background)`; // Invert text against primary bg
   };
 
   const handleMouseLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -40,13 +40,13 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
     target.style.backgroundColor = "transparent";
     target.style.boxShadow = "none";
     target.style.textShadow = "none";
-    target.style.color = 'var(--text)';
+    target.style.color = 'var(--foreground)';
   };
 
   const handlePrimaryMouseOver = (e: React.MouseEvent<HTMLButtonElement>) => {
     const target = e.currentTarget;
     target.style.boxShadow = `0 0 25px color-mix(in oklab, var(--primary), transparent 50%), 0 0 15px color-mix(in oklab, var(--primary), transparent 75%) inset`;
-    target.style.textShadow = `0 0 8px var(--backgroundDark, #000)`;
+    target.style.textShadow = `0 0 8px var(--background, #000)`;
     target.style.transform = "translateY(-2px)";
   };
 
@@ -66,8 +66,8 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
     <div
       className="h-screen flex flex-col relative w-full"
       style={{
-        background: `linear-gradient(145deg, var(--background) 0%, var(--backgroundDark, #000) 100%)`,
-        color: 'var(--text)',
+        background: `linear-gradient(145deg, var(--background) 0%, var(--background) 100%)`,
+        color: 'var(--foreground)',
         height: "100vh",
         overflow: "auto",
       }}
@@ -104,7 +104,7 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
 
             <p
               className="text-lg sm:text-xl md:text-2xl mb-8 max-w-3xl mx-auto"
-              style={{ color: 'var(--textSecondary)' }}
+              style={{ color: 'var(--muted-foreground)' }}
             >
               Your Digital Oasis for thriving online communities
             </p>
@@ -117,7 +117,7 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
                 className="px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-medium transition-all duration-300 border-2 neon-button-outline"
                 style={{
                   borderColor: 'var(--primary)',
-                  color: 'var(--text)',
+                  color: 'var(--foreground)',
                   backgroundColor: "transparent",
                 }}
                 onMouseOver={handleMouseOver}
@@ -132,14 +132,14 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
                   className="px-6 sm:px-8 py-2 sm:py-3 rounded-full text-base sm:text-lg font-medium transition-all duration-300 border-2 neon-button-outline"
                   style={{
                     borderColor: 'var(--secondary)',
-                    color: 'var(--text)',
+                    color: 'var(--foreground)',
                     backgroundColor: "transparent",
                   }}
                   onMouseOver={(e) => {
                     const target = e.currentTarget;
                     target.style.backgroundColor = 'var(--secondary)';
                     target.style.boxShadow = `0 0 20px color-mix(in oklab, var(--secondary), transparent 50%), 0 0 10px color-mix(in oklab, var(--secondary), transparent 75%) inset`;
-                    target.style.textShadow = `0 0 8px var(--text)`;
+                    target.style.textShadow = `0 0 8px var(--foreground)`;
                     target.style.color = 'var(--background)';
                   }}
                   onMouseLeave={(e) => {
@@ -147,7 +147,7 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
                     target.style.backgroundColor = "transparent";
                     target.style.boxShadow = "none";
                     target.style.textShadow = "none";
-                    target.style.color = 'var(--text)';
+                    target.style.color = 'var(--foreground)';
                   }}
                   onClick={() => window.open("https://github.com/Mindfreaken/EcosystemBetaTesters/releases/latest", "_blank")}
                 >
@@ -196,4 +196,6 @@ const HomeView = ({ onSkipSignIn }: HomeViewProps) => {
 };
 
 export default HomeView;
+
+
 

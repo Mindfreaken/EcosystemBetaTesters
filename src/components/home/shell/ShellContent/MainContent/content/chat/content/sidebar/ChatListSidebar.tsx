@@ -12,6 +12,7 @@ import Avatar from "@mui/material/Avatar";
 import NewChatModal from "./componants/NewChatModal";
 import Tooltip from "@mui/material/Tooltip";
 import InputBase from "@mui/material/InputBase";
+import { themeVar } from "@/theme/registry";
 
 export type ChatListItem = {
   _id: string;
@@ -82,10 +83,10 @@ export default function ChatListSidebar({
               aria-label="Go to chat home"
               onClick={onGoHome}
               sx={{
-                color: "var(--secondary)",
+                color: themeVar("secondary"),
                 '&:hover': {
                   backgroundColor:
-                    'color-mix(in oklab, var(--secondary), transparent 90%)',
+                    `color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)`,
                 },
               }}
             >
@@ -99,17 +100,17 @@ export default function ChatListSidebar({
                   height: 28,
                   width: 180,
                   maxWidth: 'min(240px, 100%)',
-                  border: '1px solid color-mix(in oklab, var(--borderLight), transparent 30%)',
+                  border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 30%)`,
                   borderRadius: 999,
-                  backgroundColor: 'color-mix(in oklab, var(--card), transparent 10%)',
+                  backgroundColor: `color-mix(in oklab, ${themeVar("card")}, transparent 10%)`,
                 }}
               >
-                <Search size={14} color="var(--textSecondary)" />
+                <Search size={14} style={{ color: themeVar("mutedForeground") }} />
                 <InputBase
                   placeholder="Search"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  sx={{ flex: 1, color: 'var(--text)', fontSize: 13, lineHeight: 1 }}
+                  sx={{ flex: 1, color: themeVar("foreground"), fontSize: 13, lineHeight: 1 }}
                   inputProps={{ 'aria-label': 'search chats' }}
                 />
               </Box>
@@ -117,10 +118,10 @@ export default function ChatListSidebar({
             <IconButton
               size="small"
               sx={{
-                color: "var(--secondary)",
+                color: themeVar("secondary"),
                 '&:hover': {
                   backgroundColor:
-                    'color-mix(in oklab, var(--secondary), transparent 90%)',
+                    `color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)`,
                 },
               }}
               onClick={handleOpenNewChat}
@@ -132,7 +133,7 @@ export default function ChatListSidebar({
       />
 
       {/* List */}
-      <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto", overflowX: "hidden", py: 0.5 }}>
+      <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto", overflowX: "hidden", py: 1, px: 1 }}>
         {!me || chats === undefined ? (
           <Typography variant="body2" sx={{ opacity: 0.7, px: 1.25, py: 1 }}>
             Loading chats…
@@ -159,29 +160,30 @@ export default function ChatListSidebar({
                 key={c._id}
                 sx={{
                   width: "100%",
-                  px: 1.25,
-                  py: 1,
+                  px: 1.5,
+                  py: 1.25,
+                  mb: 0.75,
                   display: "grid",
                   gridTemplateColumns: "auto 1fr auto",
                   alignItems: "center",
-                  gap: 1,
+                  gap: 1.25,
                   overflow: "hidden",
                   cursor: "pointer",
-                  color: "var(--textSecondary)",
-                  backgroundColor: "var(--backgroundLight)",
+                  color: themeVar("mutedForeground"),
+                  backgroundColor: themeVar("muted"),
                   borderRadius: 2,
                   position: "relative",
-                  border: "1px solid var(--borderLight)",
+                  border: `1px solid ${themeVar("border")}`,
                   borderLeft: "3px solid transparent",
                   transition:
                     "transform .2s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease",
                   "&:hover": {
                     transform: "translateX(2px)",
-                    backgroundColor: "color-mix(in oklab, var(--primary), transparent 92%)",
-                    boxShadow: "0 4px 8px var(--shadow)",
-                    color: "var(--text)",
-                    borderLeftColor: "var(--primary)",
-                    borderColor: "color-mix(in oklab, var(--primary), transparent 70%)",
+                    backgroundColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 92%)`,
+                    boxShadow: `0 4px 8px color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
+                    color: themeVar("foreground"),
+                    borderLeftColor: themeVar("primary"),
+                    borderColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 70%)`,
                   },
                   "&::before": {
                     content: "''",
@@ -203,20 +205,20 @@ export default function ChatListSidebar({
               >
                 {/* Avatar */}
                 {c.avatarUrl ? (
-                  <Avatar src={c.avatarUrl} alt={c.name} sx={{ width: 28, height: 28 }} />
+                  <Avatar src={c.avatarUrl} alt={c.name} sx={{ width: 34, height: 34 }} />
                 ) : (
                   <Box
                     sx={{
-                      width: 28,
-                      height: 28,
+                      width: 34,
+                      height: 34,
                       borderRadius: "50%",
                       background:
-                        "linear-gradient(135deg, color-mix(in oklab, var(--primary), transparent 70%), color-mix(in oklab, var(--textSecondary), transparent 80%))",
+                        `linear-gradient(135deg, color-mix(in oklab, ${themeVar("primary")}, transparent 70%), color-mix(in oklab, ${themeVar("mutedForeground")}, transparent 80%))`,
                     }}
                   />
                 )}
                 <Box sx={{ minWidth: 0 }}>
-                  <Typography variant="body2" noWrap sx={{ fontWeight: 500, color: 'var(--text)' }}>
+                  <Typography variant="body2" noWrap sx={{ fontWeight: 500, color: themeVar("foreground") }}>
                     {c.name}
                   </Typography>
                 </Box>
@@ -228,7 +230,7 @@ export default function ChatListSidebar({
                       px: 0.75,
                       py: 0.25,
                       borderRadius: 10,
-                      background: 'linear-gradient(45deg, color-mix(in oklab, var(--primary), transparent 20%), color-mix(in oklab, var(--secondary), transparent 20%))',
+                      background: `linear-gradient(45deg, color-mix(in oklab, ${themeVar("primary")}, transparent 20%), color-mix(in oklab, ${themeVar("secondary")}, transparent 20%))`,
                       color: '#fff',
                       letterSpacing: 0.4,
                       minWidth: 16,
@@ -254,6 +256,8 @@ export default function ChatListSidebar({
     </Box>
   );
 }
+
+
 
 
 

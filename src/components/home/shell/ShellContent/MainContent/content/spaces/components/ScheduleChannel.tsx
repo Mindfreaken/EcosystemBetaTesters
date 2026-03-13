@@ -44,10 +44,10 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
                     }}>
                         <Hash size={24} style={{ color: themeVar("primary") }} />
                     </Box>
-                    <Typography variant="h5" sx={{ fontWeight: 900, color: themeVar("textLight") }}>
+                    <Typography variant="h5" sx={{ fontWeight: 900, color: themeVar("foreground") }}>
                         #{channel.name} Schedule
                     </Typography>
-                    <Typography variant="body2" sx={{ color: themeVar("textSecondary"), display: "block", mt: 0.5 }}>
+                    <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), display: "block", mt: 0.5 }}>
                         {channel.description || "Upcoming events and scheduled activities."}
                     </Typography>
                 </Box>
@@ -56,7 +56,7 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
                         onClick={() => setViewMode("list")}
                         sx={{
                             bgcolor: viewMode === "list" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)` : "transparent",
-                            color: viewMode === "list" ? themeVar("primary") : themeVar("textSecondary"),
+                            color: viewMode === "list" ? themeVar("primary") : themeVar("mutedForeground"),
                             borderColor: themeVar("border"),
                             "&:hover": { borderColor: themeVar("border"), bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` }
                         }}
@@ -68,7 +68,7 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
                         onClick={() => setViewMode("calendar")}
                         sx={{
                             bgcolor: viewMode === "calendar" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)` : "transparent",
-                            color: viewMode === "calendar" ? themeVar("primary") : themeVar("textSecondary"),
+                            color: viewMode === "calendar" ? themeVar("primary") : themeVar("mutedForeground"),
                             borderColor: themeVar("border"),
                             "&:hover": { borderColor: themeVar("border"), bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` }
                         }}
@@ -80,11 +80,11 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
             </Box>
 
             {!eventsQuery ? (
-                <Typography sx={{ color: themeVar("textSecondary") }}>Loading events...</Typography>
+                <Typography sx={{ color: themeVar("mutedForeground") }}>Loading events...</Typography>
             ) : eventsQuery.length === 0 ? (
                 <Box sx={{ textAlign: "center", py: 8 }}>
                     <CalendarIcon size={48} style={{ color: "rgba(255,255,255,0.1)", marginBottom: 16 }} />
-                    <Typography variant="h6" sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}>No Events Scheduled</Typography>
+                    <Typography variant="h6" sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>No Events Scheduled</Typography>
                     <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.4)" }}>Check back later for upcoming activities.</Typography>
                 </Box>
             ) : (
@@ -106,7 +106,7 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
                                         sx={{
                                             p: 3,
                                             borderRadius: 3,
-                                            bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`,
+                                            bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`,
                                             border: `1px solid ${themeVar("border")}`,
                                             borderLeft: `4px solid ${isLive ? "#22c55e" : isPast ? "rgba(255,255,255,0.1)" : themeVar("primary")}`,
                                             transition: "all 0.2s ease",
@@ -117,7 +117,7 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
                                         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}>
                                             <Box>
                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 0.5 }}>
-                                                    <Typography variant="h6" sx={{ fontWeight: 800, color: themeVar("textLight") }}>{event.title}</Typography>
+                                                    <Typography variant="h6" sx={{ fontWeight: 800, color: themeVar("foreground") }}>{event.title}</Typography>
                                                     {isLive && (
                                                         <Box sx={{ px: 1, py: 0.25, borderRadius: 1, bgcolor: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)" }}>
                                                             <Typography variant="caption" sx={{ color: "#22c55e", fontWeight: 900, display: "flex", alignItems: "center", gap: 0.5 }}>
@@ -132,12 +132,12 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
                                                     )}
                                                 </Box>
                                                 {event.description && (
-                                                    <Typography variant="body2" sx={{ color: themeVar("textSecondary"), mt: 0.5 }}>{event.description}</Typography>
+                                                    <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), mt: 0.5 }}>{event.description}</Typography>
                                                 )}
                                             </Box>
                                             <Box sx={{ textAlign: "right", bgcolor: isPast ? "transparent" : `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)`, px: 2, py: 1, borderRadius: 2, display: "inline-block", border: isPast ? `1px solid ${themeVar("border")}` : "none" }}>
                                                 <Typography variant="caption" sx={{ color: isPast ? "rgba(255,255,255,0.4)" : themeVar("primary"), fontWeight: 900, display: "block", textTransform: "uppercase", letterSpacing: "0.05em" }}>{localStartDate}</Typography>
-                                                <Typography variant="body2" sx={{ color: isPast ? "rgba(255,255,255,0.4)" : themeVar("textLight"), fontWeight: 700, display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}>
+                                                <Typography variant="body2" sx={{ color: isPast ? "rgba(255,255,255,0.4)" : themeVar("foreground"), fontWeight: 700, display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}>
                                                     <Clock size={14} /> {localStartTime} - {localEndTime}
                                                 </Typography>
                                             </Box>
@@ -151,7 +151,7 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
                             display: "grid",
                             gridTemplateColumns: "repeat(7, 1fr)",
                             gap: 1,
-                            bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`,
+                            bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`,
                             border: `1px solid ${themeVar("border")}`,
                             borderRadius: 3,
                             p: 2,
@@ -159,7 +159,7 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
                             {/* Simple minimal calendar logic; can be expanded */}
                             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
                                 <Box key={day} sx={{ textAlign: "center", py: 1, borderBottom: `1px solid ${themeVar("border")}` }}>
-                                    <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("textSecondary"), textTransform: "uppercase" }}>{day}</Typography>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("mutedForeground"), textTransform: "uppercase" }}>{day}</Typography>
                                 </Box>
                             ))}
                             {/* Fill with events (simplified view) */}
@@ -170,17 +170,17 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
 
                                 return (
                                     <Box key={i} sx={{ minHeight: 100, p: 1, border: `1px solid rgba(255,255,255,0.05)`, borderRadius: 1.5, position: 'relative', overflow: 'hidden' }}>
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}>
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>
                                             {new Date(Date.now() + i * 86400000).getDate()}
                                         </Typography>
                                         <Stack spacing={0.5} sx={{ mt: 1 }}>
                                             {cellEvents.slice(0, 3).map(e => (
-                                                <Typography key={e._id} noWrap variant="caption" sx={{ display: "block", px: 1, py: 0.25, bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)`, color: themeVar("textLight"), borderRadius: 1, fontSize: "0.65rem", fontWeight: 700 }}>
+                                                <Typography key={e._id} noWrap variant="caption" sx={{ display: "block", px: 1, py: 0.25, bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)`, color: themeVar("foreground"), borderRadius: 1, fontSize: "0.65rem", fontWeight: 700 }}>
                                                     {e.title}
                                                 </Typography>
                                             ))}
                                             {cellEvents.length > 3 && (
-                                                <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontSize: "0.6rem", pl: 0.5 }}>+{cellEvents.length - 3} more</Typography>
+                                                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontSize: "0.6rem", pl: 0.5 }}>+{cellEvents.length - 3} more</Typography>
                                             )}
                                         </Stack>
                                     </Box>
@@ -193,3 +193,5 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
         </Box>
     );
 }
+
+

@@ -134,3 +134,56 @@ export const getSpaceCustomEmojis = query({
     },
 });
 
+/**
+ * Get all custom emojis for all spaces the current user is a member of.
+ */
+export const getUserAllCustomEmojis = query({
+    args: {},
+    handler: async (ctx) => {
+        const user = await ensureUserActive(ctx).catch(() => null);
+        
+        // 1. Get all public spaces
+        const publicSpaces = await ctx.db
+            .query("spaces")
+            .filter((q) => q.eq(q.field("isPublic"), true))
+            .collect();
+
+        // 2. Get spaces user is a member of
+        const userSpaces: any[] = [];
+        if (user) {
+            const memberships = await ctx.db
+                .query("spaceMembers")
+                .withIndex("by_user", (q) => q.eq("userId", user._id))
+                .collect();
+            for (const m of memberships) {
+                const s = await ctx.db.get(m.spaceId);
+                if (s) userSpaces.push(s);
+            }
+        }
+
+        // Combine and de-duplicate spaces
+        const spaceMap = new Map<string, any>();
+        publicSpaces.forEach(s => spaceMap.set(s._id.toString(), s));
+        userSpaces.forEach(s => spaceMap.set(s._id.toString(), s));
+
+        const results: any[] = [];
+        for (const space of spaceMap.values()) {
+            const emojis = await ctx.db
+                .query("spaceCustomEmojis")
+                .withIndex("by_space", (q) => q.eq("spaceId", space._id))
+                .collect();
+
+            const emojisWithUrl = await Promise.all(
+                emojis.map(async (e) => ({
+                    ...e,
+                    url: await ctx.storage.getUrl(e.storageId),
+                    spaceName: space.name,
+                }))
+            );
+            results.push(...emojisWithUrl);
+        }
+
+        return results;
+    },
+});
+

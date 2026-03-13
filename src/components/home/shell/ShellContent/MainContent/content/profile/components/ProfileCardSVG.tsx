@@ -76,13 +76,13 @@ export default function ProfileCardSVG({
         .chip { fill: var(--accent); fill-opacity: .12; stroke: var(--accent); stroke-width: 1; }
         .chip-back { fill: rgba(0,0,0,.55); stroke: var(--accent); stroke-width: 1.5; }
         .chip-neon { fill: none; stroke: var(--glow); stroke-width: 6; opacity: .28; filter: url(#glow); }
-        .chip-text { font-size: 12px; font-weight: 700; fill: var(--text); letter-spacing: .12em; text-transform: uppercase; }
+        .chip-text { font-size: 12px; font-weight: 700; fill: var(--foreground); letter-spacing: .12em; text-transform: uppercase; }
 
-        .name { font-weight: 800; font-size: 26px; fill: var(--text); }
+        .name { font-weight: 800; font-size: 26px; fill: var(--foreground); }
         .title { font-weight: 700; font-size: 14px; fill: var(--muted); }
 
         .stat-label { font-size: 12px; fill: var(--muted); }
-        .stat-value { font-size: 16px; font-weight: 800; fill: var(--text); }
+        .stat-value { font-size: 16px; font-weight: 800; fill: var(--foreground); }
 
         .footer { font-size: 12px; fill: var(--muted); }
         .cover-tint { fill: var(--accent); opacity: .14; }
@@ -187,3 +187,4 @@ export default function ProfileCardSVG({
     </svg>
   );
 }
+

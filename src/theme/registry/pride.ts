@@ -5,145 +5,86 @@ const prideDark: Theme = {
   id: 'pride-dark',
   name: 'Pride Dark',
   colors: {
-    primary: '#ff218c',
-    primaryDark: '#d10063',
-    primaryLight: '#ff4ba8',
-    primaryHover: '#ff218c80',
-    primaryActive: '#a8004e',
-
-    secondary: '#ffb400',
-    secondaryDark: '#cc9000',
-    secondaryLight: '#ffc740',
-    secondaryHover: '#ffb40080',
-    secondaryActive: '#a87800',
-
     background: '#0f172a',
-    backgroundAlt: '#1e293b',
-    backgroundLight: '#273444',
-    backgroundDark: '#0a0f1a',
-
+    foreground: '#f1f5f9',
+    primary: '#ff218c',
+    primaryForeground: '#ffffff',
+    secondary: '#ffb400',
+    secondaryForeground: '#0f172a',
+    accent: '#1e293b',
+    accentForeground: '#f1f5f9',
     card: '#1e293b',
-    cardHover: '#273444',
-    cardActive: '#334155',
-
+    cardForeground: '#f1f5f9',
+    popover: '#1e293b',
+    popoverForeground: '#f1f5f9',
+    muted: '#273444',
+    mutedForeground: '#9ca3af',
+    destructive: '#ef4444',
+    destructiveForeground: '#ffffff',
     border: '#334155',
-    borderLight: '#475569',
-    borderDark: '#1e293b',
-
-    text: '#f1f5f9',
-    textPrimary: '#f1f5f9',
-    textLight: '#ffffff',
-    textDark: '#d1d5db',
-    textMuted: '#9ca3af',
-    textSecondary: '#cbd5e1',
-
-    success: '#10b981',
-    successDark: '#059669',
-    successLight: '#34d399',
-
-    danger: '#ef4444',
-    dangerDark: '#dc2626',
-    dangerLight: '#f87171',
-
-    warning: '#f59e0b',
-    warningDark: '#d97706',
-    warningLight: '#fbbf24',
-
-    info: '#3b82f6',
-    infoDark: '#2563eb',
-    infoLight: '#60a5fa',
-
-    link: '#2563eb',
-    linkHover: '#1d4ed8',
-    linkActive: '#1e40af',
-
-    buttonPrimary: '#ff218c',
-    buttonPrimaryHover: '#d10063',
-    buttonPrimaryActive: '#a8004e',
-
-    buttonSecondary: '#7c3aed',
-    buttonSecondaryHover: '#6d28d9',
-    buttonSecondaryActive: '#5b21b6',
-
-    shadow: '#00000080',
-    highlight: '#ffffff',
-
-    overlay: '#0f172a99',
-    disabled: '#9ca3af'
+    input: '#1e293b',
+    ring: '#ff218c',
+    chart1: '#ff218c',
+    chart2: '#ffb400',
+    chart3: '#10b981',
+    chart4: '#f59e0b',
+    chart5: '#7c3aed',
+    sidebar: '#0a0f1a',
+    sidebarForeground: '#f1f5f9',
+    sidebarPrimary: '#ff218c',
+    sidebarPrimaryForeground: '#ffffff',
+    sidebarAccent: '#1e293b',
+    sidebarAccentForeground: '#f1f5f9',
+    sidebarBorder: '#334155',
+    sidebarRing: '#ff218c',
+    fontSans: '"Geist Sans", sans-serif',
+    fontSerif: 'Georgia, serif',
+    fontMono: '"Geist Mono", monospace',
   }
 };
 
-// Light version of the Pride theme
 const prideLight: Theme = {
   id: 'pride-light',
   name: 'Pride Light',
   colors: {
+    background: '#fff0f3', // Very soft pride pink
+    foreground: '#0f172a',
     primary: '#ff218c',
-    primaryDark: '#d10063',
-    primaryLight: '#ff4ba8',
-    primaryHover: '#ff218c80',
-    primaryActive: '#a8004e',
-
+    primaryForeground: '#ffffff',
     secondary: '#ffb400',
-    secondaryDark: '#cc9000',
-    secondaryLight: '#ffc740',
-    secondaryHover: '#ffb40080',
-    secondaryActive: '#a87800',
-
-    background: '#ffffff',
-    backgroundAlt: '#f8fafc',
-    backgroundLight: '#ffffff',
-    backgroundDark: '#f1f5f9',
-
-    card: '#ffffff',
-    cardHover: '#f9fafb',
-    cardActive: '#f3f4f6',
-
-    border: '#e2e8f0',
-    borderLight: '#f1f5f9',
-    borderDark: '#cbd5e1',
-
-    text: '#0f172a',
-    textPrimary: '#0f172a',
-    textLight: '#334155',
-    textDark: '#020617',
-    textMuted: '#64748b',
-    textSecondary: '#475569',
-
-    success: '#10b981',
-    successDark: '#059669',
-    successLight: '#34d399',
-
-    danger: '#ef4444',
-    dangerDark: '#dc2626',
-    dangerLight: '#f87171',
-
-    warning: '#f59e0b',
-    warningDark: '#d97706',
-    warningLight: '#fbbf24',
-
-    info: '#3b82f6',
-    infoDark: '#2563eb',
-    infoLight: '#60a5fa',
-
-    link: '#2563eb',
-    linkHover: '#1d4ed8',
-    linkActive: '#1e40af',
-
-    buttonPrimary: '#ff218c',
-    buttonPrimaryHover: '#d10063',
-    buttonPrimaryActive: '#a8004e',
-
-    buttonSecondary: '#7c3aed',
-    buttonSecondaryHover: '#6d28d9',
-    buttonSecondaryActive: '#5b21b6',
-
-    shadow: '#0000001a',
-    highlight: '#ffffff',
-
-    overlay: '#0f172a99',
-    disabled: '#9ca3af'
+    secondaryForeground: '#ffffff',
+    accent: '#e6fffa', // Soft teal accent
+    accentForeground: '#0f172a',
+    card: '#fffcf0', // Creamy yellow card
+    cardForeground: '#0f172a',
+    popover: '#ffffff',
+    popoverForeground: '#0f172a',
+    muted: '#f0eaff', // Soft lavender muted
+    mutedForeground: '#52527a',
+    destructive: '#ef4444',
+    destructiveForeground: '#ffffff',
+    border: '#f5e6ff', // Lavender border
+    input: '#ffffff',
+    ring: '#ff218c',
+    chart1: '#ff218c',
+    chart2: '#ffb400',
+    chart3: '#10b981',
+    chart4: '#f59e0b',
+    chart5: '#7c3aed',
+    sidebar: '#eef6ff', // Soft pride blue sidebar
+    sidebarForeground: '#0f172a',
+    sidebarPrimary: '#ff218c',
+    sidebarPrimaryForeground: '#ffffff',
+    sidebarAccent: '#f0eaff',
+    sidebarAccentForeground: '#0f172a',
+    sidebarBorder: '#d0e0ff',
+    sidebarRing: '#ff218c',
+    fontSans: '"Geist Sans", sans-serif',
+    fontSerif: 'Georgia, serif',
+    fontMono: '"Geist Mono", monospace',
   }
 };
 
 export { prideDark, prideLight };
+
+

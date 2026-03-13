@@ -34,7 +34,7 @@ const WindowTitleBar = () => {
           alt="Logo"
           className="w-4 h-4"
         />
-        <span className="text-xs font-medium opacity-80" style={{ color: "var(--text)" }}>
+        <span className="text-xs font-medium opacity-80" style={{ color: "var(--foreground)" }}>
           EcoSystem Beta
         </span>
       </div>
@@ -45,21 +45,21 @@ const WindowTitleBar = () => {
           className="px-4 h-full transition-colors hover:bg-white/10"
           title="Minimize"
         >
-          <Minus size={14} style={{ color: "var(--text)" }} />
+          <Minus size={14} style={{ color: "var(--foreground)" }} />
         </button>
         <button
           onClick={() => appWindow?.toggleMaximize()}
           className="px-4 h-full transition-colors hover:bg-white/10"
           title="Maximize"
         >
-          <Square size={12} style={{ color: "var(--text)" }} />
+          <Square size={12} style={{ color: "var(--foreground)" }} />
         </button>
         <button
           onClick={() => appWindow?.close()}
           className="px-4 h-full transition-colors hover:bg-red-500/80 group"
           title="Close"
         >
-          <X size={14} className="group-hover:text-white" style={{ color: "var(--text)" }} />
+          <X size={14} className="group-hover:text-white" style={{ color: "var(--foreground)" }} />
         </button>
       </div>
     </div>
@@ -67,3 +67,5 @@ const WindowTitleBar = () => {
 };
 
 export default WindowTitleBar;
+
+

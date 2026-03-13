@@ -134,8 +134,8 @@ export const setSuspensionStatus = mutation({
             .withIndex("by_clerk_id", (q) => q.eq("clerkUserId", identity.subject))
             .first();
 
-        if (!actor || !actor.isAdmin) {
-            throw new Error("Permission denied: Admin only");
+        if (!actor || !actor.overseeradmin) {
+            throw new Error("Permission denied: Overseer Admin only");
         }
 
         const targetUser = await ctx.db.get(args.targetUserId);

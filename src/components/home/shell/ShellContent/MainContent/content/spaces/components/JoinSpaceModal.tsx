@@ -48,9 +48,9 @@ export default function JoinSpaceModal({ open, onClose, onSuccess }: JoinSpaceMo
                 left: "50%",
                 transform: "translate(-50%, -50%)",
                 width: 400,
-                bgcolor: themeVar("backgroundAlt"),
+                bgcolor: themeVar("card"),
                 borderRadius: 4,
-                boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+                boxShadow: `0 20px 60px color-mix(in oklab, ${themeVar("foreground")}, transparent 85%)`,
                 p: 4,
                 border: `1px solid ${themeVar("border")}`,
                 outline: "none"
@@ -60,12 +60,12 @@ export default function JoinSpaceModal({ open, onClose, onSuccess }: JoinSpaceMo
                         <Box sx={{ p: 1, borderRadius: 1.5, bgcolor: `color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)`, color: themeVar("secondary") }}>
                             <Zap size={20} />
                         </Box>
-                        <Typography variant="h5" sx={{ fontWeight: 900, color: themeVar("textLight") }}>Join a Space</Typography>
+                        <Typography variant="h5" sx={{ fontWeight: 900, color: themeVar("foreground") }}>Join a Space</Typography>
                     </Box>
-                    <IconButton onClick={onClose} sx={{ color: themeVar("textSecondary") }}><X size={20} /></IconButton>
+                    <IconButton onClick={onClose} sx={{ color: themeVar("mutedForeground") }}><X size={20} /></IconButton>
                 </Box>
 
-                <Typography sx={{ color: themeVar("textSecondary"), mb: 4, fontSize: "0.95rem" }}>
+                <Typography sx={{ color: themeVar("mutedForeground"), mb: 4, fontSize: "0.95rem" }}>
                     Enter the invite code you received to instantly join a private space.
                 </Typography>
 
@@ -79,10 +79,10 @@ export default function JoinSpaceModal({ open, onClose, onSuccess }: JoinSpaceMo
                     autoFocus
                     InputProps={{
                         sx: {
-                            bgcolor: "rgba(0,0,0,0.2)",
+                            bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
                             fontWeight: 800,
                             letterSpacing: "0.1em",
-                            color: themeVar("textLight"),
+                            color: themeVar("foreground"),
                             "& .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("border") },
                             "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") }
                         }
@@ -112,3 +112,5 @@ export default function JoinSpaceModal({ open, onClose, onSuccess }: JoinSpaceMo
         </Modal>
     );
 }
+
+

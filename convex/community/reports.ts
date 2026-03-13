@@ -23,9 +23,26 @@ export const submitUserReport = mutation({
       throw new Error("Target user not found");
     }
 
+    // Check for existing pending report
+    const existingReport = await ctx.db
+      .query("chatReports")
+      .withIndex("by_target_user", (q) => q.eq("targetUserId", args.targetUserId))
+      .filter((q) => q.eq(q.field("status"), "pending"))
+      .first();
+
+    if (existingReport) {
+      if (existingReport.reporterId !== args.reporterId && !(existingReport.reporterIds || []).includes(args.reporterId)) {
+        await ctx.db.patch(existingReport._id, {
+          reporterIds: [...(existingReport.reporterIds || []), args.reporterId],
+        });
+      }
+      return existingReport._id;
+    }
+
     // Create the report
     const reportId = await ctx.db.insert("chatReports", {
       reporterId: args.reporterId,
+      reporterIds: [],
       targetUserId: args.targetUserId,
       reason: args.reason,
       content: args.content,
@@ -62,9 +79,26 @@ export const submitFileReport = mutation({
     // Get the file owner
     const targetUserId = file.uploadedBy;
 
+    // Check for existing pending report
+    const existingReport = await ctx.db
+      .query("chatReports")
+      .withIndex("by_file", (q) => q.eq("fileId", args.fileId))
+      .filter((q) => q.eq(q.field("status"), "pending"))
+      .first();
+
+    if (existingReport) {
+      if (existingReport.reporterId !== args.reporterId && !(existingReport.reporterIds || []).includes(args.reporterId)) {
+        await ctx.db.patch(existingReport._id, {
+          reporterIds: [...(existingReport.reporterIds || []), args.reporterId],
+        });
+      }
+      return existingReport._id;
+    }
+
     // Create the report
     const reportId = await ctx.db.insert("chatReports", {
       reporterId: args.reporterId,
+      reporterIds: [],
       fileId: args.fileId,
       targetUserId,
       reason: args.reason,
@@ -102,9 +136,26 @@ export const submitMessageReport = mutation({
     // Get the message sender
     const targetUserId = message.senderId;
 
+    // Check for existing pending report
+    const existingReport = await ctx.db
+      .query("chatReports")
+      .withIndex("by_message", (q) => q.eq("messageId", args.messageId))
+      .filter((q) => q.eq(q.field("status"), "pending"))
+      .first();
+
+    if (existingReport) {
+      if (existingReport.reporterId !== args.reporterId && !(existingReport.reporterIds || []).includes(args.reporterId)) {
+        await ctx.db.patch(existingReport._id, {
+          reporterIds: [...(existingReport.reporterIds || []), args.reporterId],
+        });
+      }
+      return existingReport._id;
+    }
+
     // Create the report
     const reportId = await ctx.db.insert("chatReports", {
       reporterId: args.reporterId,
+      reporterIds: [],
       messageId: args.messageId,
       targetUserId,
       reason: args.reason,

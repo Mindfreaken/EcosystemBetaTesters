@@ -33,7 +33,7 @@ async function isMaintainer(ctx: any): Promise<boolean> {
     .withIndex("by_clerk_id", (q: any) => q.eq("clerkUserId", identity.subject))
     .first();
   if (!user) return false;
-  if (user.isAdmin) return true;
+  if (user.overseeradmin) return true;
   if ((user as any).ecosystemdevs === true) return true;
   if ((user as any).role && (((user as any).role === "admin") || ((user as any).role === "staff"))) return true;
   return false;

@@ -20,7 +20,7 @@ export default function SpaceMembersSidebar({ spaceId }: SpaceMembersSidebarProp
     if (members === undefined) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
-                <CircularProgress size={24} sx={{ color: "var(--textSecondary)" }} />
+                <CircularProgress size={24} sx={{ color: "var(--muted-foreground)" }} />
             </Box>
         );
     }
@@ -43,7 +43,7 @@ export default function SpaceMembersSidebar({ spaceId }: SpaceMembersSidebarProp
                         px: 2,
                         mb: 1,
                         display: "block",
-                        color: "var(--textSecondary)",
+                        color: "var(--muted-foreground)",
                         fontWeight: 800,
                         fontSize: 11,
                         letterSpacing: "0.05em",
@@ -66,14 +66,14 @@ export default function SpaceMembersSidebar({ spaceId }: SpaceMembersSidebarProp
                             cursor: "pointer",
                             position: "relative",
                             overflow: "hidden",
-                            color: "var(--textSecondary)",
+                            color: "var(--muted-foreground)",
                             borderLeft: "3px solid transparent",
                             transition: "all 0.2s ease",
                             backgroundColor: "color-mix(in oklab, var(--card), transparent 92%)",
                             "&:hover": {
                                 transform: "translateX(4px) scale(1.01)",
                                 backgroundColor: "color-mix(in oklab, var(--primary), transparent 92%)",
-                                color: "var(--text)",
+                                color: "var(--foreground)",
                                 borderLeftColor: "var(--primary)",
                                 boxShadow: "0 4px 8px var(--shadow)",
                             },
@@ -98,7 +98,7 @@ export default function SpaceMembersSidebar({ spaceId }: SpaceMembersSidebarProp
                             sx={{
                                 width: 32,
                                 height: 32,
-                                border: `1px solid var(--card-border)`,
+                                border: `1px solid var(--border)`,
                             }}
                         />
                         <Typography
@@ -131,3 +131,5 @@ export default function SpaceMembersSidebar({ spaceId }: SpaceMembersSidebarProp
         </Box>
     );
 }
+
+

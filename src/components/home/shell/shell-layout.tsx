@@ -96,8 +96,9 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            backgroundColor: "var(--card)",
-            borderColor: "var(--card-border)",
+            backgroundColor: "var(--sidebar)",
+            borderColor: "var(--sidebar-border)",
+            color: "var(--sidebar-foreground)",
           }}
         >
           <Header
@@ -116,8 +117,8 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
               width: leftWidth,
               transition: "width 300ms ease-in-out",
               overflow: "hidden",
-              backgroundColor: "var(--card)",
-              borderRight: "1px solid var(--card-border)",
+              backgroundColor: "var(--sidebar)",
+              borderRight: "1px solid var(--sidebar-border)",
               display: "flex",
               flexDirection: "column"
             }}
@@ -179,13 +180,14 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
         <Box
           component="footer"
           sx={{
-            backgroundColor: "var(--card)",
-            borderTop: "1px solid var(--card-border)",
+            backgroundColor: "var(--sidebar)",
+            borderTop: "1px solid var(--sidebar-border)",
             px: { xs: 1.5, sm: 2 },
             py: 1.25,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            color: "var(--sidebar-foreground)",
           }}
         >
           <Footer />
@@ -194,3 +196,4 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
     </ShellViewProvider>
   );
 }
+

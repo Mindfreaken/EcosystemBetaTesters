@@ -120,7 +120,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
             <Box
                 sx={{
                     width: 260,
-                    borderRight: `1px solid var(--card-border)`,
+                    borderRight: `1px solid var(--border)`,
                     bgcolor: `var(--card)`,
                     display: "flex",
                     flexDirection: "column",
@@ -133,7 +133,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                 <Box sx={{ flex: 1, overflowY: "auto", p: 1 }}>
                     {categories === undefined || channels === undefined ? (
                         <Box sx={{ px: 2, py: 4, display: "flex", justifyContent: "center" }}>
-                            <CircularProgress size={20} sx={{ color: themeVar("textSecondary") }} />
+                            <CircularProgress size={20} sx={{ color: themeVar("mutedForeground") }} />
                         </Box>
                     ) : (
                         <>
@@ -177,7 +177,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                                     key={p.userId}
                                                     src={p.user?.avatarUrl}
                                                     alt={p.user?.displayName || "User"}
-                                                    sx={{ width: 24, height: 24, border: `2px solid ${themeVar("backgroundAlt")}` }}
+                                                    sx={{ width: 24, height: 24, border: `2px solid ${themeVar("muted")}` }}
                                                 />
                                             ))}
                                         </Box>
@@ -200,8 +200,8 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                                 px: 1,
                                                 mb: 0.5,
                                                 cursor: "pointer",
-                                                color: themeVar("textSecondary"),
-                                                "&:hover": { color: themeVar("textLight") }
+                                                color: themeVar("mutedForeground"),
+                                                "&:hover": { color: themeVar("foreground") }
                                             }}
                                         >
                                             {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -227,7 +227,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                                                 key={p.userId}
                                                                 src={p.user?.avatarUrl}
                                                                 alt={p.user?.displayName || "User"}
-                                                                sx={{ width: 24, height: 24, border: `2px solid ${themeVar("backgroundAlt")}` }}
+                                                                sx={{ width: 24, height: 24, border: `2px solid ${themeVar("muted")}` }}
                                                             />
                                                         ))}
                                                     </Box>
@@ -239,7 +239,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                             })}
 
                             {channels.length === 0 && categories.length === 0 && (
-                                <Typography variant="caption" sx={{ px: 2, color: themeVar("textSecondary"), fontStyle: "italic", display: "block", mt: 2 }}>No channels found</Typography>
+                                <Typography variant="caption" sx={{ px: 2, color: themeVar("mutedForeground"), fontStyle: "italic", display: "block", mt: 2 }}>No channels found</Typography>
                             )}
                         </>
                     )}
@@ -274,13 +274,13 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                             ) : currentView === "admin" ? (
                                 <Shield size={20} style={{ color: themeVar("primary") }} />
                             ) : currentView === "mod" ? (
-                                <Shield size={20} style={{ color: themeVar("warning") }} />
+                                <Shield size={20} style={{ color: themeVar("chart4") }} />
                             ) : (
-                                <Box sx={{ display: "flex", alignItems: "center", color: (currentView === "chat" || currentView === "main") ? themeVar("primary") : themeVar("textSecondary") }}>
+                                <Box sx={{ display: "flex", alignItems: "center", color: (currentView === "chat" || currentView === "main") ? themeVar("primary") : themeVar("mutedForeground") }}>
                                     {activeChannel?.type === "voice" && currentView === "chat" ? <Volume2 size={20} /> : <MessageSquare size={20} />}
                                 </Box>
                             )}
-                            <Typography sx={{ fontWeight: 700, color: (currentView === "chat" || currentView === "main" || currentView === "owner" || currentView === "admin" || currentView === "mod" || currentView === "members") ? themeVar("textLight") : themeVar("textSecondary") }}>
+                            <Typography sx={{ fontWeight: 700, color: (currentView === "chat" || currentView === "main" || currentView === "owner" || currentView === "admin" || currentView === "mod" || currentView === "members") ? themeVar("foreground") : themeVar("mutedForeground") }}>
                                 {currentView === "owner" ? "Owner Portal" :
                                     currentView === "admin" ? "Admin Portal" :
                                         currentView === "mod" ? "Moderator Portal" :
@@ -297,11 +297,11 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                         startIcon={<Crown size={14} />}
                                         onClick={() => setCurrentView("owner")}
                                         sx={{
-                                            color: currentView === "owner" ? themeVar("primary") : themeVar("textSecondary"),
+                                            color: currentView === "owner" ? themeVar("primary") : themeVar("mutedForeground"),
                                             fontWeight: 700,
                                             fontSize: "0.75rem",
                                             textTransform: "none",
-                                            "&:hover": { color: themeVar("textLight") }
+                                            "&:hover": { color: themeVar("foreground") }
                                         }}
                                     >
                                         Owner
@@ -313,11 +313,11 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                         startIcon={<Shield size={14} />}
                                         onClick={() => setCurrentView("admin")}
                                         sx={{
-                                            color: currentView === "admin" ? themeVar("primary") : themeVar("textSecondary"),
+                                            color: currentView === "admin" ? themeVar("primary") : themeVar("mutedForeground"),
                                             fontWeight: 700,
                                             fontSize: "0.75rem",
                                             textTransform: "none",
-                                            "&:hover": { color: themeVar("textLight") }
+                                            "&:hover": { color: themeVar("foreground") }
                                         }}
                                     >
                                         Admin
@@ -329,11 +329,11 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                         startIcon={<Shield size={14} />}
                                         onClick={() => setCurrentView("mod")}
                                         sx={{
-                                            color: currentView === "mod" ? themeVar("warning") : themeVar("textSecondary"),
+                                            color: currentView === "mod" ? themeVar("chart4") : themeVar("mutedForeground"),
                                             fontWeight: 700,
                                             fontSize: "0.75rem",
                                             textTransform: "none",
-                                            "&:hover": { color: themeVar("textLight") }
+                                            "&:hover": { color: themeVar("foreground") }
                                         }}
                                     >
                                         Mod
@@ -344,11 +344,11 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                     startIcon={<Users size={14} />}
                                     onClick={() => setCurrentView("members")}
                                     sx={{
-                                        color: currentView === "members" ? themeVar("primary") : themeVar("textSecondary"),
+                                        color: currentView === "members" ? themeVar("primary") : themeVar("mutedForeground"),
                                         fontWeight: 700,
                                         fontSize: "0.75rem",
                                         textTransform: "none",
-                                        "&:hover": { color: themeVar("textLight") }
+                                        "&:hover": { color: themeVar("foreground") }
                                     }}
                                 >
                                     Members
@@ -360,10 +360,10 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                         size="small"
                         onClick={() => setShowMembersSidebar(v => !v)}
                         sx={{
-                            color: "var(--textSecondary)",
+                            color: "var(--muted-foreground)",
                             "&:hover": {
                                 backgroundColor: "color-mix(in oklab, var(--primary), transparent 88%)",
-                                color: "var(--textPrimary)",
+                                color: "var(--foreground)",
                             },
                         }}
                     >
@@ -516,7 +516,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
             <Box
                 sx={{
                     width: showMembersSidebar ? 240 : 0,
-                    borderLeft: showMembersSidebar ? `1px solid var(--card-border)` : "none",
+                    borderLeft: showMembersSidebar ? `1px solid var(--border)` : "none",
                     bgcolor: `var(--card)`,
                     display: "flex",
                     flexDirection: "column",
@@ -548,7 +548,7 @@ function ChannelItem({ icon, label, active = false, unread = false, onClick, ind
                 cursor: "pointer",
                 position: "relative",
                 overflow: "hidden",
-                color: active ? "var(--textLight)" : (unread ? "var(--textLight)" : "var(--textSecondary)"),
+                color: active ? "var(--textLight)" : (unread ? "var(--textLight)" : "var(--muted-foreground)"),
                 backgroundColor: active
                     ? "color-mix(in oklab, var(--primary), transparent 92%)"
                     : "color-mix(in oklab, var(--card), transparent 92%)",
@@ -598,3 +598,5 @@ function ChannelItem({ icon, label, active = false, unread = false, onClick, ind
         </Box>
     );
 }
+
+

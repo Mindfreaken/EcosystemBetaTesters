@@ -128,7 +128,7 @@ const FeatureGrid: React.FC = () => {
                 className="mb-3 sm:mb-5 p-3 sm:p-4 rounded-full border-2 icon-glow"
                 style={{
                   borderColor: 'var(--primary)',
-                  backgroundColor: `color-mix(in oklab, var(--backgroundDark, #000), transparent 20%)`,
+                  backgroundColor: `color-mix(in oklab, var(--background), transparent 20%)`,
                   boxShadow: `0 0 15px color-mix(in oklab, var(--primary), transparent 20%)`,
                 }}
               >
@@ -138,14 +138,14 @@ const FeatureGrid: React.FC = () => {
               <h3
                 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-glow"
                 style={{
-                  color: 'var(--text)',
+                  color: 'var(--foreground)',
                   textShadow: `0 0 5px color-mix(in oklab, var(--primary), transparent 20%)`,
                 }}
               >
                 {feature.title}
               </h3>
 
-              <p className="text-sm sm:text-base" style={{ color: 'var(--textSecondary)' }}>
+              <p className="text-sm sm:text-base" style={{ color: 'var(--muted-foreground)' }}>
                 {feature.description}
               </p>
             </div>
@@ -157,3 +157,5 @@ const FeatureGrid: React.FC = () => {
 };
 
 export default FeatureGrid;
+
+

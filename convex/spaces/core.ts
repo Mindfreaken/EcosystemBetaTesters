@@ -67,6 +67,13 @@ export const createSpace = mutation({
 
         if (args.name.length > 32) throw new Error("Space name cannot exceed 32 characters.");
         if (args.description && args.description.length > 150) throw new Error("Description cannot exceed 150 characters.");
+        
+        // Check for unique name
+        const existingWithName = await ctx.db
+            .query("spaces")
+            .withIndex("by_name", (q) => q.eq("name", args.name))
+            .unique();
+        if (existingWithName) throw new Error(`A space with the name "${args.name}" already exists.`);
 
         // Enforce limit: max 5 owned spaces
         const ownedCount = await ctx.db
@@ -142,6 +149,18 @@ export const updateSpaceMetadata = mutation({
         }
 
         if (args.name && args.name.length > 32) throw new Error("Space name cannot exceed 32 characters.");
+
+        if (args.name) {
+            const nameToUpdate = args.name;
+            const existingWithName = await ctx.db
+                .query("spaces")
+                .withIndex("by_name", (q) => q.eq("name", nameToUpdate))
+                .unique();
+            if (existingWithName && existingWithName._id !== args.spaceId) {
+                throw new Error(`A space with the name "${nameToUpdate}" already exists.`);
+            }
+        }
+
         if (args.description && args.description.length > 150) throw new Error("Description cannot exceed 150 characters.");
 
         const updates: any = { updatedAt: Date.now() };

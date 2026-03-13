@@ -142,3 +142,5 @@ export default function DecagonSpiral({ displayNumber = 1234, size = 120 }: Deca
     </div>
   )
 }
+
+

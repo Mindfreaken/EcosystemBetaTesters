@@ -63,7 +63,7 @@ export default function HeaderIdentity({ region, queue, puuid }: HeaderIdentityP
       }}
     >
       {!profile ? (
-        <Typography variant="body2" sx={{ color: "var(--textSecondary)", gridColumn: '1 / -1' }}>No leaderboard data.</Typography>
+        <Typography variant="body2" sx={{ color: "var(--muted-foreground)", gridColumn: '1 / -1' }}>No leaderboard data.</Typography>
       ) : (
         <>
           <Box
@@ -80,13 +80,13 @@ export default function HeaderIdentity({ region, queue, puuid }: HeaderIdentityP
                 {profile.name}
               </Box>
             </Typography>
-            <Typography variant="caption" sx={{ color: "var(--textSecondary)", display: 'flex', alignItems: 'center', gap: 0.75 }}>
+            <Typography variant="caption" sx={{ color: "var(--muted-foreground)", display: 'flex', alignItems: 'center', gap: 0.75 }}>
               <Box component="span">{profile.region}</Box>
               {profile.current ? (
                 <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
                   <Box component="span" sx={{ opacity: 0.6 }}>•</Box>
                   <Box component="img" src={`/league/emblems/emblem_${profile.current.tier}.svg`} alt="current rank" sx={{ width: 16, height: 16 }} />
-                  <Box component="span" sx={{ fontWeight: 800, color: 'var(--textPrimary)' }}>
+                  <Box component="span" sx={{ fontWeight: 800, color: 'var(--foreground)' }}>
                     {profile.current.tier}
                   </Box>
                 </Box>
@@ -104,3 +104,5 @@ export default function HeaderIdentity({ region, queue, puuid }: HeaderIdentityP
     </Paper>
   );
 }
+
+

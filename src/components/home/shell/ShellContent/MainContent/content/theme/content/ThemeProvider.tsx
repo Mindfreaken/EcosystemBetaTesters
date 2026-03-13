@@ -75,3 +75,5 @@ export function useThemeManager() {
   if (!ctx) throw new Error("useThemeManager must be used within ThemeProvider");
   return ctx;
 }
+
+

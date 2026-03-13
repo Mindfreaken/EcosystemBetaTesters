@@ -3,78 +3,89 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  /* App theme tokens */
-  --text: #111213;
-  --textPrimary: #111213;
-  --textSecondary: #525a64;
-  --primary: #6c47ff;
-  --secondary: #2da1ff;
-  --card: #ffffff;
-  --card-border: rgba(0, 0, 0, 0.08);
-  --input: rgba(0, 0, 0, 0.04);
-  --input-border: rgba(0, 0, 0, 0.12);
-  --backgroundLight: #f7f7f8;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
-    --text: #eaeaea;
-    --textPrimary: #eaeaea;
-    --textSecondary: #9ca3af;
-    --primary: #6c47ff;
-    --secondary: #2da1ff;
-    --card: rgba(24, 24, 27, 0.9);
-    --card-border: rgba(255, 255, 255, 0.08);
-    --input: rgba(255, 255, 255, 0.06);
-    --input-border: rgba(255, 255, 255, 0.14);
-    --backgroundLight: #0f0f0f;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
 
 /* ===== Clerk OTP (verification code) input squares ===== */
 /* Scope to Clerk components only and adjust just the input boxes */
 .cl-card .cl-otpCodeFieldInput,
 .cl-otpCodeFieldInput {
-  background-color: var(--backgroundLight, #0f0f0f) !important;
-  color: var(--text, #e5e7eb) !important;
-  border: 1px solid color-mix(in oklab, var(--text, #e5e7eb), transparent 70%) !important;
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--text, #e5e7eb), transparent 70%) !important;
+  background-color: var(--muted) !important;
+  color: var(--foreground) !important;
+  border: 1px solid color-mix(in oklab, var(--foreground), transparent 70%) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--foreground), transparent 70%) !important;
 }
 
 .cl-card .cl-otpCodeFieldInput:focus,
 .cl-otpCodeFieldInput:focus {
   outline: 0 !important;
-  border-color: var(--primary, #6c47ff) !important;
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary, #6c47ff), transparent 30%) !important;
-  background-color: color-mix(in oklab, var(--primary, #6c47ff), var(--backgroundLight, #0f0f0f) 85%) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary), transparent 30%) !important;
+  background-color: color-mix(in oklab, var(--primary), var(--muted) 85%) !important;
 }
 
 /* ===== Generic themed input using app tokens ===== */
 .themed-input {
   background-color: var(--input);
-  color: var(--text);
-  border: 1px solid var(--input-border);
+  color: var(--foreground);
+  border: 1px solid var(--border);
   outline: none;
   transition: box-shadow .2s ease, border-color .2s ease, background-color .2s ease;
 }
 
 .themed-input::placeholder {
-  color: color-mix(in oklab, var(--text), transparent 60%);
+  color: var(--muted-foreground);
 }
 
 .themed-input:focus {
@@ -88,17 +99,17 @@ body {
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
-  -webkit-text-fill-color: var(--text) !important;
+  -webkit-text-fill-color: var(--foreground) !important;
   transition: background-color 5000s ease-in-out 0s;
-  caret-color: var(--text);
+  caret-color: var(--foreground);
   box-shadow: 0 0 0px 1000px var(--input) inset !important;
   /* force dark bg */
-  border: 1px solid var(--input-border) !important;
+  border: 1px solid var(--border) !important;
 }
 
 .themed-input option {
-  background-color: var(--backgroundLight) !important;
-  color: var(--text) !important;
+  background-color: var(--muted) !important;
+  color: var(--foreground) !important;
 }
 
 /* Ensure UA renders controls in dark surfaces properly */
@@ -107,3 +118,5 @@ textarea,
 select {
   color-scheme: dark;
 }
+
+

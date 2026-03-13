@@ -32,7 +32,7 @@ const FriendsHeader: React.FC<FriendsHeaderProps> = ({
       className="flex items-center justify-between border-b px-6 py-2.5"
       style={{
         borderColor: "var(--border)",
-        backgroundColor: "var(--backgroundAlt)",
+        backgroundColor: "var(--muted)",
       }}
     >
       {/* Left: Friend Code */}
@@ -97,3 +97,5 @@ const FriendsHeader: React.FC<FriendsHeaderProps> = ({
 };
 
 export default FriendsHeader;
+
+

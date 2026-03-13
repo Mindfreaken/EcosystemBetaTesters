@@ -8,15 +8,29 @@ import { api, internal } from "../_generated/api";
 const DEFAULT_PUNISHMENT_TYPES = [
   {
     name: "ban",
-    description: "User has been banned",
-    pointValue: 50,
+    description: "User has been permanently restricted from the platform",
+    pointValue: 10000,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    name: "suspend",
+    description: "User has been temporarily restricted (7 days)",
+    pointValue: 1000,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    name: "warn",
+    description: "User has received a formal warning",
+    pointValue: 250,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   },
   {
     name: "mute",
-    description: "User has been muted",
-    pointValue: 10,
+    description: "User has been temporarily muted",
+    pointValue: 500,
     createdAt: Date.now(),
     updatedAt: Date.now(),
   },
@@ -25,15 +39,23 @@ const DEFAULT_PUNISHMENT_TYPES = [
 // Threshold settings to prevent abuse
 const PUNISHMENT_THRESHOLDS = {
   ban: {
-    daily: 2,     // Max 2 bans per day count against score
-    weekly: 5,    // Max 5 bans per week count against score
+    daily: 1,
+    weekly: 1,
+  },
+  suspend: {
+    daily: 1,
+    weekly: 2,
+  },
+  warn: {
+    daily: 3,
+    weekly: 7,
   },
   mute: {
-    daily: 3,     // Max 3 mutes per day count against score
-    weekly: 7,    // Max 7 mutes per week count against score
+    daily: 3,
+    weekly: 7,
   },
   default: {
-    daily: 3,     // Default threshold for new punishment types
+    daily: 3,
     weekly: 7,
   }
 };
@@ -43,15 +65,13 @@ export const initializePunishmentTypes = mutation({
   args: {},
   returns: v.null(),
   handler: async (ctx) => {
-    // Check if punishment types are already initialized
-    const existingBan = await ctx.db
-      .query("punishmentTypes")
-      .withIndex("by_name", (q) => q.eq("name", "ban"))
-      .first();
-    
-    // If not already initialized, add the default punishment types
-    if (!existingBan) {
-      for (const punishmentType of DEFAULT_PUNISHMENT_TYPES) {
+    for (const punishmentType of DEFAULT_PUNISHMENT_TYPES) {
+      const existing = await ctx.db
+        .query("punishmentTypes")
+        .withIndex("by_name", (q) => q.eq("name", punishmentType.name))
+        .first();
+      
+      if (!existing) {
         await ctx.db.insert("punishmentTypes", punishmentType);
       }
     }

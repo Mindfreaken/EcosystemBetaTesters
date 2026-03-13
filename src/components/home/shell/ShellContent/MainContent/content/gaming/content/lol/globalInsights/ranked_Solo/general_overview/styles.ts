@@ -4,7 +4,7 @@ export const dividerColor = "color-mix(in oklab, var(--border), transparent 50%)
 
 export const chipNeutralSx = {
   height: 22,
-  color: "var(--textPrimary)",
+  color: "var(--foreground)",
   backgroundColor: "transparent",
   border: "none",
   fontWeight: 800,
@@ -18,3 +18,5 @@ export const cardSx = {
   border: "1px solid color-mix(in oklab, var(--border), transparent 30%)",
   backgroundColor: "var(--card)",
 } as const;
+
+

@@ -182,3 +182,5 @@ const FriendCodeModal: React.FC<FriendCodeModalProps> = ({ show, onClose }) => {
 };
 
 export default FriendCodeModal;
+
+

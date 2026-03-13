@@ -60,8 +60,8 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
         <Box
             sx={{
                 p: 1.5,
-                borderTop: "1px solid var(--card-border)",
-                backgroundColor: "var(--backgroundLight, #0f0f0f)",
+                borderTop: "1px solid var(--border)",
+                backgroundColor: "var(--muted)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -79,14 +79,14 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
                 onClick={handleNavigate}
             >
                 <Box sx={{ position: "relative", display: "flex" }}>
-                    <Signal size={20} color={isConnected ? "var(--success, #22c55e)" : "var(--textSecondary)"} />
+                    <Signal size={20} color={isConnected ? "var(--success, #22c55e)" : "var(--muted-foreground)"} />
                 </Box>
                 <Box sx={{ minWidth: 0 }}>
                     <Typography
                         variant="body2"
                         sx={{
                             fontWeight: 600,
-                            color: isConnected ? "var(--success, #22c55e)" : "var(--textSecondary)",
+                            color: isConnected ? "var(--success, #22c55e)" : "var(--muted-foreground)",
                             lineHeight: 1.2,
                             whiteSpace: "nowrap",
                             overflow: "hidden",
@@ -98,7 +98,7 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
                     <Typography
                         variant="caption"
                         sx={{
-                            color: "var(--textSecondary)",
+                            color: "var(--muted-foreground)",
                             display: "block",
                             whiteSpace: "nowrap",
                             overflow: "hidden",
@@ -115,21 +115,18 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
                     size="small"
                     onClick={buttonProps.onClick}
                     sx={{
-                        color: isMuted ? "var(--error, #ef4444)" : "var(--textSecondary)",
-                        "&:hover": { backgroundColor: "var(--hover, rgba(255,255,255,0.05))" }
+                        color: isMuted ? "var(--destructive)" : "var(--muted-foreground)",
+                        "&:hover": { backgroundColor: "rgba(255,255,255,0.05)" }
                     }}
                 >
                     {isMuted ? <MicOff size={18} /> : <Mic size={18} />}
                 </IconButton>
 
-                {/* Deafen requires manipulating the local tracks/audio outputs, 
-            which is complex for a v1, skipping hard deafen logic for now 
-            and just building the UI button */}
                 <IconButton
                     size="small"
                     sx={{
-                        color: "var(--textSecondary)",
-                        "&:hover": { backgroundColor: "var(--hover, rgba(255,255,255,0.05))" }
+                        color: "var(--muted-foreground)",
+                        "&:hover": { backgroundColor: "rgba(255,255,255,0.05)" }
                     }}
                 >
                     <Headphones size={18} />
@@ -139,8 +136,8 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
                     size="small"
                     onClick={() => leaveRoom()}
                     sx={{
-                        color: "var(--error, #ef4444)",
-                        "&:hover": { backgroundColor: "var(--error-alpha, rgba(239, 68, 68, 0.1))" }
+                        color: "var(--destructive)",
+                        "&:hover": { backgroundColor: "rgba(239, 68, 68, 0.1)" }
                     }}
                 >
                     <PhoneOff size={18} />
@@ -149,3 +146,5 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
         </Box>
     );
 }
+
+

@@ -6,6 +6,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { gamingTabs, GamingTabKey } from "../tabsConfig";
+import { themeVar } from "@/theme/registry";
 
 export default function SectionTabs({ value, onChange }: { value: GamingTabKey; onChange: (val: GamingTabKey) => void }) {
   const isMdUp = useMediaQuery("(min-width:900px)");
@@ -31,9 +32,9 @@ export default function SectionTabs({ value, onChange }: { value: GamingTabKey; 
           height: 24,
           borderRadius: 999,
           background:
-            "linear-gradient(180deg, color-mix(in oklab, #ffffff, transparent 88%), color-mix(in oklab, var(--primaryLight), transparent 82%))",
-          boxShadow: `0 10px 28px -12px var(--shadow)`,
-          border: "1px solid color-mix(in oklab, var(--border), transparent 28%)",
+            `linear-gradient(180deg, color-mix(in oklab, ${themeVar("foreground")}, transparent 88%), color-mix(in oklab, ${themeVar("primary")}, transparent 82%))`,
+          boxShadow: `0 10px 28px -12px ${themeVar("foreground")}1a`, // Using hex suffix for shadow opacity or color-mix
+          border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 28%)`,
           backdropFilter: "blur(6px) saturate(1.2)",
           zIndex: 0,
           top: "50%",
@@ -66,7 +67,7 @@ export default function SectionTabs({ value, onChange }: { value: GamingTabKey; 
             minHeight: 28,
             py: 0.25,
             px: 1,
-            color: "color-mix(in oklab, var(--foreground), transparent 30%)",
+            color: `color-mix(in oklab, ${themeVar("mutedForeground")}, transparent 10%)`,
             textTransform: "none",
             fontSize: 11,
             fontWeight: 700,
@@ -74,11 +75,11 @@ export default function SectionTabs({ value, onChange }: { value: GamingTabKey; 
             zIndex: 1,
             transition: "color .2s ease",
             '&.Mui-selected': {
-              color: "var(--textPrimary)",
-              textShadow: "0 0 12px color-mix(in oklab, var(--highlight), transparent 55%)",
+              color: themeVar("foreground"),
+              textShadow: `0 0 12px color-mix(in oklab, ${themeVar("primary")}, transparent 55%)`,
             },
             ':hover': {
-              color: "var(--textPrimary)",
+              color: themeVar("foreground"),
             },
             '&:not(.Mui-selected):hover::after': {
               content: "''",
@@ -88,8 +89,8 @@ export default function SectionTabs({ value, onChange }: { value: GamingTabKey; 
               bottom: 4,
               height: 2,
               borderRadius: 2,
-              background: "linear-gradient(90deg, color-mix(in oklab, var(--primaryLight), transparent 30%), color-mix(in oklab, var(--secondaryLight), transparent 40%))",
-              boxShadow: "0 0 12px color-mix(in oklab, var(--highlight), transparent 70%)",
+              background: `linear-gradient(90deg, color-mix(in oklab, ${themeVar("primary")}, transparent 30%), color-mix(in oklab, ${themeVar("secondary")}, transparent 40%))`,
+              boxShadow: `0 0 12px color-mix(in oklab, ${themeVar("primary")}, transparent 70%)`,
             },
           }}
         />
@@ -97,3 +98,5 @@ export default function SectionTabs({ value, onChange }: { value: GamingTabKey; 
     </Tabs>
   );
 }
+
+

@@ -16,8 +16,8 @@ export default function ActivityTab() {
 
   if (!me) {
     return (
-      <Box sx={{ textAlign: "center", color: "var(--textSecondary)", py: 6 }}>
-        <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--textLight)", mb: 0.5 }}>
+      <Box sx={{ textAlign: "center", color: "var(--muted-foreground)", py: 6 }}>
+        <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--foreground)", mb: 0.5 }}>
           Activity
         </Typography>
         <Typography variant="body2">Loading your recent activity…</Typography>
@@ -37,8 +37,8 @@ export default function ActivityTab() {
   }, [recentRaw]);
 
   return (
-    <Box sx={{ color: "var(--textSecondary)", py: 2 }}>
-      <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--textLight)", mb: 1 }}>
+    <Box sx={{ color: "var(--muted-foreground)", py: 2 }}>
+      <Typography variant="h6" sx={{ fontWeight: 800, color: "var(--foreground)", mb: 1 }}>
         Activity
       </Typography>
 
@@ -50,17 +50,17 @@ export default function ActivityTab() {
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
           {recent.map((e: any) => (
             <MuiCard key={(e._id || e.id) as string} variant="interactive" size="sm">
-              <Typography variant="subtitle2" sx={{ color: "var(--textLight)", fontWeight: 700 }}>
+              <Typography variant="subtitle2" sx={{ color: "var(--foreground)", fontWeight: 700 }}>
                 {e.title || e.type}
               </Typography>
               {e.description ? (
-                <Typography variant="caption" sx={{ color: "var(--textSecondary)", wordBreak: "break-word", overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>
+                <Typography variant="caption" sx={{ color: "var(--muted-foreground)", wordBreak: "break-word", overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>
                   {e.description}
                 </Typography>
               ) : null}
               <Typography
                 variant="caption"
-                sx={{ color: "var(--textSecondary)", fontVariantNumeric: "tabular-nums", letterSpacing: ".02em" }}
+                sx={{ color: "var(--muted-foreground)", fontVariantNumeric: "tabular-nums", letterSpacing: ".02em" }}
               >
                 {new Date(e.timestamp).toLocaleString()}
               </Typography>
@@ -71,3 +71,5 @@ export default function ActivityTab() {
     </Box>
   );
 }
+
+

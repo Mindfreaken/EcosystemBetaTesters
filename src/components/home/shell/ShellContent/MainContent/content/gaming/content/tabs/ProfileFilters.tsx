@@ -11,6 +11,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { profileModes } from "../tabsConfig";
 import { glowPill } from "@/components/ui/glow";
+import { themeVar } from "@/theme/registry";
 
 export default function ProfileFilters({
   visible,
@@ -54,12 +55,12 @@ export default function ProfileFilters({
             fontSize: 12,
             px: 1.25,
             py: 0.25,
-            color: "color-mix(in oklab, var(--foreground), transparent 10%)",
-            borderColor: "color-mix(in oklab, var(--border), transparent 10%)",
+            color: `color-mix(in oklab, ${themeVar("mutedForeground")}, transparent 10%)`,
+            borderColor: `color-mix(in oklab, ${themeVar("border")}, transparent 10%)`,
             background: "transparent",
             '&:hover': {
-              borderColor: "color-mix(in oklab, var(--border), transparent 0%)",
-              background: "color-mix(in oklab, var(--card), transparent 80%)",
+              borderColor: `color-mix(in oklab, ${themeVar("border")}, transparent 0%)`,
+              background: `color-mix(in oklab, ${themeVar("card")}, transparent 80%)`,
             },
             ...glowPill(),
           }}
@@ -79,9 +80,9 @@ export default function ProfileFilters({
             height: 28,
             borderRadius: 999,
             background:
-              "linear-gradient(180deg, color-mix(in oklab, #ffffff, transparent 90%), color-mix(in oklab, var(--primaryLight), transparent 90%))",
+              `linear-gradient(180deg, color-mix(in oklab, ${themeVar("foreground")}, transparent 90%), color-mix(in oklab, ${themeVar("primary")}, transparent 90%))`,
             boxShadow: "none",
-            border: "1px solid color-mix(in oklab, var(--border), transparent 28%)",
+            border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 28%)`,
             backdropFilter: "blur(6px) saturate(1.2)",
             zIndex: 0,
             top: "50%",
@@ -103,7 +104,7 @@ export default function ProfileFilters({
               minHeight: 34,
               py: 0.25,
               px: 1,
-              color: "color-mix(in oklab, var(--foreground), transparent 30%)",
+              color: `color-mix(in oklab, ${themeVar("mutedForeground")}, transparent 10%)`,
               textTransform: "none",
               fontSize: 12,
               fontWeight: 700,
@@ -111,8 +112,8 @@ export default function ProfileFilters({
               zIndex: 1,
               transition: "color .2s ease",
               cursor: m !== "Ranked Solo" ? "not-allowed" : undefined,
-              '&.Mui-selected': { color: "var(--textPrimary)" },
-              ':hover': { color: "var(--textPrimary)" },
+              '&.Mui-selected': { color: themeVar("foreground") },
+              ':hover': { color: themeVar("foreground") },
               '&:not(.Mui-selected):hover::after': {
                 content: "''",
                 position: "absolute",
@@ -121,8 +122,8 @@ export default function ProfileFilters({
                 bottom: 3,
                 height: 2,
                 borderRadius: 2,
-                background: "linear-gradient(90deg, color-mix(in oklab, var(--primaryLight), transparent 30%), color-mix(in oklab, var(--secondaryLight), transparent 40%))",
-                boxShadow: "0 0 10px color-mix(in oklab, var(--highlight), transparent 70%)",
+                background: `linear-gradient(90deg, color-mix(in oklab, ${themeVar("primary")}, transparent 30%), color-mix(in oklab, ${themeVar("secondary")}, transparent 40%))`,
+                boxShadow: `0 0 10px color-mix(in oklab, ${themeVar("primary")}, transparent 70%)`,
               },
             }}
           />
@@ -146,19 +147,19 @@ export default function ProfileFilters({
             sx: {
               mt: 0.5,
               borderRadius: 2,
-              bgcolor: 'var(--card)',
-              color: 'var(--textPrimary)',
-              border: '1px solid color-mix(in oklab, var(--border), transparent 20%)',
-              boxShadow: '0 12px 30px color-mix(in oklab, var(--shadow), transparent 85%)',
+              bgcolor: themeVar("card"),
+              color: themeVar("foreground"),
+              border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 20%)`,
+              boxShadow: `0 12px 30px color-mix(in oklab, ${themeVar("foreground")}, transparent 85%)`,
               '& .MuiMenuItem-root': {
                 fontWeight: 700,
                 fontSize: 11,
               },
               '& .MuiMenuItem-root.Mui-selected': {
-                background: 'color-mix(in oklab, var(--primaryLight), transparent 88%)',
+                background: `color-mix(in oklab, ${themeVar("primary")}, transparent 88%)`,
               },
               '& .MuiMenuItem-root:hover': {
-                background: 'color-mix(in oklab, var(--secondaryLight), transparent 88%)',
+                background: `color-mix(in oklab, ${themeVar("secondary")}, transparent 88%)`,
               },
             },
           },
@@ -168,10 +169,10 @@ export default function ProfileFilters({
           fontSize: 11,
           fontWeight: 700,
           height: 28,
-          color: "color-mix(in oklab, var(--foreground), transparent 10%)",
-          borderColor: "color-mix(in oklab, var(--border), transparent 10%)",
-          '.MuiOutlinedInput-notchedOutline': { borderColor: "color-mix(in oklab, var(--border), transparent 20%)" },
-          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: "color-mix(in oklab, var(--border), transparent 0%)" },
+          color: `color-mix(in oklab, ${themeVar("mutedForeground")}, transparent 10%)`,
+          borderColor: `color-mix(in oklab, ${themeVar("border")}, transparent 10%)`,
+          '.MuiOutlinedInput-notchedOutline': { borderColor: `color-mix(in oklab, ${themeVar("border")}, transparent 20%)` },
+          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: `color-mix(in oklab, ${themeVar("border")}, transparent 0%)` },
           '.MuiSelect-select': {
             display: 'inline-flex',
             alignItems: 'center',
@@ -180,7 +181,7 @@ export default function ProfileFilters({
             px: 1,
             lineHeight: 1.1,
           },
-          '.MuiSelect-icon': { right: 6, color: 'color-mix(in oklab, var(--foreground), transparent 30%)' },
+          '.MuiSelect-icon': { right: 6, color: `color-mix(in oklab, ${themeVar("mutedForeground")}, transparent 10%)` },
           background: "transparent",
           ...glowPill(),
         }}
@@ -192,3 +193,5 @@ export default function ProfileFilters({
     </Box>
   );
 }
+
+

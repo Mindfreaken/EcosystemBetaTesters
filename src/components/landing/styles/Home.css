@@ -6,12 +6,12 @@
 /* Button effects */
 .neon-button-outline:hover {
   box-shadow: 0 0 20px var(--primary), 0 0 10px var(--primary) inset;
-  text-shadow: 0 0 8px var(--text);
+  text-shadow: 0 0 8px var(--foreground);
 }
 
 .neon-button-primary:hover {
   box-shadow: 0 0 25px var(--primary), 0 0 15px var(--primary) inset;
-  text-shadow: 0 0 8px var(--backgroundDark);
+  text-shadow: 0 0 8px var(--background);
   transform: translateY(-2px);
 }
 
@@ -68,12 +68,12 @@
 @media (max-width: 640px) {
   .neon-button-outline:active {
     box-shadow: 0 0 20px var(--primary), 0 0 10px var(--primary) inset;
-    text-shadow: 0 0 8px var(--text);
+    text-shadow: 0 0 8px var(--foreground);
   }
 
   .neon-button-primary:active {
     box-shadow: 0 0 25px var(--primary), 0 0 15px var(--primary) inset;
-    text-shadow: 0 0 8px var(--backgroundDark);
+    text-shadow: 0 0 8px var(--background);
     transform: translateY(-2px);
   }
 }
@@ -163,3 +163,5 @@ body,
   --primary-rgb: 255, 45, 85;
   /* Default for Night City theme */
 }
+
+

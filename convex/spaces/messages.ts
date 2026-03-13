@@ -100,11 +100,11 @@ export const sendChannelMessage = mutation({
 
         if (channel.isReadOnly) {
             const isOwner = membership.role === "owner";
-            const isAdmin = membership.role === "admin";
+            const isSpaceAdmin = membership.role === "admin";
             const isMod = membership.role === "moderator";
 
             const canPost = isOwner ||
-                (isAdmin && (space?.adminCanPostInReadOnly ?? false)) ||
+                (isSpaceAdmin && (space?.adminCanPostInReadOnly ?? false)) ||
                 (isMod && (space?.modCanPostInReadOnly ?? false));
 
             if (!canPost) {

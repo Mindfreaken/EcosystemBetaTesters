@@ -107,7 +107,6 @@ export const createUser = mutation({
       joinNumber,
       createdAt,
       updatedAt: createdAt,
-      isAdmin: false,
       isBanned: false,
       suspensionStatus: undefined, // undefined = Active/Normal
       storageStatus: 'free',

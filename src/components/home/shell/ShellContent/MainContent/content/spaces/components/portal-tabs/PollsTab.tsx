@@ -100,7 +100,7 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
     return (
         <Box sx={{ maxWidth: 800 }}>
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("textSecondary") }}>POLLS & SURVEYS</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("mutedForeground") }}>POLLS & SURVEYS</Typography>
                 {canCreate && (
                     <Button
                         size="small"
@@ -113,13 +113,13 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                 )}
             </Box>
 
-            <Box sx={{ p: 4, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("backgroundAlt")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
+            <Box sx={{ p: 4, borderRadius: 3, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
                 {polls === undefined ? (
-                    <Typography sx={{ color: themeVar("textSecondary"), textAlign: "center" }}>Loading polls...</Typography>
+                    <Typography sx={{ color: themeVar("mutedForeground"), textAlign: "center" }}>Loading polls...</Typography>
                 ) : polls.length === 0 ? (
                     <Box sx={{ textAlign: "center", py: 4 }}>
                         <BarChart3 size={48} style={{ color: "rgba(255,255,255,0.1)", marginBottom: 16 }} />
-                        <Typography sx={{ color: themeVar("textSecondary"), display: "block" }}>No polls active.</Typography>
+                        <Typography sx={{ color: themeVar("mutedForeground"), display: "block" }}>No polls active.</Typography>
                     </Box>
                 ) : (
                     <Stack spacing={3}>
@@ -127,11 +127,11 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                             <Box key={poll._id} sx={{ p: 2.5, borderRadius: 2, bgcolor: "rgba(0,0,0,0.2)", border: `1px solid ${themeVar("border")}` }}>
                                 <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
                                     <Box>
-                                        <Typography sx={{ fontWeight: 800, color: themeVar("textLight"), fontSize: "1.1rem" }}>{poll.question}</Typography>
-                                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), display: "block", mt: 0.5 }}>
+                                        <Typography sx={{ fontWeight: 800, color: themeVar("foreground"), fontSize: "1.1rem" }}>{poll.question}</Typography>
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "block", mt: 0.5 }}>
                                             Created by {poll.creator?.displayName} • {poll.totalVotes} votes
                                             {poll.expiresAt && (
-                                                <Box component="span" sx={{ ml: 1, px: 0.8, py: 0.2, bgcolor: poll.expiresAt > Date.now() ? "rgba(255,255,255,0.05)" : "rgba(255,0,0,0.1)", color: poll.expiresAt > Date.now() ? themeVar("textSecondary") : themeVar("danger"), borderRadius: 1, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                                                <Box component="span" sx={{ ml: 1, px: 0.8, py: 0.2, bgcolor: poll.expiresAt > Date.now() ? "rgba(255,255,255,0.05)" : "rgba(255,0,0,0.1)", color: poll.expiresAt > Date.now() ? themeVar("mutedForeground") : themeVar("destructive"), borderRadius: 1, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                                                     {formatTimeLeft(poll.expiresAt)}
                                                 </Box>
                                             )}
@@ -147,7 +147,7 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                                         </Typography>
                                     </Box>
                                     {(role === "owner" || role === "admin" || poll.creatorId === (poll as any).myUserId) && (
-                                        <IconButton size="small" onClick={() => setPollToDelete(poll._id)} sx={{ color: themeVar("danger"), "&:hover": { bgcolor: "rgba(255,0,0,0.1)" } }}>
+                                        <IconButton size="small" onClick={() => setPollToDelete(poll._id)} sx={{ color: themeVar("destructive"), "&:hover": { bgcolor: "rgba(255,0,0,0.1)" } }}>
                                             <Trash2 size={16} />
                                         </IconButton>
                                     )}
@@ -181,10 +181,10 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                                                 <Box sx={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${percentage}%`, bgcolor: isMyVote ? `color-mix(in oklab, ${themeVar("primary")}, transparent 70%)` : "rgba(255,255,255,0.03)", transition: "width 0.3s ease", zIndex: 0 }} />
 
                                                 <Box sx={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                    <Typography variant="body2" sx={{ fontWeight: isMyVote ? 700 : 500, color: isMyVote ? themeVar("primary") : themeVar("textLight") }}>
+                                                    <Typography variant="body2" sx={{ fontWeight: isMyVote ? 700 : 500, color: isMyVote ? themeVar("primary") : themeVar("foreground") }}>
                                                         {option}
                                                     </Typography>
-                                                    <Typography variant="caption" sx={{ fontWeight: 800, color: isMyVote ? themeVar("primary") : themeVar("textSecondary") }}>
+                                                    <Typography variant="caption" sx={{ fontWeight: 800, color: isMyVote ? themeVar("primary") : themeVar("mutedForeground") }}>
                                                         {Math.round(percentage)}% ({voteCount})
                                                     </Typography>
                                                 </Box>
@@ -198,7 +198,7 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                 )}
             </Box>
 
-            <Dialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: "none" } }}>
+            <Dialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none" } }}>
                 <DialogTitle sx={{ fontWeight: 900 }}>Create New Poll</DialogTitle>
                 <DialogContent>
                     <Stack spacing={3} sx={{ mt: 1 }}>
@@ -209,10 +209,10 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                             rows={2}
                             value={question}
                             onChange={e => setQuestion(e.target.value)}
-                            InputLabelProps={{ sx: { color: themeVar("textSecondary") } }}
+                            InputLabelProps={{ sx: { color: themeVar("mutedForeground") } }}
                             InputProps={{
                                 sx: {
-                                    color: themeVar("textLight"),
+                                    color: themeVar("foreground"),
                                     '.MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.2)" },
                                     '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.3)" },
                                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: themeVar("primary") }
@@ -226,7 +226,7 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                                 fullWidth
                                 startIcon={<Clock size={16} />}
                                 sx={{
-                                    color: themeVar("textLight"),
+                                    color: themeVar("foreground"),
                                     borderColor: "rgba(255,255,255,0.2)",
                                     "&:hover": { borderColor: themeVar("primary") },
                                     justifyContent: "flex-start",
@@ -263,7 +263,7 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                             />
                         </Box>
 
-                        <Typography variant="caption" sx={{ color: themeVar("textSecondary"), fontWeight: 800, mb: -2 }}>OPTIONS</Typography>
+                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 800, mb: -2 }}>OPTIONS</Typography>
                         <Stack spacing={1}>
                             {options.map((opt, i) => (
                                 <Box key={i} sx={{ display: "flex", gap: 1 }}>
@@ -279,7 +279,7 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                                         }}
                                         InputProps={{
                                             sx: {
-                                                color: themeVar("textLight"),
+                                                color: themeVar("foreground"),
                                                 '.MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.2)" },
                                                 '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.3)" },
                                                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: themeVar("primary") }
@@ -287,7 +287,7 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                                         }}
                                     />
                                     {options.length > 2 && (
-                                        <IconButton size="small" onClick={() => handleRemoveOption(i)} sx={{ color: themeVar("danger") }}>
+                                        <IconButton size="small" onClick={() => handleRemoveOption(i)} sx={{ color: themeVar("destructive") }}>
                                             <XCircle size={18} />
                                         </IconButton>
                                     )}
@@ -303,17 +303,17 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                         <Stack spacing={1} direction="row">
                             <FormControlLabel
                                 control={<Checkbox checked={showInAnnouncements} onChange={e => setShowInAnnouncements(e.target.checked)} sx={{ color: themeVar("primary"), '&.Mui-checked': { color: themeVar("primary") } }} />}
-                                label={<Typography variant="body2" sx={{ color: themeVar("textSecondary"), display: "flex", alignItems: "center", gap: 1 }}><Megaphone size={14} /> Announce</Typography>}
+                                label={<Typography variant="body2" sx={{ color: themeVar("mutedForeground"), display: "flex", alignItems: "center", gap: 1 }}><Megaphone size={14} /> Announce</Typography>}
                             />
                             <FormControlLabel
                                 control={<Checkbox checked={allowMultiSelect} onChange={e => setAllowMultiSelect(e.target.checked)} sx={{ color: themeVar("primary"), '&.Mui-checked': { color: themeVar("primary") } }} />}
-                                label={<Typography variant="body2" sx={{ color: themeVar("textSecondary"), display: "flex", alignItems: "center", gap: 1 }}>Allow multiple answers</Typography>}
+                                label={<Typography variant="body2" sx={{ color: themeVar("mutedForeground"), display: "flex", alignItems: "center", gap: 1 }}>Allow multiple answers</Typography>}
                             />
                         </Stack>
                     </Stack>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setIsCreateOpen(false)} sx={{ color: themeVar("textSecondary") }}>Cancel</Button>
+                    <Button onClick={() => setIsCreateOpen(false)} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>
                     <Button onClick={handleCreate} variant="contained" disabled={!question.trim() || options.filter(o => o.trim()).length < 2} sx={{ bgcolor: themeVar("primary") }}>
                         Create Poll
                     </Button>
@@ -324,16 +324,16 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
             <Dialog
                 open={Boolean(pollToDelete)}
                 onClose={() => setPollToDelete(null)}
-                PaperProps={{ sx: { bgcolor: themeVar("backgroundAlt"), color: themeVar("textLight"), backgroundImage: "none", border: `1px solid ${themeVar("border")}`, borderRadius: 3 } }}
+                PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none", border: `1px solid ${themeVar("border")}`, borderRadius: 3 } }}
             >
                 <DialogTitle sx={{ fontWeight: 900 }}>Delete Poll?</DialogTitle>
                 <DialogContent>
-                    <Typography variant="body2" sx={{ color: themeVar("textSecondary") }}>
+                    <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>
                         Are you sure you want to delete this poll? This action cannot be undone and all associated votes will be lost.
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setPollToDelete(null)} sx={{ color: themeVar("textSecondary"), fontWeight: 700 }}>Cancel</Button>
+                    <Button onClick={() => setPollToDelete(null)} sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>Cancel</Button>
                     <Button
                         onClick={handleDelete}
                         variant="contained"
@@ -347,3 +347,5 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
         </Box>
     );
 }
+
+
