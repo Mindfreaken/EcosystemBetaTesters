@@ -1,7 +1,7 @@
 import type { Theme } from './types'; // Import the Theme type from the types module
 
 // Dark version of the Valorant theme (Gamer)
-const valorantDark: Theme = { 
+const valorantDark: Theme = {
   id: 'valorant-dark',
   name: 'Gamer Dark',
   colors: {
@@ -22,7 +22,6 @@ const valorantDark: Theme = {
     destructive: '#FF4655',
     destructiveForeground: '#FFFFFF',
     border: '#364966',
-    borderLight: '#4a5d7c',
     input: '#1F2731',
     ring: '#FF4655',
     chart1: '#FF4655',
@@ -44,7 +43,7 @@ const valorantDark: Theme = {
   }
 };
 
-const valorantLight: Theme = { 
+const valorantLight: Theme = {
   id: 'valorant-light',
   name: 'Gamer Light',
   colors: {
@@ -65,7 +64,6 @@ const valorantLight: Theme = {
     destructive: '#FF4655',
     destructiveForeground: '#FFFFFF',
     border: '#f08080',
-    borderLight: '#e07070',
     input: '#FFFFFF',
     ring: '#FF4655',
     chart1: '#FF4655',

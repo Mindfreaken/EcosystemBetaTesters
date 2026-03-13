@@ -70,9 +70,11 @@ export default function NewChatModal({
   }, [friendDetailsList, friendSearch]);
 
   const toggleFriend = (id: string) => {
-    setSelectedFriendIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    setSelectedFriendIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= 9) return prev; // Max 10 including me
+      return [...prev, id];
+    });
   };
 
   const canSubmit = !!me?._id && selectedFriendIds.length > 0 && !creating;
@@ -139,7 +141,14 @@ export default function NewChatModal({
         alignItems: 'center',
         justifyContent: 'space-between',
       }}>
-        New chat
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          New chat
+          {selectedFriendIds.length > 0 && (
+            <Typography variant="caption" sx={{ color: selectedFriendIds.length >= 9 ? themeVar("destructive") : themeVar("primary"), fontWeight: 700 }}>
+              ({selectedFriendIds.length + 1}/10 members)
+            </Typography>
+          )}
+        </Box>
         <IconButton
           size="small"
           onClick={handleClose}
@@ -154,7 +163,7 @@ export default function NewChatModal({
       </DialogTitle>
       <DialogContent sx={{ pt: 0.5, pb: 0.8, px: 1.8, overflow: 'hidden' }}>
         <Typography variant="body2" sx={{ mb: 1, color: themeVar("mutedForeground"), fontSize: 13 }}>
-          Start a new conversation by selecting one or more friends.
+          Start a new conversation by selecting up to 9 friends (max 10 members).
         </Typography>
         {/* Friends search */}
         <Box
@@ -210,6 +219,7 @@ export default function NewChatModal({
                 <Checkbox
                   edge="end"
                   checked={selectedFriendIds.includes(u.userId)}
+                  disabled={!selectedFriendIds.includes(u.userId) && selectedFriendIds.length >= 9}
                   tabIndex={-1}
                   disableRipple
                   size="small"

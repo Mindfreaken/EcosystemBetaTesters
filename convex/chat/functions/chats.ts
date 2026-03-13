@@ -135,6 +135,9 @@ export const createChat = mutation({
   returns: v.id("chats"),
   handler: async (ctx, args) => {
     const participants = [...new Set([...args.participants, args.createdBy])];
+    if (args.isGroup && participants.length > 10) {
+      throw new Error("Group chat size cannot exceed 10 participants.");
+    }
     const initialStatus = args.isGroup ? "active" : "pending_first_message";
 
     const newChatId = await ctx.db.insert("chats", {
@@ -227,7 +230,7 @@ export const addChatParticipant = mutation({
     if (!chat) throw new Error("Chat not found");
     if (!chat.participants.includes(args.addedBy)) throw new Error("Unauthorized to add participants");
     if (chat.participants.includes(args.participantId)) return null;
-
+    if (chat.participants.length >= 10) throw new Error("Group chat size cannot exceed 10 participants.");
     const updatedParticipants = [...chat.participants, args.participantId];
     await ctx.db.patch(args.chatId, { participants: updatedParticipants, lastActivityAt: Date.now() });
     return null;
@@ -263,6 +266,7 @@ export const createOrGetChat = mutation({
   handler: async (ctx, args) => {
     const uniqueParticipantIds = [...new Set([...args.participantIds, args.creatorId])];
     if (uniqueParticipantIds.length < 2) throw new Error("At least two unique participants are required to create a chat");
+    if (uniqueParticipantIds.length > 10) throw new Error("Group chat size cannot exceed 10 participants.");
 
     if (uniqueParticipantIds.length === 2) {
       const userOneToUserTwoBlock = await ctx.db
@@ -551,9 +555,24 @@ export const addUserToChat = mutation({
     if (!chat.participants.includes(args.currentUserId)) throw new Error("Unauthorized: Only existing members can add new users to this group.");
     if (chat.blockedFromRejoin?.includes(args.userIdToAdd)) throw new Error("This user cannot be added back to the group.");
     if (chat.participants.includes(args.userIdToAdd)) return null;
-
+    if (chat.participants.length >= 10) throw new Error("Group chat size cannot exceed 10 participants.");
     const updatedParticipants = [...chat.participants, args.userIdToAdd];
     await ctx.db.patch(args.chatId, { participants: updatedParticipants, lastActivityAt: Date.now() });
+    return null;
+  },
+});
+
+export const transferOwnership = mutation({
+  args: { chatId: v.id("chats"), newOwnerId: v.id("users"), currentUserId: v.id("users") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const chat = await ctx.db.get(args.chatId);
+    if (!chat) throw new Error("Chat not found");
+    if (!chat.isGroup) throw new Error("Ownership can only be transferred for group chats.");
+    if (chat.createdBy !== args.currentUserId) throw new Error("Unauthorized: Only the current owner can transfer ownership.");
+    if (!chat.participants.includes(args.newOwnerId)) throw new Error("Target user must be a member of the group.");
+
+    await ctx.db.patch(args.chatId, { createdBy: args.newOwnerId, lastActivityAt: Date.now() });
     return null;
   },
 });
@@ -566,10 +585,20 @@ export const leaveChat = mutation({
     if (!chat) throw new Error("Chat not found");
     if (!chat.isGroup) throw new Error("Leaving chat this way is only for group chats.");
     if (!chat.participants.includes(args.currentUserId)) throw new Error("User is not a participant of this chat.");
-    if (chat.createdBy === args.currentUserId) throw new Error("Creator cannot leave the group. Consider deleting the group or transferring ownership.");
 
     const updatedParticipants = chat.participants.filter((pId: Id<"users">) => pId !== args.currentUserId);
     const updatedAdmins = chat.admins?.filter((adminId: Id<"users">) => adminId !== args.currentUserId) || [];
+    
+    let newCreatorId = chat.createdBy;
+    if (chat.createdBy === args.currentUserId) {
+      if (updatedParticipants.length === 0) {
+        throw new Error("Creator cannot leave the only member. Consider deleting the group instead.");
+      }
+      // Auto-transfer ownership
+      // Priority: 1. Other admins, 2. First remaining participant
+      newCreatorId = updatedAdmins[0] || updatedParticipants[0];
+    }
+
     let updatedBlockedFromRejoin = chat.blockedFromRejoin || [];
     if (args.preventReAdd) {
       if (!updatedBlockedFromRejoin.includes(args.currentUserId)) {
@@ -580,6 +609,7 @@ export const leaveChat = mutation({
     await ctx.db.patch(args.chatId, {
       participants: updatedParticipants,
       admins: updatedAdmins,
+      createdBy: newCreatorId,
       blockedFromRejoin: updatedBlockedFromRejoin,
       lastActivityAt: Date.now(),
     });

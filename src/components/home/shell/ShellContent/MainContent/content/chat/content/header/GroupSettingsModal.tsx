@@ -14,11 +14,16 @@ import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemText from "@mui/material/ListItemText";
+import Checkbox from "@mui/material/Checkbox";
 import { useConvexStorage } from "../../../../../../../../../services/convexStorage";
 import { useQuery } from "convex/react";
 import IconButton from "@mui/material/IconButton";
 import InputBase from "@mui/material/InputBase";
-import { X } from "lucide-react";
+import { X, Search, UserPlus, UserMinus, Crown } from "lucide-react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { themeVar } from "@/theme/registry";
@@ -50,7 +55,8 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(undefined);
   const [confirmLeaveOpen, setConfirmLeaveOpen] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
-  const [tab, setTab] = useState<'leader' | 'members'>('leader');
+  const [tab, setTab] = useState<'leader' | 'members' | 'add'>('leader');
+  const [friendSearch, setFriendSearch] = useState("");
 
   React.useEffect(() => {
     if (chatDetails) {
@@ -124,6 +130,68 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
     }
   };
 
+  const handleAddMember = async (friendId: Id<"users">) => {
+    try {
+      await convex.mutation(api.chat.functions.chats.addUserToChat as any, {
+        chatId,
+        userIdToAdd: friendId,
+        currentUserId: meId,
+      } as any);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleKickMember = async (userIdToKick: Id<"users">) => {
+    try {
+      await convex.mutation(api.chat.functions.chats.kickUserFromChat as any, {
+        chatId,
+        userIdToKick,
+        currentUserId: meId,
+      } as any);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleTransferOwnership = async (newOwnerId: Id<"users">) => {
+    try {
+      await convex.mutation(api.chat.functions.chats.transferOwnership as any, {
+        chatId,
+        newOwnerId,
+        currentUserId: meId,
+      } as any);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Chat members data
+  const members = useQuery(api.chat.functions.chats.getChatMembers as any, { chatId } as any) as any[] | undefined;
+
+  // Friends data for adding members
+  const me = useQuery(api.users.onboarding.queries.me, {});
+  const friends = useQuery(
+    api.users.friends.functions.getFriends.getFriends as any,
+    me?.clerkUserId ? { clerkUserId: me.clerkUserId as string, status: "active" } : "skip"
+  ) as Array<{ friendId: string }> | undefined;
+
+  const friendIds = useMemo(() => (friends?.map((f) => f.friendId) ?? []), [friends]);
+  const friendDetails = useQuery(
+    api.users.onboarding.queries.getUsersDetailsByConvexId,
+    friendIds.length > 0 ? { userIds: friendIds as any } : "skip"
+  ) as any[] | undefined;
+
+  const filteredFriends = useMemo(() => {
+    if (!friendDetails || !chatDetails) return [];
+    const participants = new Set(chatDetails.participants.map((p: any) => p.toString()));
+    const q = friendSearch.trim().toLowerCase();
+    return friendDetails.filter((f: any) => 
+      !participants.has(f.userId.toString()) &&
+      ((f.displayName || "").toLowerCase().includes(q) || (f.username || "").toLowerCase().includes(q))
+    );
+  }, [friendDetails, chatDetails, friendSearch]);
+
   const disabledFields = !isCreator;
 
   return (
@@ -186,8 +254,9 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
                 '& .MuiTabs-indicator': { backgroundColor: themeVar("primary") },
               }}
             >
-              {isCreator && <Tab value="leader" label="Group leader" />}
+               {isCreator && <Tab value="leader" label="Group leader" />}
               <Tab value="members" label="Members" />
+              <Tab value="add" label="Add members" />
             </Tabs>
           </Box>
 
@@ -246,20 +315,135 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
           )}
 
           {tab === 'members' && (
-            <Box>
-              <Button
-                color="error"
-                variant="outlined"
-                onClick={() => setConfirmLeaveOpen(true)}
-                sx={{
-                  borderColor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 30%)`,
-                  color: themeVar("destructive"),
-                  '&:hover': { backgroundColor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 92%)` },
-                  width: '100%',
-                }}
-              >
-                Leave group
-              </Button>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Box>
+                <Typography variant="caption" sx={{ display: 'block', mb: 1, color: themeVar("mutedForeground") }}>
+                  Current members: {chatDetails?.participants?.length ?? 0}/10
+                </Typography>
+                
+                <Box sx={{ maxHeight: 240, overflowY: 'auto', mb: 2 }}>
+                  <List dense>
+                    {(members || []).map((m: any) => (
+                      <ListItem
+                        key={m._id}
+                        secondaryAction={
+                          isCreator && m._id.toString() !== meId.toString() && (
+                            <Box sx={{ display: 'flex', gap: 0.5 }}>
+                              <IconButton 
+                                edge="end" 
+                                size="small" 
+                                onClick={() => handleTransferOwnership(m._id)}
+                                title="Transfer Ownership"
+                                sx={{ color: themeVar("primary") }}
+                              >
+                                <Crown size={16} />
+                              </IconButton>
+                              <IconButton 
+                                edge="end" 
+                                size="small" 
+                                onClick={() => handleKickMember(m._id)}
+                                title="Kick Member"
+                                sx={{ color: themeVar("destructive") }}
+                              >
+                                <UserMinus size={16} />
+                              </IconButton>
+                            </Box>
+                          )
+                        }
+                        sx={{ px: 1 }}
+                      >
+                        <ListItemAvatar sx={{ minWidth: 40 }}>
+                          <Avatar src={m.avatarUrl} sx={{ width: 32, height: 32 }} />
+                        </ListItemAvatar>
+                        <ListItemText 
+                          primary={
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              {m.displayName || m.username}
+                              {m.isCreator && (
+                                <Typography variant="caption" sx={{ color: themeVar("primary"), bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)`, px: 0.5, borderRadius: 1 }}>
+                                  Owner
+                                </Typography>
+                              )}
+                            </Box>
+                          }
+                          primaryTypographyProps={{ fontSize: 13, fontWeight: 500, color: themeVar("foreground") }}
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => setConfirmLeaveOpen(true)}
+                  sx={{
+                    borderColor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 30%)`,
+                    color: themeVar("destructive"),
+                    '&:hover': { backgroundColor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 92%)` },
+                    width: '100%',
+                  }}
+                >
+                  Leave group
+                </Button>
+              </Box>
+            </Box>
+          )}
+
+          {tab === 'add' && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+              <Typography variant="caption" sx={{ display: 'block', mb: 0.5, color: themeVar("mutedForeground") }}>
+                Add up to {10 - (chatDetails?.participants?.length ?? 0)} more members (max 10)
+              </Typography>
+              
+              <Box sx={{ 
+                display: 'flex', alignItems: 'center', gap: 1, px: 1, 
+                border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 15%)`, 
+                borderRadius: 999, backgroundColor: `color-mix(in oklab, ${themeVar("card")}, transparent 10%)` 
+              }}>
+                <Search size={14} style={{ color: themeVar("mutedForeground") }} />
+                <InputBase 
+                  placeholder="Search friends" 
+                  value={friendSearch} 
+                  onChange={(e) => setFriendSearch(e.target.value)} 
+                  sx={{ flex: 1, color: themeVar("foreground"), fontSize: 13 }} 
+                />
+              </Box>
+
+              <Box sx={{ maxHeight: 200, overflowY: 'auto' }}>
+                <List dense>
+                  {filteredFriends.map((f: any) => (
+                    <ListItem
+                      key={f.userId}
+                      secondaryAction={
+                        <IconButton 
+                          edge="end" 
+                          size="small"
+                          disabled={(chatDetails?.participants?.length ?? 0) >= 10}
+                          onClick={() => handleAddMember(f.userId)}
+                          sx={{ color: themeVar("primary") }}
+                        >
+                          <UserPlus size={16} />
+                        </IconButton>
+                      }
+                      sx={{ px: 1 }}
+                    >
+                      <ListItemAvatar sx={{ minWidth: 40 }}>
+                        <Avatar src={f.avatarUrl} sx={{ width: 32, height: 32 }} />
+                      </ListItemAvatar>
+                      <ListItemText 
+                        primary={f.displayName || f.username} 
+                        primaryTypographyProps={{ fontSize: 13, fontWeight: 500, color: themeVar("foreground") }}
+                      />
+                    </ListItem>
+                  ))}
+                  {filteredFriends.length === 0 && (
+                    <Typography variant="caption" sx={{ px: 1, color: themeVar("mutedForeground") }}>
+                      No more friends to add.
+                    </Typography>
+                  )}
+                </List>
+              </Box>
             </Box>
           )}
         </DialogContent>
@@ -324,7 +508,10 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
       >
         <DialogTitle sx={{ color: themeVar("foreground"), fontWeight: 700, fontSize: 16 }}>Leave group?</DialogTitle>
         <DialogContent sx={{ color: themeVar("mutedForeground") }}>
-          You can be added back later by a member.
+          {isCreator 
+            ? "Ownership will be automatically transferred to an admin or member. You can be added back later by a member." 
+            : "You can be added back later by a member."
+          }
         </DialogContent>
         <DialogActions sx={{ px: 1.8, py: 1.2, gap: 1 }}>
           <Button onClick={() => setConfirmLeaveOpen(false)} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>

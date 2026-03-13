@@ -25,8 +25,12 @@ export const messageTables = {
       fileId: v.optional(v.id("files")),
     }))),
     encryptionMetadata: v.optional(v.object({
-      iv: v.string(),
-      ephemeralPublicKey: v.string(),
+      ciphertexts: v.array(v.object({
+        deviceId: v.string(),
+        ciphertext: v.string(),
+        type: v.number(),
+      })),
+      senderDeviceId: v.string(),
     })),
     isPinned: v.optional(v.boolean()),
     pinnedBy: v.optional(v.id("users")),

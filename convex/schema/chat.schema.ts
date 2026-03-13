@@ -6,6 +6,7 @@ import { editTables } from "./chat/edits";
 import { deleteTables } from "./chat/deletes";
 import { chatTables as chatsTables } from "./chat/chats";
 import { attachmentTables } from "./chat/attachments";
+import { keyTables } from "./chat/keys";
 
 // Aggregated Chat domain tables
 export const chatTables = {
@@ -17,4 +18,5 @@ export const chatTables = {
   ...deleteTables,
   ...chatsTables,
   ...attachmentTables,
+  ...keyTables,
 } as const;

@@ -6,19 +6,17 @@ import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
-import { Send, Flag, ShieldAlert, Smile, X } from "lucide-react";
+import { Send, Smile, X } from "lucide-react";
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import EmotePicker from "./EmotePicker";
 import { themeVar } from "@/theme/registry";
 import { useToast } from "@/hooks/use-toast";
+import { signalManager } from "@/lib/crypto/signal";
 
 export type MinimalChat = { _id: string; name: string };
 
@@ -36,13 +34,15 @@ export default function ChatThread({
   const prevScrollHeightRef = useRef(0);
   const markedReadRef = useRef<Set<string>>(new Set());
 
-  // Report Dialog State
-  const [reportMessageId, setReportMessageId] = useState<string | null>(null);
-  const [reportReason, setReportReason] = useState("");
-  const [isReporting, setIsReporting] = useState(false);
 
   // Current user
   const me = useQuery(api.users.onboarding.queries.me, {});
+
+  // Fetch chat details for participants (needed for encryption)
+  const chatDetails = useQuery(
+    api.chat.functions.chats.getChatDetails as any,
+    chat?._id ? ({ chatId: chat._id } as any) : ("skip" as any)
+  ) as any;
 
   // Messages for selected chat (paginated)
   const messages = usePaginatedQuery(
@@ -72,6 +72,28 @@ export default function ChatThread({
 
   // Mark messages as read for the current user when viewing the thread
   const markMessageRead = useMutation(api.chat.functions.messages.markMessageRead);
+  const registerDevice = useMutation(api.chat.functions.keys.registerDevice);
+  const userDevicesAndKeys = useQuery(api.chat.functions.keys.getUserDevicesAndKeys, 
+    chatDetails?.participants ? { userIds: chatDetails.participants } : "skip"
+  );
+
+  // Initialize and register device
+  useEffect(() => {
+    if (!me?._id || !me?.clerkUserId) return; // Ensure full auth synced
+    const init = async () => {
+        try {
+            const bundle = await signalManager.initializeDevice((me._id as any).toString());
+            await registerDevice({
+                ...bundle,
+                deviceName: navigator.userAgent.split(') ')[0] + ')', // Simple device name
+            });
+        } catch (e) {
+            console.error("Failed to register device for encryption", e);
+        }
+    };
+    init();
+  }, [me?._id, me?.clerkUserId]);
+
   useEffect(() => {
     if (!me?._id) return;
     if (!orderedMessages.length) return;
@@ -164,49 +186,30 @@ export default function ChatThread({
 
   const sendMessage = useMutation(api.chat.functions.messages.sendMessage);
   const toggleReaction = useMutation(api.chat.functions.messages.toggleReaction);
-  const reportMessage = useMutation(api.hub.overseer.reportMessage);
   const canSend = !!chat && !isSystemChat && !!me && input.trim().length > 0;
 
   const handleSend = async () => {
-    if (!canSend || !chat || !me) return;
+    if (!canSend || !chat || !me || !userDevicesAndKeys) return;
     const content = input.trim();
     try {
+      // Encrypt for all participants' devices
+      const encryptionMetadata = await signalManager.encryptMessage(content, userDevicesAndKeys);
+      
       await sendMessage({
         chatId: chat._id as any,
-        content,
+        content: "[Encrypted Message]", // Fallback for clients without E2EE
         senderId: me._id,
+        encryptionMetadata: encryptionMetadata as any,
       });
       setInput("");
     } catch (e) {
-      console.error("Failed to send message", e);
-    }
-  };
-
-  const handleReport = (messageId: string) => {
-    setReportMessageId(messageId);
-    setReportReason("");
-  };
-
-  const submitReport = async () => {
-    if (!reportMessageId || !reportReason.trim()) return;
-    setIsReporting(true);
-    try {
-      await reportMessage({ messageId: reportMessageId as any, reason: reportReason.trim() });
-      setReportMessageId(null);
-      setReportReason("");
+      console.error("Failed to send encrypted message", e);
+      // Fallback to unencrypted if needed, or show error
       toast({
-        title: "Report Submitted",
-        description: "Thank you for your feedback.",
+        title: "Encryption Failed",
+        description: "Could not encrypt message for all devices.",
+        variant: "destructive"
       });
-    } catch (e) {
-      console.error("Failed to report message", e);
-      toast({
-        title: "Report Failed",
-        description: "Failed to submit report. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsReporting(false);
     }
   };
 
@@ -224,48 +227,10 @@ export default function ChatThread({
   const isOnlyEmotes = (content: string) => {
     const trimmed = content.trim();
     if (!trimmed) return false;
-    // Regex to match custom emotes :name: and standard emojis
     const customEmoteRegex = /:[a-zA-Z0-9_]+:/g;
     const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
     const remaining = trimmed.replace(customEmoteRegex, "").replace(emojiRegex, "").replace(/\s+/g, "");
     return remaining.length === 0;
-  };
-
-  const renderContent = (content: string) => {
-    const isJumbo = isOnlyEmotes(content);
-    const size = isJumbo ? 48 : 22;
-    const emojiSize = isJumbo ? "2.5rem" : "inherit";
-
-    const parts = content.split(/(:[a-zA-Z0-9_]+:)/g);
-    return (
-      <Box component="span" sx={{ fontSize: emojiSize, display: "inline-block", verticalAlign: "middle" }}>
-        {parts.map((part, i) => {
-          if (part.startsWith(":") && part.endsWith(":")) {
-            const name = part.slice(1, -1);
-            const url = emojiMap.get(name);
-            if (url) {
-              return (
-                <Tooltip key={i} title={part}>
-                  <Box
-                    component="img"
-                    src={url}
-                    sx={{
-                      width: size,
-                      height: size,
-                      verticalAlign: "middle",
-                      display: "inline-block",
-                      mx: 0.25,
-                      transition: "transform 0.2s"
-                    }}
-                  />
-                </Tooltip>
-              );
-            }
-          }
-          return <span key={i}>{part}</span>;
-        })}
-      </Box>
-    );
   };
 
   return (
@@ -361,29 +326,17 @@ export default function ChatThread({
                             >
                               <Smile size={14} />
                             </IconButton>
-                            {!isMine && !isSystemUser && (
-                              <IconButton
-                                className="report-button"
-                                size="small"
-                                onClick={() => handleReport(m._id)}
-                                sx={{
-                                  opacity: 0,
-                                  transition: "opacity 0.2s",
-                                  p: 0.5,
-                                  color: themeVar("mutedForeground"),
-                                  "&:hover": { color: themeVar("destructive"), bgcolor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 90%)` },
-                                }}
-                                title="Report message"
-                              >
-                                <Flag size={14} />
-                              </IconButton>
-                            )}
                           </Stack>
                         </Box>
                       )}
 
                       <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word", overflowWrap: "anywhere", color: themeVar("foreground") }}>
-                        {renderContent(m.content)}
+                        <MessageContent 
+                          m={m} 
+                          meId={me?._id as any} 
+                          emojiMap={emojiMap} 
+                          isOnlyEmotes={isOnlyEmotes} 
+                        />
                       </Typography>
 
                       {/* Reactions display */}
@@ -495,113 +448,76 @@ export default function ChatThread({
         onSelect={handleEmoteSelect}
       />
 
-      {/* Report Dialog */}
-      <Dialog
-        open={Boolean(reportMessageId)}
-        onClose={() => !isReporting && setReportMessageId(null)}
-        maxWidth="xs"
-        fullWidth
-        slotProps={{
-          backdrop: {
-            sx: {
-              backgroundColor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
-              backdropFilter: 'blur(4px)',
-            },
-          },
-          paper: {
-            sx: {
-              background: `color-mix(in oklab, ${themeVar("card")}, transparent 5%)`,
-              border: `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 35%)`,
-              boxShadow: `0 6px 18px color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
-              borderRadius: '9px',
-              overflow: 'hidden',
-            },
-          },
-        }}
-      >
-        <DialogTitle sx={{ 
-          px: 1.8, 
-          py: 1.2, 
-          color: themeVar("foreground"), 
-          fontWeight: 700, 
-          letterSpacing: 0.2, 
-          fontSize: 17, 
-          display: "flex", 
-          alignItems: "center", 
-          justifyContent: "space-between" 
-        }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-            <ShieldAlert size={20} color={themeVar("destructive")} />
-            Report Message
-          </Box>
-          <IconButton
-            size="small"
-            onClick={() => setReportMessageId(null)}
-            sx={{ color: themeVar("mutedForeground"), ml: 1, '&:hover': { color: themeVar("foreground"), backgroundColor: 'transparent' } }}
-          >
-            <X size={16} />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent sx={{ pt: 0.5, pb: 0.8, px: 1.8, overflow: 'hidden' }}>
-          <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), mb: 2 }}>
-            Help us understand what's wrong with this message. Your report will be reviewed by the Ecosystem Overseers.
-          </Typography>
-          <TextField
-            autoFocus
-            fullWidth
-            multiline
-            rows={4}
-            variant="outlined"
-            placeholder="Describe the issue (e.g., harassment, spam, inappropriate content)..."
-            value={reportReason}
-            onChange={(e) => setReportReason(e.target.value)}
-            disabled={isReporting}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                backgroundColor: themeVar("input"),
-                "& fieldset": { borderColor: themeVar("border") },
-                "&:hover fieldset": { borderColor: themeVar("primary") },
-                "&.Mui-focused fieldset": { borderColor: themeVar("primary") },
-                color: themeVar("foreground"),
-              },
-            }}
-          />
-        </DialogContent>
-        <DialogActions sx={{ px: 1.8, py: 1.2, gap: 1 }}>
-          <Button
-            onClick={() => setReportMessageId(null)}
-            disabled={isReporting}
-            sx={{
-              color: themeVar("mutedForeground"),
-              fontSize: 13,
-              px: 1.25,
-              minWidth: 0,
-              '&:hover': { backgroundColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)`, color: themeVar("primary") },
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={submitReport}
-            disabled={!reportReason.trim() || isReporting}
-            variant="contained"
-            sx={{
-              backgroundColor: themeVar("destructive"),
-              color: "white",
-              px: 1.25,
-              py: 0.4,
-              fontSize: 13,
-              boxShadow: `0 3px 8px color-mix(in oklab, ${themeVar("destructive")}, transparent 60%)`,
-              "&:hover": { backgroundColor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 10%)` },
-              textTransform: "none",
-              borderRadius: "8px",
-              fontWeight: 600,
-            }}
-          >
-            {isReporting ? "Submitting..." : "Submit Report"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+    </Box>
+  );
+}
+
+function MessageContent({ m, meId, emojiMap, isOnlyEmotes }: { m: any; meId: string; emojiMap: Map<string, string>; isOnlyEmotes: (content: string) => boolean }) {
+  const isEncrypted = !!m.encryptionMetadata;
+  const [decryptedContent, setDecryptedContent] = useState<string | null>(null);
+  const [isDecrypting, setIsDecrypting] = useState(isEncrypted);
+
+  useEffect(() => {
+    if (!isEncrypted || !meId) return;
+    const decrypt = async () => {
+      try {
+        const myDeviceId = await signalManager.initializeDevice(meId);
+        const myCiphertext = m.encryptionMetadata.ciphertexts.find((c: any) => c.deviceId === myDeviceId.deviceId);
+
+        if (myCiphertext) {
+          const text = await signalManager.decryptMessage(
+            m.senderId,
+            m.encryptionMetadata.senderDeviceId,
+            myCiphertext.ciphertext,
+            myCiphertext.type
+          );
+          setDecryptedContent(text);
+        } else {
+          setDecryptedContent("[Message not encrypted for this device]");
+        }
+      } catch (e) {
+        console.error("Decryption failed", e);
+        setDecryptedContent("[Decryption Error]");
+      } finally {
+        setIsDecrypting(false);
+      }
+    };
+    decrypt();
+  }, [m._id, isEncrypted, meId]);
+
+  const content = isEncrypted ? (decryptedContent || (isDecrypting ? "Decrypting..." : "[Encrypted]")) : m.content;
+  const isJumbo = isOnlyEmotes(content);
+  const size = isJumbo ? 48 : 22;
+  const emojiSize = isJumbo ? "2.5rem" : "inherit";
+
+  const parts = content.split(/(:[a-zA-Z0-9_]+:)/g);
+  return (
+    <Box component="span" sx={{ fontSize: emojiSize, display: "inline-block", verticalAlign: "middle" }}>
+      {parts.map((part: string, i: number) => {
+        if (part.startsWith(":") && part.endsWith(":")) {
+          const name = part.slice(1, -1);
+          const url = emojiMap.get(name);
+          if (url) {
+            return (
+              <Tooltip key={i} title={part}>
+                <Box
+                  component="img"
+                  src={url}
+                  sx={{
+                    width: size,
+                    height: size,
+                    verticalAlign: "middle",
+                    display: "inline-block",
+                    mx: 0.25,
+                    transition: "transform 0.2s"
+                  }}
+                />
+              </Tooltip>
+            );
+          }
+        }
+        return <span key={i}>{part}</span>;
+      })}
     </Box>
   );
 }

@@ -11,8 +11,12 @@ export const sendMessage = mutation({
     contentRich: v.optional(v.any()),
     senderId: v.id("users"),
     encryptionMetadata: v.optional(v.object({
-      iv: v.string(),
-      ephemeralPublicKey: v.string(),
+      ciphertexts: v.array(v.object({
+        deviceId: v.string(),
+        ciphertext: v.string(),
+        type: v.number(),
+      })),
+      senderDeviceId: v.string(),
     })),
     attachments: v.optional(v.array(v.object({
       type: v.string(),
@@ -55,8 +59,12 @@ export const replyToMessage = mutation({
     senderId: v.id("users"),
     parentMessageId: v.id("messages"),
     encryptionMetadata: v.optional(v.object({
-      iv: v.string(),
-      ephemeralPublicKey: v.string(),
+      ciphertexts: v.array(v.object({
+        deviceId: v.string(),
+        ciphertext: v.string(),
+        type: v.number(),
+      })),
+      senderDeviceId: v.string(),
     })),
   },
   handler: async (ctx, args) => {
@@ -130,8 +138,12 @@ export const getThreadMessagesPaginated = query({
       deletedBy: v.optional(v.id("users")),
       deletedByName: v.optional(v.string()),
       encryptionMetadata: v.optional(v.object({
-        iv: v.string(),
-        ephemeralPublicKey: v.string(),
+        ciphertexts: v.array(v.object({
+          deviceId: v.string(),
+          ciphertext: v.string(),
+          type: v.number(),
+        })),
+        senderDeviceId: v.string(),
       })),
       isPinned: v.optional(v.boolean()),
       pinnedBy: v.optional(v.id("users")),
@@ -433,9 +445,14 @@ export const getThreadsForChat = query({
           fileId: v.optional(v.id("files")),
         })),
         chatId: v.id("chats"),
-        content: v.string(),
-        encryptionMetadata: v.optional(v.object({ iv: v.string(), ephemeralPublicKey: v.string() })),
-        lastActivity: v.float64(),
+        encryptionMetadata: v.optional(v.object({
+          ciphertexts: v.array(v.object({
+            deviceId: v.string(),
+            ciphertext: v.string(),
+            type: v.number(),
+          })),
+          senderDeviceId: v.string(),
+        })),
         replyCount: v.float64(),
         senderId: v.id("users"),
         sentAt: v.float64(),
@@ -694,8 +711,14 @@ export const getMessagesForChat = query({
             })
           )
         ),
-        encryptionMetadata: v.optional(v.object({ iv: v.string(), ephemeralPublicKey: v.string() })),
-        isPinned: v.optional(v.boolean()),
+        encryptionMetadata: v.optional(v.object({
+          ciphertexts: v.array(v.object({
+            deviceId: v.string(),
+            ciphertext: v.string(),
+            type: v.number(),
+          })),
+          senderDeviceId: v.string(),
+        })),
         pinnedBy: v.optional(v.id("users")),
         pinnedAt: v.optional(v.number()),
         hasTask: v.optional(v.boolean()),
