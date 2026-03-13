@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.0-10] - 2026-03-13
+## [0.0.0-10] - 2026-03-13
 
 ### Added
 - **Signal Protocol E2EE**: Integrated End-to-End Encryption for chat messages with multi-device support.
