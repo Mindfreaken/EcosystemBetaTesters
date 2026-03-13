@@ -6,11 +6,27 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Stack from "@mui/material/Stack";
+import IconButton from "@mui/material/IconButton";
 import { List, Calendar as CalendarIcon, Clock, Link as LinkIcon, Hash } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Doc, Id } from "convex/_generated/dataModel";
 import { themeVar } from "@/theme/registry";
+
+import { 
+    startOfMonth, 
+    endOfMonth, 
+    startOfWeek, 
+    endOfWeek, 
+    eachDayOfInterval, 
+    format, 
+    addMonths, 
+    subMonths, 
+    isSameMonth, 
+    isSameDay, 
+    isToday 
+} from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ScheduleChannelProps {
     channel: Doc<"spaceChannels">;
@@ -19,6 +35,7 @@ interface ScheduleChannelProps {
 
 export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelProps) {
     const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+    const [currentDate, setCurrentDate] = useState(new Date());
     const eventsQuery = useQuery(api.spaces.schedule.getEvents, { spaceId: spaceId as Id<"spaces"> });
     const markAsRead = useMutation(api.spaces.channels.markChannelAsRead);
 
@@ -27,6 +44,9 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
             markAsRead({ channelId: channel._id });
         }
     }, [eventsQuery !== undefined, channel._id, markAsRead]);
+
+    const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+    const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%", bgcolor: themeVar("background"), p: 3, overflowY: "auto" }}>
@@ -51,32 +71,47 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
                         {channel.description || "Upcoming events and scheduled activities."}
                     </Typography>
                 </Box>
-                <ButtonGroup variant="outlined" size="small" sx={{ borderColor: themeVar("border") }}>
-                    <Button
-                        onClick={() => setViewMode("list")}
-                        sx={{
-                            bgcolor: viewMode === "list" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)` : "transparent",
-                            color: viewMode === "list" ? themeVar("primary") : themeVar("mutedForeground"),
-                            borderColor: themeVar("border"),
-                            "&:hover": { borderColor: themeVar("border"), bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` }
-                        }}
-                        startIcon={<List size={16} />}
-                    >
-                        List
-                    </Button>
-                    <Button
-                        onClick={() => setViewMode("calendar")}
-                        sx={{
-                            bgcolor: viewMode === "calendar" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)` : "transparent",
-                            color: viewMode === "calendar" ? themeVar("primary") : themeVar("mutedForeground"),
-                            borderColor: themeVar("border"),
-                            "&:hover": { borderColor: themeVar("border"), bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` }
-                        }}
-                        startIcon={<CalendarIcon size={16} />}
-                    >
-                        Calendar
-                    </Button>
-                </ButtonGroup>
+                <Stack direction="row" spacing={2} alignItems="center">
+                    {viewMode === "calendar" && (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 2, bgcolor: "rgba(0,0,0,0.2)", px: 2, py: 1, borderRadius: 2, border: `1px solid ${themeVar("border")}` }}>
+                            <IconButton size="small" onClick={handlePrevMonth} sx={{ color: themeVar("primary") }}>
+                                <ChevronLeft size={18} />
+                            </IconButton>
+                            <Typography sx={{ fontWeight: 800, color: themeVar("foreground"), minWidth: 140, textAlign: "center" }}>
+                                {format(currentDate, "MMMM yyyy")}
+                            </Typography>
+                            <IconButton size="small" onClick={handleNextMonth} sx={{ color: themeVar("primary") }}>
+                                <ChevronRight size={18} />
+                            </IconButton>
+                        </Box>
+                    )}
+                    <ButtonGroup variant="outlined" size="small" sx={{ borderColor: themeVar("border") }}>
+                        <Button
+                            onClick={() => setViewMode("list")}
+                            sx={{
+                                bgcolor: viewMode === "list" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)` : "transparent",
+                                color: viewMode === "list" ? themeVar("primary") : themeVar("mutedForeground"),
+                                borderColor: themeVar("border"),
+                                "&:hover": { borderColor: themeVar("border"), bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` }
+                            }}
+                            startIcon={<List size={16} />}
+                        >
+                            List
+                        </Button>
+                        <Button
+                            onClick={() => setViewMode("calendar")}
+                            sx={{
+                                bgcolor: viewMode === "calendar" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)` : "transparent",
+                                color: viewMode === "calendar" ? themeVar("primary") : themeVar("mutedForeground"),
+                                borderColor: themeVar("border"),
+                                "&:hover": { borderColor: themeVar("border"), bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` }
+                            }}
+                            startIcon={<CalendarIcon size={16} />}
+                        >
+                            Calendar
+                        </Button>
+                    </ButtonGroup>
+                </Stack>
             </Box>
 
             {!eventsQuery ? (
@@ -156,36 +191,78 @@ export default function ScheduleChannel({ channel, spaceId }: ScheduleChannelPro
                             borderRadius: 3,
                             p: 2,
                         }}>
-                            {/* Simple minimal calendar logic; can be expanded */}
                             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
                                 <Box key={day} sx={{ textAlign: "center", py: 1, borderBottom: `1px solid ${themeVar("border")}` }}>
                                     <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("mutedForeground"), textTransform: "uppercase" }}>{day}</Typography>
                                 </Box>
                             ))}
-                            {/* Fill with events (simplified view) */}
-                            {Array.from({ length: 35 }).map((_, i) => {
-                                // Real calendar math would go here, for now a placeholder grid
-                                const dayStr = new Date(Date.now() + i * 86400000).toLocaleDateString();
-                                const cellEvents = eventsQuery.filter(e => new Date(e.startTime).toLocaleDateString() === dayStr);
+                            {(() => {
+                                const start = startOfWeek(startOfMonth(currentDate));
+                                const end = endOfWeek(endOfMonth(currentDate));
+                                const days = eachDayOfInterval({ start, end });
 
-                                return (
-                                    <Box key={i} sx={{ minHeight: 100, p: 1, border: `1px solid rgba(255,255,255,0.05)`, borderRadius: 1.5, position: 'relative', overflow: 'hidden' }}>
-                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 700 }}>
-                                            {new Date(Date.now() + i * 86400000).getDate()}
-                                        </Typography>
-                                        <Stack spacing={0.5} sx={{ mt: 1 }}>
-                                            {cellEvents.slice(0, 3).map(e => (
-                                                <Typography key={e._id} noWrap variant="caption" sx={{ display: "block", px: 1, py: 0.25, bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)`, color: themeVar("foreground"), borderRadius: 1, fontSize: "0.65rem", fontWeight: 700 }}>
-                                                    {e.title}
+                                return days.map((day, i) => {
+                                    const cellEvents = eventsQuery.filter(e => isSameDay(new Date(e.startTime), day));
+                                    const isSelectedMonth = isSameMonth(day, currentDate);
+                                    const today = isToday(day);
+
+                                    return (
+                                        <Box key={day.toISOString()} sx={{ 
+                                            minHeight: 120, 
+                                            p: 1, 
+                                            bgcolor: today ? "rgba(255,255,255,0.05)" : "transparent",
+                                            border: `1px solid ${today ? themeVar("primary") : "rgba(255,255,255,0.05)"}`, 
+                                            borderRadius: 2, 
+                                            position: 'relative', 
+                                            overflow: 'hidden',
+                                            opacity: isSelectedMonth ? 1 : 0.3,
+                                            transition: "all 0.2s ease",
+                                            "&:hover": { bgcolor: "rgba(255,255,255,0.08)" }
+                                        }}>
+                                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                                <Typography variant="caption" sx={{ 
+                                                    color: today ? themeVar("primary") : themeVar("mutedForeground"), 
+                                                    fontWeight: today ? 900 : 700,
+                                                    fontSize: today ? "0.9rem" : "0.75rem"
+                                                }}>
+                                                    {day.getDate()}
                                                 </Typography>
-                                            ))}
-                                            {cellEvents.length > 3 && (
-                                                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontSize: "0.6rem", pl: 0.5 }}>+{cellEvents.length - 3} more</Typography>
-                                            )}
-                                        </Stack>
-                                    </Box>
-                                );
-                            })}
+                                                {today && (
+                                                    <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: themeVar("primary") }} />
+                                                )}
+                                            </Box>
+                                            <Stack spacing={0.5} sx={{ mt: 1 }}>
+                                                {cellEvents.slice(0, 3).map(e => (
+                                                    <Typography 
+                                                        key={e._id} 
+                                                        noWrap 
+                                                        variant="caption" 
+                                                        sx={{ 
+                                                            display: "block", 
+                                                            px: 1, 
+                                                            py: 0.25, 
+                                                            bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 80%)`, 
+                                                            color: themeVar("foreground"), 
+                                                            borderRadius: 1, 
+                                                            fontSize: "0.65rem", 
+                                                            fontWeight: 700,
+                                                            borderLeft: `2px solid ${themeVar("primary")}`,
+                                                            maxWidth: "100%"
+                                                        }}
+                                                    >
+                                                        {e.title}
+                                                    </Typography>
+                                                ))}
+                                                {cellEvents.length > 3 && (
+                                                    <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontSize: "0.6rem", pl: 0.5, fontWeight: 700 }}>
+                                                        +{cellEvents.length - 3} more
+                                                    </Typography>
+                                                )}
+                                            </Stack>
+                                        </Box>
+                                    );
+                                });
+                            })()}
                         </Box>
                     )}
                 </>

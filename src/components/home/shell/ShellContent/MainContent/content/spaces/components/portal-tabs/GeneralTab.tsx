@@ -10,10 +10,18 @@ import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tooltip from "@mui/material/Tooltip";
-import { Camera, Image as ImageIcon, Edit2, X } from "lucide-react";
+import { Camera, Image as ImageIcon, Edit2, X, AlertTriangle, Trash2 } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Doc } from "convex/_generated/dataModel";
+import { useRouter } from "next/navigation";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+import Stack from "@mui/material/Stack";
+import Divider from "@mui/material/Divider";
 
 interface GeneralTabProps {
     space: Doc<"spaces">;
@@ -23,8 +31,13 @@ interface GeneralTabProps {
 
 export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
     const updateMetadata = useMutation(api.spaces.core.updateSpaceMetadata);
+    const deleteSpaceMut = useMutation(api.spaces.core.deleteSpace);
     const generateUploadUrl = useMutation(api.chat.storage.generateUploadUrl);
     const saveFileMetadata = useMutation(api.chat.storage.saveFileMetadata);
+    const router = useRouter();
+
+    const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+    const [isDeleting, setIsDeleting] = React.useState(false);
 
     const [editingDescription, setEditingDescription] = React.useState(false);
     const [newDescription, setNewDescription] = React.useState(space.description || "");
@@ -104,6 +117,19 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
 
     const handleDismissTip = async () => {
         await updateMetadata({ spaceId: space._id, hideAssistantAvatarTip: true });
+    };
+
+    const handleDeleteSpace = async () => {
+        setIsDeleting(true);
+        try {
+            await deleteSpaceMut({ spaceId: space._id });
+            setDeleteDialogOpen(false);
+            router.push("/spaces");
+        } catch (error) {
+            console.error("Error deleting space:", error);
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     // If moderator somehow accesses general tab, we might restrict edit actions, but the wrapper handles visibility mostly.
@@ -461,6 +487,131 @@ export default function GeneralTab({ space, role, userRole }: GeneralTabProps) {
                     )}
                 </Box>
             </Box>
+
+            {/* Danger Zone - Only for Owners */}
+            {userRole === "owner" && (
+                <Box sx={{
+                    mt: 4,
+                    borderRadius: 4,
+                    border: `1px solid color-mix(in oklab, ${themeVar("destructive")}, transparent 70%)`,
+                    overflow: "hidden",
+                    bgcolor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 96%)`
+                }}>
+                    <Box sx={{
+                        px: 3,
+                        py: 2,
+                        bgcolor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 90%)`,
+                        borderBottom: `1px solid color-mix(in oklab, ${themeVar("destructive")}, transparent 70%)`,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.5
+                    }}>
+                        <AlertTriangle size={18} color={themeVar("destructive")} />
+                        <Typography variant="caption" sx={{
+                            fontWeight: 800,
+                            color: themeVar("destructive"),
+                            letterSpacing: "0.08em",
+                            fontSize: "0.75rem",
+                            textTransform: "uppercase"
+                        }}>
+                            Danger Zone
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ p: 3 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 3 }}>
+                            <Box>
+                                <Typography sx={{ color: themeVar("foreground"), fontWeight: 700, mb: 0.5 }}>
+                                    Delete this Space
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: themeVar("mutedForeground"), fontSize: "0.85rem" }}>
+                                    Once you delete a space, there is no going back. All messages, channels, rules, and settings will be permanently lost.
+                                </Typography>
+                            </Box>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={() => setDeleteDialogOpen(true)}
+                                startIcon={<Trash2 size={16} />}
+                                sx={{
+                                    bgcolor: themeVar("destructive"),
+                                    color: "white",
+                                    fontWeight: 800,
+                                    textTransform: "none",
+                                    borderRadius: 2,
+                                    px: 3,
+                                    whiteSpace: "nowrap",
+                                    "&:hover": { bgcolor: themeVar("destructive"), filter: "brightness(0.9)" }
+                                }}
+                            >
+                                Delete Space
+                            </Button>
+                        </Box>
+                    </Box>
+                </Box>
+            )}
+
+            {/* Deletion Confirmation Dialog */}
+            <Dialog 
+                open={deleteDialogOpen} 
+                onClose={() => !isDeleting && setDeleteDialogOpen(false)}
+                PaperProps={{
+                    sx: {
+                        bgcolor: themeVar("background"),
+                        backgroundImage: "none",
+                        borderRadius: 4,
+                        border: `1px solid ${themeVar("border")}`,
+                        maxWidth: 400
+                    }
+                }}
+            >
+                <DialogTitle component="div" sx={{ display: "flex", alignItems: "center", gap: 1.5, pb: 1 }}>
+                    <AlertTriangle color={themeVar("destructive")} size={24} />
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>Delete Space?</Typography>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText sx={{ color: themeVar("foreground"), mb: 2 }}>
+                        Are you absolutely sure you want to delete <Box component="span" sx={{ fontWeight: 800, color: themeVar("primary") }}>{space.name}</Box>? 
+                        This action cannot be undone.
+                    </DialogContentText>
+                    <Box sx={{ 
+                        p: 1.5, 
+                        borderRadius: 2, 
+                        bgcolor: `color-mix(in oklab, ${themeVar("destructive")}, transparent 90%)`,
+                        border: `1px solid color-mix(in oklab, ${themeVar("destructive")}, transparent 80%)`
+                    }}>
+                        <Typography variant="caption" sx={{ color: themeVar("destructive"), fontWeight: 700, display: "flex", gap: 1 }}>
+                            <X size={14} /> All data will be permanently wiped.
+                        </Typography>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, pt: 1 }}>
+                    <Button 
+                        onClick={() => setDeleteDialogOpen(false)} 
+                        disabled={isDeleting}
+                        sx={{ color: themeVar("mutedForeground"), fontWeight: 700, textTransform: "none" }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={handleDeleteSpace}
+                        disabled={isDeleting}
+                        sx={{
+                            bgcolor: themeVar("destructive"),
+                            color: "white",
+                            fontWeight: 800,
+                            textTransform: "none",
+                            borderRadius: 2,
+                            px: 3,
+                            "&:hover": { bgcolor: themeVar("destructive"), filter: "brightness(0.9)" }
+                        }}
+                    >
+                        {isDeleting ? <CircularProgress size={20} sx={{ color: "white" }} /> : "Yes, Delete Space"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }

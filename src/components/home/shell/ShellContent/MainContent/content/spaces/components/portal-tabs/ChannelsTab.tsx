@@ -31,25 +31,6 @@ interface ChannelsTabProps {
     canManageChannels: boolean;
 }
 
-const parseRules = (text: string) => {
-    if (!text || !text.includes("=== SERVER RULES ===")) return [];
-    try {
-        const blocks = text.split("=== SERVER RULES ===\n\n")[1].split("\n\n");
-        return blocks.map(block => {
-            const lines = block.split('\n');
-            const firstLine = lines[0].trim();
-            const firstSpace = firstLine.indexOf(' ');
-            if (firstSpace === -1) return null;
-            let parsedId = firstLine.substring(0, firstSpace);
-            if (parsedId.endsWith('.')) parsedId = parsedId.slice(0, -1);
-            const title = firstLine.substring(firstSpace + 1);
-            const description = lines.slice(1).map(l => l.trimStart()).join('\n');
-            return { id: parsedId, title, description };
-        }).filter(Boolean) as { id: string, title: string, description: string }[];
-    } catch {
-        return [];
-    }
-}
 
 export default function ChannelsTab({ space, role, userRole, canManageChannels }: ChannelsTabProps) {
     const channels = useQuery(api.spaces.channels.getChannels, { spaceId: space._id });
@@ -64,8 +45,6 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
     const deleteCategory = useMutation(api.spaces.channels.deleteCategory);
     const reorderCategories = useMutation(api.spaces.channels.reorderCategories);
     const reorderChannels = useMutation(api.spaces.channels.reorderChannels);
-    const setupWelcomeCategory = useMutation(api.spaces.welcome.setupWelcomeCategory);
-    const welcomeContentQuery = useQuery(api.spaces.welcome.getWelcomeContent, { spaceId: space._id });
 
     const [creatingChannel, setCreatingChannel] = React.useState(false);
     const [newChannelName, setNewChannelName] = React.useState("");
@@ -82,9 +61,6 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
     const [newCategoryName, setNewCategoryName] = React.useState("");
     const [editingCategoryId, setEditingCategoryId] = React.useState<Id<"spaceCategories"> | null>(null);
     const [editingCategoryName, setEditingCategoryName] = React.useState("");
-
-    const [setupWelcomeOpen, setSetupWelcomeOpen] = React.useState(false);
-    const [welcomeRules, setWelcomeRules] = React.useState([{ id: "1", title: "Be Respectful", description: "Treat everyone with respect." }]);
     const [channelToDelete, setChannelToDelete] = React.useState<{ id: Id<"spaceChannels">, name: string } | null>(null);
     const [categoryToDelete, setCategoryToDelete] = React.useState<{ id: Id<"spaceCategories">, name: string } | null>(null);
 
@@ -97,15 +73,6 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
         return <Typography sx={{ color: themeVar("mutedForeground"), p: 4 }}>You do not have permission to manage channels.</Typography>;
     }
 
-    const handleOpenWelcomeSetup = () => {
-        if (welcomeContentQuery) {
-            if (welcomeContentQuery.rulesText) {
-                const parsed = parseRules(welcomeContentQuery.rulesText);
-                if (parsed.length > 0) setWelcomeRules(parsed);
-            }
-        }
-        setSetupWelcomeOpen(true);
-    };
 
     const handleCreateChannel = async () => {
         if (!newChannelName.trim()) return;
@@ -307,35 +274,6 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                     </Box>
                 </Box>
 
-                <Box sx={{ mb: 4, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <Box>
-                        <Typography variant="h6" sx={{ fontWeight: 900, color: themeVar("foreground") }}>Space Control Center</Typography>
-                        <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>Manage categories and channel structure.</Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", gap: 1.5 }}>
-                        <Button
-                            startIcon={<Plus size={16} />} onClick={() => setCreatingCategory(true)}
-                            sx={{ color: themeVar("mutedForeground"), bgcolor: "rgba(255,255,255,0.05)", textTransform: "none", fontWeight: 700, "&:hover": { bgcolor: "rgba(255,255,255,0.1)" } }}
-                        >
-                            Category
-                        </Button>
-                        <Button
-                            variant="contained" startIcon={<MessageSquarePlus size={16} />} onClick={() => setCreatingChannel(true)}
-                            sx={{
-                                bgcolor: themeVar("primary"), color: "white", textTransform: "none", fontWeight: 800, px: 2,
-                                "&:hover": {
-                                    bgcolor: themeVar("primary"),
-                                    filter: "brightness(1.1)",
-                                    boxShadow: `0 4px 12px color-mix(in oklab, ${themeVar("primary")}, transparent 50%)`,
-                                },
-                                transition: "all 0.2s ease"
-                            }}
-                        >
-                            New Channel
-                        </Button>
-                    </Box>
-                </Box>
-
                 {/* Create Category Modal */}
                 <Dialog 
                     open={creatingCategory} 
@@ -500,7 +438,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                                     ))}
                                 </Select>
                             </FormControl>
-                            {renderToggle("Read-Only Channel (Staff Only)", newChannelIsReadOnly, () => setNewChannelIsReadOnly(!newChannelIsReadOnly))}
+                            {renderToggle(newChannelType === "voice" ? "Staff Only Channel" : "Read-Only Channel (Staff Only)", newChannelIsReadOnly, () => setNewChannelIsReadOnly(!newChannelIsReadOnly))}
                         </Stack>
                     </DialogContent>
                     <DialogActions sx={{ p: 2.5, gap: 1.5 }}>
@@ -663,29 +601,6 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                 </Box>
             )}
 
-            <Dialog open={setupWelcomeOpen} onClose={() => setSetupWelcomeOpen(false)} maxWidth="md" fullWidth PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none" } }}>
-                <DialogTitle sx={{ fontWeight: 900 }}>Setup Welcome Category</DialogTitle>
-                <DialogContent>
-                    <DialogContentText sx={{ color: themeVar("mutedForeground"), mb: 3 }}>
-                        This will create or update the "Welcome" category. The #rules channel will be completely refreshed with the contents below.
-                        The #announcements channel will be created if it doesn't exist.
-                    </DialogContentText>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>Rules</Typography>
-                    {welcomeRules.map((r, i) => (
-                        <Box key={i} sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'flex-start' }}>
-                            <TextField size="small" label="ID" value={r.id} onChange={e => { const newR = [...welcomeRules]; newR[i].id = e.target.value; setWelcomeRules(newR); }} sx={{ width: 80 }} InputProps={{ sx: { color: themeVar("foreground") } }} />
-                            <TextField size="small" label="Title" value={r.title} onChange={e => { const newR = [...welcomeRules]; newR[i].title = e.target.value; setWelcomeRules(newR); }} sx={{ flex: 1 }} InputProps={{ sx: { color: themeVar("foreground") } }} />
-                            <TextField size="small" label="Description" value={r.description} onChange={e => { const newR = [...welcomeRules]; newR[i].description = e.target.value; setWelcomeRules(newR); }} sx={{ flex: 2 }} InputProps={{ sx: { color: themeVar("foreground") } }} />
-                            <IconButton onClick={() => setWelcomeRules(welcomeRules.filter((_, idx) => idx !== i))} sx={{ color: themeVar("destructive") }}><Trash2 size={16} /></IconButton>
-                        </Box>
-                    ))}
-                    <Button startIcon={<Plus size={16} />} onClick={() => setWelcomeRules([...welcomeRules, { id: `${welcomeRules.length + 1}`, title: "", description: "" }])} sx={{ color: themeVar("primary"), textTransform: "none", fontWeight: 700 }}>Add Rule</Button>
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setSetupWelcomeOpen(false)} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>
-                    <Button variant="contained" onClick={async () => { await setupWelcomeCategory({ spaceId: space._id, rulesItems: welcomeRules as any }); setSetupWelcomeOpen(false); setWelcomeRules([{ id: "1", title: "Be Respectful", description: "Treat everyone with respect." }]); }} sx={{ bgcolor: themeVar("primary"), color: "white", fontWeight: 700 }}>Save Welcome Category</Button>
-                </DialogActions>
-            </Dialog>
 
             {/* Channel Delete Confirmation Dialog */}
             <Dialog

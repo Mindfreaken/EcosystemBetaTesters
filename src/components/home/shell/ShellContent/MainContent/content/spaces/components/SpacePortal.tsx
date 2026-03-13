@@ -68,15 +68,18 @@ export default function SpacePortal({ space, role, userRole }: SpacePortalProps)
 
     const config = portalConfig[role];
 
-    const isOwner = userRole === "owner";
-    const isSpaceAdmin = userRole === "admin";
-    const isMod = userRole === "moderator";
+    const isOwner = role === "owner";
+    const isSpaceAdmin = role === "admin";
+    const isMod = role === "moderator";
 
     const canEditGeneral = isOwner || isSpaceAdmin;
     const canManageChannels = isOwner ||
         (isSpaceAdmin && (space.adminCanEditChannels ?? true)) ||
         (isMod && (space.modCanEditChannels ?? false));
     const canManageEmojis = isOwner || isSpaceAdmin;
+    const canManagePolls = isOwner ||
+        (isSpaceAdmin && (space.adminCanCreatePolls !== false)) ||
+        (isMod && (space.modCanCreatePolls ?? false));
 
     return (
         <Box sx={{ flex: 1, overflowY: "auto", p: 4, bgcolor: themeVar("background") }}>
@@ -120,7 +123,7 @@ export default function SpacePortal({ space, role, userRole }: SpacePortalProps)
                     <Tab value="members" label="Members" />
                     {canManageChannels && <Tab value="channels" label="Channels" />}
                     {(isOwner || isSpaceAdmin) && <Tab value="schedule" label="Schedule" />}
-                    <Tab value="polls" label="Polls" />
+                    {canManagePolls && <Tab value="polls" label="Polls" />}
                     <Tab value="bans" label="Bans & Timeouts" />
                     {canManageEmojis && <Tab value="emojis" label="Emojis" />}
                 </Tabs>
@@ -131,7 +134,7 @@ export default function SpacePortal({ space, role, userRole }: SpacePortalProps)
                     {currentTab === "members" && <MembersTab space={space} role={role} userRole={userRole} />}
                     {currentTab === "channels" && canManageChannels && <ChannelsTab space={space} role={role} userRole={userRole} canManageChannels={canManageChannels} />}
                     {currentTab === "schedule" && (isOwner || isSpaceAdmin) && <ScheduleTab space={space} role={role} />}
-                    {currentTab === "polls" && <PollsTab space={space} role={role} userRole={userRole} />}
+                    {currentTab === "polls" && canManagePolls && <PollsTab space={space} role={role} userRole={userRole} />}
                     {currentTab === "bans" && <BansTab space={space} role={role} />}
                     {currentTab === "emojis" && canManageEmojis && <EmojisTab space={space} role={role} />}
                 </Box>

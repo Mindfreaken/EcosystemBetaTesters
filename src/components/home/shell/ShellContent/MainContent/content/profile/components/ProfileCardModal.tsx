@@ -26,6 +26,7 @@ export interface ProfileCardModalProps {
     projectsCount?: number;
     xp?: number;
   };
+  children?: React.ReactNode;
 }
 
 function formatCompact(n: number | undefined | null): string {
@@ -36,7 +37,7 @@ function formatCompact(n: number | undefined | null): string {
   return (n / 1_000_000_000).toFixed(1).replace(/\.0$/, "") + "b";
 }
 
-export default function ProfileCardModal({ show, onClose, userId, prefill }: ProfileCardModalProps) {
+export default function ProfileCardModal({ show, onClose, userId, prefill, children }: ProfileCardModalProps) {
   const me = useQuery(api.users.onboarding.queries.me, {});
   const effectiveUserId = (userId as any) || (me as any)?._id || "";
   const isSelf = !userId || ((me as any)?._id && String((me as any)?._id) === String(userId));
@@ -140,6 +141,11 @@ export default function ProfileCardModal({ show, onClose, userId, prefill }: Pro
             footerBadge={footerBadge}
           />
         </Box>
+        {children && (
+          <Box sx={{ mt: 2, px: 2, pb: 2 }}>
+            {children}
+          </Box>
+        )}
       </DialogContent>
     </Dialog>
   );

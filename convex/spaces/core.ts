@@ -44,6 +44,26 @@ export const getUserSpaces = query({
 });
 
 /**
+ * Get the list of spaces a specific user is a member of.
+ */
+export const getPublicUserSpaces = query({
+    args: { userId: v.union(v.id("users"), v.null()) },
+    handler: async (ctx, args) => {
+        if (!args.userId) return [];
+        const memberships = await ctx.db
+            .query("spaceMembers")
+            .withIndex("by_user", (q) => q.eq("userId", args.userId as Id<"users">))
+            .collect();
+
+        const spaces = await Promise.all(
+            memberships.map((m) => ctx.db.get(m.spaceId))
+        );
+
+        return spaces.filter((s) => s !== null);
+    },
+});
+
+/**
  * Get a single space by its ID.
  */
 export const getSpace = query({
@@ -61,6 +81,8 @@ export const createSpace = mutation({
         name: v.string(),
         description: v.optional(v.string()),
         isPublic: v.boolean(),
+        avatarUrl: v.optional(v.string()),
+        coverUrl: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         const user = await ensureUserActive(ctx);
@@ -90,6 +112,8 @@ export const createSpace = mutation({
             name: args.name,
             description: args.description,
             ownerId: user._id,
+            avatarUrl: args.avatarUrl,
+            coverUrl: args.coverUrl,
             createdAt: now,
             updatedAt: now,
             isPublic: args.isPublic,
@@ -111,6 +135,41 @@ export const createSpace = mutation({
             channelOrder: 0,
             createdAt: now,
         });
+
+        // Create specialized #rules channel
+        await ctx.db.insert("spaceChannels", {
+            spaceId,
+            name: "rules",
+            type: "text",
+            description: "The official space rules.",
+            channelOrder: 1,
+            isReadOnly: true,
+            createdAt: now,
+        });
+
+        // Populate default rules
+        const defaultRules = [
+            { title: "Be Respectful", description: "Treat all members with kindness and respect." },
+            { title: "No Spam", description: "Avoid excessive messaging or self-promotion without permission." },
+            { title: "Follow Guidelines", description: "Adhere to the community guidelines at all times." },
+            { title: "Keep Content Relevant", description: "Post in the appropriate channels and stay on topic." },
+            { title: "No Hate Speech", description: "Discrimination or harassment of any kind will not be tolerated." },
+            { title: "Protect Privacy", description: "Do not share personal information of yourself or others." },
+            { title: "Appropriate Content", description: "Avoid NSFW or offensive material in public channels." },
+            { title: "No Self-Promotion", description: "Do not advertise products, services, or other communities without permission." },
+            { title: "Respect Staff", description: "Follow instructions from moderators and admins." },
+            { title: "Report Issues", description: "Notify staff if you see someone breaking the rules or encounter problems." }
+        ];
+
+        for (let i = 0; i < defaultRules.length; i++) {
+            await ctx.db.insert("spaceRules", {
+                spaceId,
+                title: defaultRules[i].title,
+                description: defaultRules[i].description,
+                order: i,
+                createdAt: now
+            });
+        }
 
         // Add welcome message
         await ctx.db.insert("spaceChannelMessages", {
@@ -202,16 +261,48 @@ export const deleteSpace = mutation({
         if (!space) throw new Error("Space not found.");
         if (space.ownerId !== user._id) throw new Error("Unauthorized: Only the owner can delete the space.");
 
-        // Delete all members, invites, actions, and stats
-        const members = await ctx.db.query("spaceMembers").withIndex("by_space", (q) => q.eq("spaceId", args.spaceId)).collect();
-        const invites = await ctx.db.query("spaceInvites").withIndex("by_space", (q) => q.eq("spaceId", args.spaceId)).collect();
-        const actions = await ctx.db.query("spaceAdminActions").withIndex("by_space", (q) => q.eq("spaceId", args.spaceId)).collect();
-        const categories = await ctx.db.query("spaceCategories").withIndex("by_space", (q) => q.eq("spaceId", args.spaceId)).collect();
+        // 1. Delete Channels and their children (messages, reactions)
+        const channels = await ctx.db.query("spaceChannels").withIndex("by_space", (q) => q.eq("spaceId", args.spaceId)).collect();
+        for (const channel of channels) {
+            const messages = await ctx.db.query("spaceChannelMessages").withIndex("by_channel_time", (q) => q.eq("channelId", channel._id)).collect();
+            for (const msg of messages) {
+                const reactions = await ctx.db.query("spaceChannelMessageReactions").withIndex("by_message", (q) => q.eq("messageId", msg._id)).collect();
+                await Promise.all(reactions.map((r) => ctx.db.delete(r._id)));
+                await ctx.db.delete(msg._id);
+            }
+            await ctx.db.delete(channel._id);
+        }
 
-        await Promise.all(members.map((m) => ctx.db.delete(m._id)));
-        await Promise.all(invites.map((i) => ctx.db.delete(i._id)));
-        await Promise.all(actions.map((a) => ctx.db.delete(a._id)));
-        await Promise.all(categories.map((c) => ctx.db.delete(c._id)));
+        // 2. Delete Polls and Votes
+        const polls = await ctx.db.query("spacePolls").withIndex("by_space", (q) => q.eq("spaceId", args.spaceId)).collect();
+        for (const poll of polls) {
+            const votes = await ctx.db.query("spacePollVotes").withIndex("by_poll", (q) => q.eq("pollId", poll._id)).collect();
+            await Promise.all(votes.map((v) => ctx.db.delete(v._id)));
+            await ctx.db.delete(poll._id);
+        }
+
+        // 3. Delete other space-related data
+        const collections = [
+            "spaceMembers", 
+            "spaceInvites", 
+            "spaceAdminActions", 
+            "spaceCategories",
+            "spaceRules",
+            "spaceRoles",
+            "spaceMemberRoles",
+            "spaceEvents",
+            "spaceCustomEmojis",
+            "spaceDailyStats",
+            "spaceDailyActive",
+            "spaceMonthlyActive",
+            "spaceMemberNotes",
+            "spaceVoicePresence"
+        ];
+
+        for (const collection of collections) {
+            const items = await ctx.db.query(collection as any).withIndex("by_space", (q: any) => q.eq("spaceId", args.spaceId)).collect();
+            await Promise.all(items.map((i) => ctx.db.delete(i._id)));
+        }
 
         await ctx.db.delete(args.spaceId);
     },

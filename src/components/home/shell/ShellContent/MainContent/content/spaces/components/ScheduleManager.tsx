@@ -9,9 +9,10 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import { Plus, Calendar as CalendarIcon, Clock, Trash2, Edit2, Info, Megaphone } from "lucide-react";
+import { Plus, X, Calendar as CalendarIcon, Clock, Info, Edit2, Trash2, Megaphone } from "lucide-react";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
+import Switch from "@mui/material/Switch";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Id, Doc } from "convex/_generated/dataModel";
@@ -108,6 +109,45 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
         }
     };
 
+    const renderToggle = (label: string, value: boolean, onChange: () => void) => (
+        <Box
+            onClick={onChange}
+            sx={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                p: 2, borderRadius: 3,
+                bgcolor: "rgba(0,0,0,0.15)",
+                border: `1px solid ${value ? `color-mix(in oklab, ${themeVar("primary")}, transparent 70%)` : "rgba(255,255,255,0.05)"}`,
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                    bgcolor: "rgba(0,0,0,0.25)",
+                    borderColor: value ? themeVar("primary") : "rgba(255,255,255,0.15)",
+                }
+            }}
+        >
+            <Typography variant="body2" sx={{ color: themeVar("foreground"), fontWeight: 600 }}>{label}</Typography>
+            <Box
+                sx={{
+                    width: 44, height: 24, borderRadius: 12,
+                    bgcolor: value ? themeVar("primary") : "rgba(255,255,255,0.1)",
+                    position: "relative",
+                    transition: "background-color 0.3s ease"
+                }}
+            >
+                <Box
+                    sx={{
+                        width: 18, height: 18, borderRadius: "50%",
+                        bgcolor: "white",
+                        position: "absolute", top: 3,
+                        left: value ? 23 : 3,
+                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                    }}
+                />
+            </Box>
+        </Box>
+    );
+
     return (
         <Box sx={{ maxWidth: 800 }}>
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
@@ -182,57 +222,188 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
                 )}
             </Box>
 
-            <Dialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none" } }}>
-                <DialogTitle sx={{ fontWeight: 900 }}>{editingEventId ? "Edit Event" : "Create Event"}</DialogTitle>
+            <Dialog 
+                open={isCreateOpen} 
+                onClose={() => setIsCreateOpen(false)} 
+                fullWidth 
+                maxWidth="xs"
+                slotProps={{
+                    backdrop: {
+                        sx: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                            backdropFilter: 'blur(4px)',
+                        }
+                    }
+                }}
+                PaperProps={{
+                    sx: {
+                        bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
+                        backdropFilter: "blur(12px)",
+                        borderRadius: "9px",
+                        border: `1px solid ${themeVar("border")}`,
+                        backgroundImage: "none",
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                        width: "100%",
+                        maxWidth: 450
+                    }
+                }}
+            >
+                <DialogTitle 
+                    sx={{ 
+                        fontWeight: 900, 
+                        color: themeVar("foreground"),
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        pb: 1
+                    }}
+                >
+                    {editingEventId ? "Edit Event" : "Create Event"}
+                    <IconButton
+                        size="small"
+                        onClick={() => setIsCreateOpen(false)}
+                        sx={{
+                            color: themeVar("mutedForeground"),
+                            "&:hover": { color: themeVar("foreground"), background: "transparent" },
+                        }}
+                    >
+                        <X size={18} />
+                    </IconButton>
+                </DialogTitle>
                 <DialogContent>
-                    <Stack spacing={3} sx={{ mt: 1 }}>
+                    <Stack spacing={2.5} sx={{ py: 1 }}>
                         <TextField
                             label="Event Title"
                             fullWidth
+                            size="small"
                             value={title}
                             onChange={e => setTitle(e.target.value)}
-                            InputLabelProps={{ sx: { color: themeVar("mutedForeground") } }}
-                            InputProps={{ sx: { color: themeVar("foreground") } }}
+                            variant="outlined"
+                            InputLabelProps={{ 
+                                shrink: true,
+                                sx: { color: themeVar("foreground"), fontWeight: 700, "&.Mui-focused": { color: themeVar("primary") } }
+                            }}
+                            InputProps={{ 
+                                sx: { 
+                                    color: themeVar("foreground"),
+                                    bgcolor: "rgba(0,0,0,0.3)",
+                                    borderRadius: 2,
+                                    "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary"), borderWidth: 2 }
+                                } 
+                            }}
                         />
                         <TextField
                             label="Description (Optional)"
                             fullWidth
                             multiline
                             rows={3}
+                            size="small"
                             value={description}
                             onChange={e => setDescription(e.target.value)}
-                            InputLabelProps={{ sx: { color: themeVar("mutedForeground") } }}
-                            InputProps={{ sx: { color: themeVar("foreground") } }}
+                            variant="outlined"
+                            InputLabelProps={{ 
+                                shrink: true,
+                                sx: { color: themeVar("foreground"), fontWeight: 700, "&.Mui-focused": { color: themeVar("primary") } }
+                            }}
+                            InputProps={{ 
+                                sx: { 
+                                    color: themeVar("foreground"),
+                                    bgcolor: "rgba(0,0,0,0.3)",
+                                    borderRadius: 2,
+                                    "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary"), borderWidth: 2 }
+                                } 
+                            }}
                         />
                         <Stack direction="row" spacing={2}>
                             <TextField
                                 label="Start Time (Local)"
                                 type="datetime-local"
                                 fullWidth
+                                size="small"
                                 value={startTime}
                                 onChange={e => setStartTime(e.target.value)}
-                                InputLabelProps={{ shrink: true, sx: { color: themeVar("mutedForeground") } }}
-                                InputProps={{ sx: { color: themeVar("foreground") } }}
+                                variant="outlined"
+                                InputLabelProps={{ 
+                                    shrink: true, 
+                                    sx: { 
+                                        color: themeVar("foreground"), fontWeight: 700, "&.Mui-focused": { color: themeVar("primary") }
+                                    } 
+                                }}
+                                InputProps={{ 
+                                    sx: { 
+                                        color: themeVar("foreground"),
+                                        bgcolor: "rgba(0,0,0,0.3)",
+                                        borderRadius: 2,
+                                        "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+                                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary"), borderWidth: 2 },
+                                        "& [type='datetime-local']::-webkit-calendar-picker-indicator": { filter: "invert(1)" }
+                                    } 
+                                }}
                             />
                             <TextField
                                 label="End Time (Local)"
                                 type="datetime-local"
                                 fullWidth
+                                size="small"
                                 value={endTime}
                                 onChange={e => setEndTime(e.target.value)}
-                                InputLabelProps={{ shrink: true, sx: { color: themeVar("mutedForeground") } }}
-                                InputProps={{ sx: { color: themeVar("foreground") } }}
+                                variant="outlined"
+                                InputLabelProps={{ 
+                                    shrink: true, 
+                                    sx: { 
+                                        color: themeVar("foreground"), fontWeight: 700, "&.Mui-focused": { color: themeVar("primary") }
+                                    } 
+                                }}
+                                InputProps={{ 
+                                    sx: { 
+                                        color: themeVar("foreground"),
+                                        bgcolor: "rgba(0,0,0,0.3)",
+                                        borderRadius: 2,
+                                        "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+                                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary"), borderWidth: 2 },
+                                        "& [type='datetime-local']::-webkit-calendar-picker-indicator": { filter: "invert(1)" }
+                                    } 
+                                }}
                             />
                         </Stack>
-                        <FormControlLabel
-                            control={<Checkbox checked={showInAnnouncements} onChange={e => setShowInAnnouncements(e.target.checked)} sx={{ color: themeVar("primary"), '&.Mui-checked': { color: themeVar("primary") } }} />}
-                            label={<Typography variant="body2" sx={{ color: themeVar("mutedForeground"), display: "flex", alignItems: "center", gap: 1 }}><Megaphone size={14} /> Announce in #announcements</Typography>}
-                        />
+                        {renderToggle("Announce in #announcements", showInAnnouncements, () => setShowInAnnouncements(!showInAnnouncements))}
                     </Stack>
                 </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setIsCreateOpen(false)} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>
-                    <Button onClick={handleSave} variant="contained" disabled={!title.trim() || !startTime || !endTime} sx={{ bgcolor: themeVar("primary") }}>
+                <DialogActions sx={{ p: 2.5, gap: 1.5 }}>
+                    <Button 
+                        onClick={() => setIsCreateOpen(false)} 
+                        sx={{ 
+                            color: themeVar("mutedForeground"),
+                            fontWeight: 700,
+                            textTransform: "none",
+                            "&:hover": { color: themeVar("foreground"), bgcolor: "transparent" },
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={handleSave} 
+                        variant="contained" 
+                        disabled={!title.trim() || !startTime || !endTime} 
+                        sx={{ 
+                            bgcolor: themeVar("primary"),
+                            color: "white",
+                            fontWeight: 900,
+                            textTransform: "none",
+                            px: 3,
+                            borderRadius: 2,
+                            "&:hover": {
+                                bgcolor: themeVar("primary"),
+                                filter: "brightness(1.1)",
+                            },
+                            "&:disabled": {
+                                bgcolor: themeVar("border"),
+                                color: themeVar("mutedForeground"),
+                            }
+                        }}
+                    >
                         {editingEventId ? "Save Changes" : "Create Event"}
                     </Button>
                 </DialogActions>

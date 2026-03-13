@@ -80,7 +80,8 @@ export const spacesTables = {
         createdAt: v.number(),
     })
         .index("by_day", ["spaceId", "day"])
-        .index("by_day_user", ["spaceId", "day", "userId"]),
+        .index("by_day_user", ["spaceId", "day", "userId"])
+        .index("by_space", ["spaceId"]),
 
     spaceMonthlyActive: defineTable({
         spaceId: v.id("spaces"),
@@ -89,7 +90,8 @@ export const spacesTables = {
         createdAt: v.number(),
     })
         .index("by_month", ["spaceId", "month"])
-        .index("by_month_user", ["spaceId", "month", "userId"]),
+        .index("by_month_user", ["spaceId", "month", "userId"])
+        .index("by_space", ["spaceId"]),
 
     spaceCategories: defineTable({
         spaceId: v.id("spaces"),
@@ -192,7 +194,8 @@ export const spacesTables = {
         totalMessages: v.number(),
         totalVoiceMinutes: v.number(),
     })
-        .index("by_day", ["spaceId", "day"]),
+        .index("by_day", ["spaceId", "day"])
+        .index("by_space", ["spaceId"]),
 
     spacePolls: defineTable({
         spaceId: v.id("spaces"),
@@ -215,4 +218,45 @@ export const spacesTables = {
     })
         .index("by_poll", ["pollId"])
         .index("by_poll_user", ["pollId", "userId"]),
+
+    spaceRoles: defineTable({
+        spaceId: v.id("spaces"),
+        name: v.string(),
+        color: v.string(), // Hex color
+        style: v.string(), // "solid" | "gradient" | "holographic"
+        gradientConfig: v.optional(v.object({
+            color1: v.string(),
+            color2: v.string(),
+            angle: v.number(),
+            isAnimated: v.boolean(),
+        })),
+        isHoisted: v.boolean(), // Display members separately in sidebar
+        order: v.number(),
+        isSystem: v.optional(v.boolean()),
+        systemKey: v.optional(v.string()), // "owner", "admin", "moderator"
+        createdAt: v.number(),
+    })
+        .index("by_space", ["spaceId"])
+        .index("by_space_order", ["spaceId", "order"]),
+
+    spaceMemberRoles: defineTable({
+        spaceId: v.id("spaces"),
+        userId: v.id("users"),
+        roleId: v.id("spaceRoles"),
+    })
+        .index("by_space", ["spaceId"])
+        .index("by_user", ["userId"])
+        .index("by_role", ["roleId"])
+        .index("by_space_user", ["spaceId", "userId"])
+        .index("by_space_user_role", ["spaceId", "userId", "roleId"]),
+
+    spaceRules: defineTable({
+        spaceId: v.id("spaces"),
+        title: v.string(),
+        description: v.string(),
+        order: v.number(),
+        createdAt: v.number(),
+    })
+        .index("by_space", ["spaceId"])
+        .index("by_space_order", ["spaceId", "order"]),
 } as const;

@@ -64,7 +64,16 @@ export const getSpaceMembers = query({
         return await Promise.all(
             members.map(async (m) => {
                 const user = await ctx.db.get(m.userId);
-                return { ...m, user };
+                const roleAssociations = await ctx.db
+                    .query("spaceMemberRoles")
+                    .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", m.userId))
+                    .collect();
+                
+                const roles = await Promise.all(
+                    roleAssociations.map(async (ra) => await ctx.db.get(ra.roleId))
+                );
+
+                return { ...m, user, roles: roles.filter(Boolean) };
             })
         );
     },
@@ -76,13 +85,28 @@ export const getSpaceMembers = query({
 export const getSpaceMember = query({
     args: {
         spaceId: v.id("spaces"),
-        userId: v.id("users"),
+        userId: v.union(v.id("users"), v.null()),
     },
     handler: async (ctx, args) => {
-        return await ctx.db
+        if (!args.userId) return null;
+        const membership = await ctx.db
             .query("spaceMembers")
-            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", args.userId))
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", args.userId as Id<"users">))
             .unique();
+
+        if (!membership) return null;
+
+        const user = await ctx.db.get(membership.userId);
+        const roleAssociations = await ctx.db
+            .query("spaceMemberRoles")
+            .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", membership.userId))
+            .collect();
+        
+        const roles = await Promise.all(
+            roleAssociations.map(async (ra) => await ctx.db.get(ra.roleId))
+        );
+
+        return { ...membership, user, roles: roles.filter(Boolean) };
     },
 });
 

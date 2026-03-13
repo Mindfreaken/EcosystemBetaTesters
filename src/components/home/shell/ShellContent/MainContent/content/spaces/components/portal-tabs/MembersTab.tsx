@@ -15,12 +15,19 @@ import Dialog from "@mui/material/Dialog";
 import Switch from "@mui/material/Switch";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogActions from "@mui/material/DialogActions";
-import { Search, Plus, Link, Trophy, Trash2, ShieldAlert, FileText, UserMinus } from "lucide-react";
+import { Search, Plus, Link, Trophy, Trash2, ShieldAlert, FileText, UserMinus, Tags, Check, MoreVertical, Copy } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Doc, Id } from "convex/_generated/dataModel";
 import MemberNotesDialog from "../MemberNotesDialog";
 import InvitedMembersDialog from "./InvitedMembersDialog";
+import RoleTag from "../RoleTag";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import RoleManager from "../RoleManager";
+import { useToast } from "@/hooks/use-toast";
 
 interface MembersTabProps {
     space: Doc<"spaces">;
@@ -29,9 +36,11 @@ interface MembersTabProps {
 }
 
 export default function MembersTab({ space, role, userRole }: MembersTabProps) {
+    const { toast } = useToast();
     const members = useQuery(api.spaces.members.getSpaceMembers, { spaceId: space._id });
     const invites = useQuery(api.spaces.invites.getSpaceInvites, { spaceId: space._id });
     const leaderboard = useQuery(api.spaces.invites.getInviteLeaderboard, { spaceId: space._id });
+    const allRoles = useQuery(api.spaces.roles.getSpaceRoles, { spaceId: space._id });
 
     const createInvite = useMutation(api.spaces.invites.createInvite);
     const revokeInvite = useMutation(api.spaces.invites.revokeInvite);
@@ -45,6 +54,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
     const [notesDialogOpen, setNotesDialogOpen] = React.useState(false);
     const [notesDialogMember, setNotesDialogMember] = React.useState<any>(null);
     const [invitedMembersDialog, setInvitedMembersDialog] = React.useState<{ open: boolean; inviterId: Id<"users"> | null; inviterName: string; }>({ open: false, inviterId: null, inviterName: "" });
+    const [roleManagerOpen, setRoleManagerOpen] = React.useState(false);
 
     const [confirmDialog, setConfirmDialog] = React.useState<{
         open: boolean;
@@ -60,7 +70,17 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
     const handleCreateInviteCode = async () => {
         setCreatingInvite(true);
         try {
-            await createInvite({ spaceId: space._id });
+            const code = await createInvite({ spaceId: space._id });
+            toast({
+                title: "Invite Created",
+                description: `Code ${code} is now active.`,
+            });
+        } catch (err: any) {
+            toast({
+                title: "Error",
+                description: err.message || "Failed to create invite.",
+                variant: "destructive",
+            });
         } finally {
             setCreatingInvite(false);
         }
@@ -76,27 +96,50 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
 
     return (
         <Box sx={{ maxWidth: 1200 }}>
+             <RoleManager 
+                open={roleManagerOpen} 
+                onClose={() => setRoleManagerOpen(false)} 
+                spaceId={space._id} 
+            />
             <Box sx={{ display: "grid", gridTemplateColumns: canManageInvites ? "1fr 400px" : "1fr", gap: 4 }}>
                 {/* Member Management Section */}
                 <Box>
                     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
                         <Typography variant="subtitle2" sx={{ fontWeight: 800, color: themeVar("mutedForeground") }}>MEMBER MANAGEMENT</Typography>
-                        <TextField
-                            size="small" placeholder="Search members..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                            InputProps={{
-                                startAdornment: <InputAdornment position="start"><Search size={14} style={{ color: themeVar("mutedForeground") }} /></InputAdornment>,
-                                sx: {
-                                    fontSize: "0.8rem",
-                                    height: 32,
-                                    bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
-                                    color: themeVar("foreground"),
-                                    border: `1px solid ${themeVar("border")}`,
-                                    borderRadius: 1,
-                                    "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                                    "& input::placeholder": { color: themeVar("mutedForeground"), opacity: 1 }
-                                }
-                            }}
-                        />
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            {canManageRoles && (
+                                <Button
+                                    size="small"
+                                    startIcon={<Tags size={14} />}
+                                    onClick={() => setRoleManagerOpen(true)}
+                                    sx={{
+                                        fontSize: "0.7rem",
+                                        fontWeight: 800,
+                                        color: themeVar("primary"),
+                                        bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 92%)`,
+                                        "&:hover": { bgcolor: `color-mix(in oklab, ${themeVar("primary")}, transparent 85%)` }
+                                    }}
+                                >
+                                    MANAGE ROLES
+                                </Button>
+                            )}
+                            <TextField
+                                size="small" placeholder="Search members..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start"><Search size={14} style={{ color: themeVar("mutedForeground") }} /></InputAdornment>,
+                                    sx: {
+                                        fontSize: "0.8rem",
+                                        height: 32,
+                                        bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
+                                        color: themeVar("foreground"),
+                                        border: `1px solid ${themeVar("border")}`,
+                                        borderRadius: 1,
+                                        "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                                        "& input::placeholder": { color: themeVar("mutedForeground"), opacity: 1 }
+                                    }
+                                }}
+                            />
+                        </Stack>
                     </Box>
                     <Stack spacing={1} sx={{ maxHeight: 600, overflowY: "auto", pr: 1 }}>
                         {filteredMembers?.map((member: any) => (
@@ -116,15 +159,20 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                     </Box>
                                 </Box>
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                    <Box sx={{
-                                        px: 1, py: 0.25, borderRadius: 1, mr: 1,
-                                    bgcolor: member.role === "owner" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` : member.role === "admin" ? `color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)` : member.role === "moderator" ? `color-mix(in oklab, ${themeVar("chart4")}, transparent 90%)` : `color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
-                                    border: `1px solid ${member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("chart4") : themeVar("border")}`
-                                }}>
-                                    <Typography variant="caption" sx={{ fontWeight: 800, color: member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("chart4") : themeVar("mutedForeground") }}>
-                                        {member.role.toUpperCase()}
-                                    </Typography>
-                                </Box>
+                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mr: 1, justifyContent: "flex-end", maxWidth: 200 }}>
+                                        <Box sx={{
+                                            px: 1, py: 0.25, borderRadius: 1,
+                                            bgcolor: member.role === "owner" ? `color-mix(in oklab, ${themeVar("primary")}, transparent 90%)` : member.role === "admin" ? `color-mix(in oklab, ${themeVar("secondary")}, transparent 90%)` : member.role === "moderator" ? `color-mix(in oklab, ${themeVar("chart4")}, transparent 90%)` : `color-mix(in oklab, ${themeVar("foreground")}, transparent 95%)`,
+                                            border: `1px solid ${member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("chart4") : themeVar("border")}`
+                                        }}>
+                                            <Typography variant="caption" sx={{ fontWeight: 800, color: member.role === "owner" ? themeVar("primary") : member.role === "admin" ? themeVar("secondary") : member.role === "moderator" ? themeVar("chart4") : themeVar("mutedForeground") }}>
+                                                {member.role.toUpperCase()}
+                                            </Typography>
+                                        </Box>
+                                        {member.roles?.map((r: any) => (
+                                            <RoleTag key={r._id} role={r} />
+                                        ))}
+                                    </Box>
 
                                     <Tooltip title="View Notes">
                                         <IconButton size="small" sx={{ color: themeVar("mutedForeground"), "&:hover": { bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 90%)`, color: themeVar("foreground") } }} onClick={() => { setNotesDialogMember(member); setNotesDialogOpen(true); }}>
@@ -139,6 +187,13 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                         (role === "moderator" && member.role === "member")
                                     ) && (
                                             <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                                {canManageRoles && (
+                                                    <RoleAssignmentMenu 
+                                                        member={member} 
+                                                        spaceId={space._id} 
+                                                        allRoles={allRoles || []}
+                                                    />
+                                                )}
                                                 {canManageRoles && member.role === "member" && (
                                                     <Tooltip title={`Promote to ${role === "owner" ? "Admin" : "Moderator"}`}>
                                                         <IconButton
@@ -262,6 +317,74 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                 </Box>
                             </Box>
 
+                            <Box sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px solid ${themeVar("border")}`, mb: 2 }}>
+                                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("mutedForeground"), display: "flex", alignItems: "center", gap: 1 }}>
+                                        <Link size={14} /> ACTIVE INVITES
+                                    </Typography>
+                                </Box>
+                                <Stack spacing={1.5} sx={{ maxHeight: 300, overflowY: "auto" }}>
+                                    {invites?.map((invite: any) => (
+                                        <Box 
+                                            key={invite._id} 
+                                            sx={{ 
+                                                p: 1.5, 
+                                                borderRadius: 1.5, 
+                                                bgcolor: "rgba(0,0,0,0.2)",
+                                                border: `1px solid ${themeVar("border")}`,
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "space-between"
+                                            }}
+                                        >
+                                            <Box sx={{ minWidth: 0 }}>
+                                                <Typography 
+                                                    onClick={() => {
+                                                        const url = `${window.location.origin}/join/${invite.code}`;
+                                                        navigator.clipboard.writeText(url);
+                                                        toast({
+                                                            title: "Copied!",
+                                                            description: "Invite link copied to clipboard.",
+                                                        });
+                                                    }}
+                                                    sx={{ 
+                                                        fontWeight: 800, 
+                                                        color: themeVar("primary"), 
+                                                        fontSize: "0.85rem",
+                                                        fontFamily: "monospace",
+                                                        cursor: "pointer",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: 1,
+                                                        "&:hover": { textDecoration: "underline" }
+                                                    }}
+                                                >
+                                                    {invite.code}
+                                                    <Copy size={12} />
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), display: "block", fontSize: "0.65rem" }}>
+                                                    By {invite.creatorDisplayName} • {invite.uses} uses
+                                                </Typography>
+                                            </Box>
+                                            <Tooltip title="Revoke Invite">
+                                                <IconButton 
+                                                    size="small" 
+                                                    onClick={() => revokeInvite({ spaceId: space._id, inviteId: invite._id })}
+                                                    sx={{ color: themeVar("destructive"), "&:hover": { bgcolor: "rgba(255,0,0,0.1)" } }}
+                                                >
+                                                    <Trash2 size={14} />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Box>
+                                    ))}
+                                    {(!invites || invites.length === 0) && (
+                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontStyle: "italic", textAlign: "center", py: 2, display: "block" }}>
+                                            No active invite codes.
+                                        </Typography>
+                                    )}
+                                </Stack>
+                            </Box>
+
                             <Box sx={{ p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("muted")}, transparent 50%)`, border: `1px solid ${themeVar("border")}` }}>
                                 <Typography variant="caption" sx={{ fontWeight: 800, color: themeVar("mutedForeground"), mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
                                     <Trophy size={14} /> LEADERBOARD
@@ -332,4 +455,67 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
     );
 }
 
+function RoleAssignmentMenu({ member, spaceId, allRoles }: { member: any; spaceId: Id<"spaces">; allRoles: any[] }) {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const assignRole = useMutation(api.spaces.roles.assignRole);
+    const removeRole = useMutation(api.spaces.roles.removeRole);
 
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const toggleRole = async (roleId: Id<"spaceRoles">, isAssigned: boolean) => {
+        if (isAssigned) {
+            await removeRole({ spaceId, userId: member.userId, roleId });
+        } else {
+            await assignRole({ spaceId, userId: member.userId, roleId });
+        }
+    };
+
+    return (
+        <>
+            <Tooltip title="Assign Roles">
+                <IconButton size="small" sx={{ color: themeVar("primary") }} onClick={handleClick}>
+                    <Tags size={18} />
+                </IconButton>
+            </Tooltip>
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+                PaperProps={{
+                    sx: {
+                        bgcolor: themeVar("muted"),
+                        border: `1px solid ${themeVar("border")}`,
+                        color: themeVar("foreground"),
+                    }
+                }}
+            >
+                <Box sx={{ px: 2, py: 1 }}>
+                    <Typography variant="overline" sx={{ fontWeight: 800, color: themeVar("mutedForeground") }}>ASSIGN ROLES</Typography>
+                </Box>
+                {allRoles.length === 0 ? (
+                    <MenuItem disabled>
+                         <Typography variant="caption">No roles created yet</Typography>
+                    </MenuItem>
+                ) : (
+                    allRoles.map((role) => {
+                        const isAssigned = member.roles?.some((r: any) => r._id === role._id);
+                        return (
+                            <MenuItem key={role._id} onClick={() => toggleRole(role._id, isAssigned)}>
+                                <ListItemIcon sx={{ color: isAssigned ? themeVar("primary") : "transparent" }}>
+                                    <Check size={16} />
+                                </ListItemIcon>
+                                <RoleTag role={role} />
+                            </MenuItem>
+                        );
+                    })
+                )}
+            </Menu>
+        </>
+    );
+}

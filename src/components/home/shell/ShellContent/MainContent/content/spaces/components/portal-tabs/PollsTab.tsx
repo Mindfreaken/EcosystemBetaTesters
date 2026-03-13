@@ -12,11 +12,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import { Plus, BarChart3, Trash2, Info, PlusCircle, XCircle, Megaphone, Clock } from "lucide-react";
+import { Plus, BarChart3, Trash2, Info, PlusCircle, XCircle, Megaphone, Clock, X } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Id, Doc } from "convex/_generated/dataModel";
@@ -97,6 +93,45 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
         }
     };
 
+    const renderToggle = (label: string, value: boolean, onChange: () => void) => (
+        <Box
+            onClick={onChange}
+            sx={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                p: 2, borderRadius: 3,
+                bgcolor: "rgba(0,0,0,0.15)",
+                border: `1px solid ${value ? `color-mix(in oklab, ${themeVar("primary")}, transparent 70%)` : "rgba(255,255,255,0.05)"}`,
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                    bgcolor: "rgba(0,0,0,0.25)",
+                    borderColor: value ? themeVar("primary") : "rgba(255,255,255,0.15)",
+                }
+            }}
+        >
+            <Typography variant="body2" sx={{ color: themeVar("foreground"), fontWeight: 600 }}>{label}</Typography>
+            <Box
+                sx={{
+                    width: 44, height: 24, borderRadius: 12,
+                    bgcolor: value ? themeVar("primary") : "rgba(255,255,255,0.1)",
+                    position: "relative",
+                    transition: "background-color 0.3s ease"
+                }}
+            >
+                <Box
+                    sx={{
+                        width: 18, height: 18, borderRadius: "50%",
+                        bgcolor: "white",
+                        position: "absolute", top: 3,
+                        left: value ? 23 : 3,
+                        transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                    }}
+                />
+            </Box>
+        </Box>
+    );
+
     return (
         <Box sx={{ maxWidth: 800 }}>
             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
@@ -133,15 +168,6 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                                             {poll.expiresAt && (
                                                 <Box component="span" sx={{ ml: 1, px: 0.8, py: 0.2, bgcolor: poll.expiresAt > Date.now() ? "rgba(255,255,255,0.05)" : "rgba(255,0,0,0.1)", color: poll.expiresAt > Date.now() ? themeVar("mutedForeground") : themeVar("destructive"), borderRadius: 1, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                                                     {formatTimeLeft(poll.expiresAt)}
-                                                </Box>
-                                            )}
-                                            {poll.allowMultiSelect ? (
-                                                <Box component="span" sx={{ ml: 1, px: 0.8, py: 0.2, bgcolor: "rgba(255,255,255,0.05)", borderRadius: 1, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                                                    Multi-select
-                                                </Box>
-                                            ) : (
-                                                <Box component="span" sx={{ ml: 1, px: 0.8, py: 0.2, bgcolor: "rgba(255,165,0,0.1)", color: "rgba(255,165,0,0.8)", borderRadius: 1, fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-                                                    Votes are final
                                                 </Box>
                                             )}
                                         </Typography>
@@ -198,123 +224,173 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
                 )}
             </Box>
 
-            <Dialog open={isCreateOpen} onClose={() => setIsCreateOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none" } }}>
-                <DialogTitle sx={{ fontWeight: 900 }}>Create New Poll</DialogTitle>
-                <DialogContent>
-                    <Stack spacing={3} sx={{ mt: 1 }}>
+            <Dialog
+                open={isCreateOpen}
+                onClose={() => setIsCreateOpen(false)}
+                fullWidth
+                maxWidth="xs"
+                slotProps={{
+                    backdrop: {
+                        sx: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+                            backdropFilter: 'blur(4px)',
+                        }
+                    }
+                }}
+                PaperProps={{
+                    sx: {
+                        bgcolor: `color-mix(in oklab, ${themeVar("background")}, transparent 20%)`,
+                        backdropFilter: "blur(12px)",
+                        borderRadius: "9px",
+                        border: `1px solid ${themeVar("border")}`,
+                        backgroundImage: "none",
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                        width: "100%",
+                        maxWidth: 500
+                    }
+                }}
+            >
+                <DialogTitle
+                    sx={{
+                        fontWeight: 900,
+                        color: themeVar("foreground"),
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        pb: 1,
+                        px: 3,
+                        pt: 2.5
+                    }}
+                >
+                    Create New Poll
+                    <IconButton
+                        size="small"
+                        onClick={() => setIsCreateOpen(false)}
+                        sx={{
+                            color: themeVar("mutedForeground"),
+                            "&:hover": { color: themeVar("foreground"), background: "transparent" },
+                        }}
+                    >
+                        <X size={18} />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ px: 3 }}>
+                    <Stack spacing={2.5} sx={{ py: 1 }}>
                         <TextField
-                            label="Question"
                             fullWidth
-                            multiline
-                            rows={2}
+                            size="small"
+                            label="Question"
+                            placeholder="e.g. What's our next event theme?"
                             value={question}
-                            onChange={e => setQuestion(e.target.value)}
-                            InputLabelProps={{ sx: { color: themeVar("mutedForeground") } }}
+                            onChange={(e) => setQuestion(e.target.value)}
+                            InputLabelProps={{
+                                shrink: true,
+                                sx: { color: themeVar("foreground"), fontWeight: 700, "&.Mui-focused": { color: themeVar("primary") } }
+                            }}
                             InputProps={{
                                 sx: {
                                     color: themeVar("foreground"),
-                                    '.MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.2)" },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.3)" },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: themeVar("primary") }
+                                    bgcolor: "rgba(0,0,0,0.3)",
+                                    borderRadius: 2,
+                                    "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary"), borderWidth: 2 }
                                 }
                             }}
                         />
 
-                        <Box sx={{ position: "relative", width: "100%" }}>
-                            <Button
-                                variant="outlined"
-                                fullWidth
-                                startIcon={<Clock size={16} />}
-                                sx={{
-                                    color: themeVar("foreground"),
-                                    borderColor: "rgba(255,255,255,0.2)",
-                                    "&:hover": { borderColor: themeVar("primary") },
-                                    justifyContent: "flex-start",
-                                    textTransform: "none",
-                                    fontWeight: 600,
-                                    py: 1
-                                }}
-                            >
-                                {endDate ? `Ends: ${new Date(endDate).toLocaleString()}` : "Set End Time (Optional)"}
-                            </Button>
-                            <Box
-                                component="input"
-                                type="datetime-local"
-                                value={endDate}
-                                onChange={(e: any) => setEndDate(e.target.value)}
-                                sx={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100%",
-                                    height: "100%",
-                                    opacity: 0,
-                                    cursor: "pointer",
-                                    "&::-webkit-calendar-picker-indicator": {
-                                        position: "absolute",
-                                        top: 0,
-                                        left: 0,
-                                        width: "100%",
-                                        height: "100%",
-                                        cursor: "pointer",
-                                        background: "transparent"
-                                    }
-                                }}
-                            />
-                        </Box>
-
-                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 800, mb: -2 }}>OPTIONS</Typography>
-                        <Stack spacing={1}>
-                            {options.map((opt, i) => (
-                                <Box key={i} sx={{ display: "flex", gap: 1 }}>
-                                    <TextField
-                                        fullWidth
-                                        size="small"
-                                        placeholder={`Option ${i + 1}`}
-                                        value={opt}
-                                        onChange={e => {
-                                            const newOptions = [...options];
-                                            newOptions[i] = e.target.value;
-                                            setOptions(newOptions);
-                                        }}
-                                        InputProps={{
-                                            sx: {
-                                                color: themeVar("foreground"),
-                                                '.MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.2)" },
-                                                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: "rgba(255,255,255,0.3)" },
-                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: themeVar("primary") }
-                                            }
-                                        }}
-                                    />
-                                    {options.length > 2 && (
-                                        <IconButton size="small" onClick={() => handleRemoveOption(i)} sx={{ color: themeVar("destructive") }}>
-                                            <XCircle size={18} />
+                        <Box>
+                            <Typography variant="overline" sx={{ fontWeight: 900, color: themeVar("mutedForeground"), display: "block", mb: 1, ml: 0.5 }}>OPTIONS</Typography>
+                            <Stack spacing={1.5}>
+                                {options.map((opt, i) => (
+                                    <Box key={i} sx={{ display: "flex", gap: 1 }}>
+                                        <TextField
+                                            fullWidth
+                                            size="small"
+                                            placeholder={`Option ${i + 1}`}
+                                            value={opt}
+                                            onChange={(e) => {
+                                                const newOpts = [...options];
+                                                newOpts[i] = e.target.value;
+                                                setOptions(newOpts);
+                                            }}
+                                            InputProps={{
+                                                sx: {
+                                                    color: themeVar("foreground"),
+                                                    bgcolor: "rgba(0,0,0,0.2)",
+                                                    borderRadius: 1.5,
+                                                    "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.05)" },
+                                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary") }
+                                                }
+                                            }}
+                                        />
+                                        <IconButton
+                                            onClick={() => setOptions(options.filter((_, idx) => idx !== i))}
+                                            disabled={options.length <= 2}
+                                            sx={{ color: themeVar("destructive"), opacity: options.length <= 2 ? 0.3 : 0.7 }}
+                                        >
+                                            <Trash2 size={16} />
                                         </IconButton>
-                                    )}
-                                </Box>
-                            ))}
-                            {options.length < 10 && (
-                                <Button size="small" startIcon={<PlusCircle size={14} />} onClick={handleAddOption} sx={{ alignSelf: "flex-start", color: themeVar("primary"), textTransform: "none" }}>
+                                    </Box>
+                                ))}
+                                <Button
+                                    size="small"
+                                    startIcon={<Plus size={16} />}
+                                    onClick={() => setOptions([...options, ""])}
+                                    sx={{ alignSelf: "flex-start", color: themeVar("primary"), fontWeight: 700, textTransform: "none" }}
+                                >
                                     Add Option
                                 </Button>
-                            )}
-                        </Stack>
+                            </Stack>
+                        </Box>
 
-                        <Stack spacing={1} direction="row">
-                            <FormControlLabel
-                                control={<Checkbox checked={showInAnnouncements} onChange={e => setShowInAnnouncements(e.target.checked)} sx={{ color: themeVar("primary"), '&.Mui-checked': { color: themeVar("primary") } }} />}
-                                label={<Typography variant="body2" sx={{ color: themeVar("mutedForeground"), display: "flex", alignItems: "center", gap: 1 }}><Megaphone size={14} /> Announce</Typography>}
-                            />
-                            <FormControlLabel
-                                control={<Checkbox checked={allowMultiSelect} onChange={e => setAllowMultiSelect(e.target.checked)} sx={{ color: themeVar("primary"), '&.Mui-checked': { color: themeVar("primary") } }} />}
-                                label={<Typography variant="body2" sx={{ color: themeVar("mutedForeground"), display: "flex", alignItems: "center", gap: 1 }}>Allow multiple answers</Typography>}
-                            />
-                        </Stack>
+                        <TextField
+                            fullWidth
+                            size="small"
+                            label="End Time (Optional)"
+                            type="datetime-local"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            InputLabelProps={{
+                                shrink: true,
+                                sx: { color: themeVar("foreground"), fontWeight: 700, "&.Mui-focused": { color: themeVar("primary") } }
+                            }}
+                            InputProps={{
+                                sx: {
+                                    color: themeVar("foreground"),
+                                    bgcolor: "rgba(0,0,0,0.3)",
+                                    borderRadius: 2,
+                                    "& .MuiOutlinedInput-notchedOutline": { borderColor: "rgba(255,255,255,0.1)" },
+                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: themeVar("primary"), borderWidth: 2 },
+                                    "& [type='datetime-local']::-webkit-calendar-picker-indicator": { filter: "invert(1)" }
+                                }
+                            }}
+                        />
+
+                        {renderToggle("Announce in #announcements", showInAnnouncements, () => setShowInAnnouncements(!showInAnnouncements))}
+                        {renderToggle("Allow Multiple Choices", allowMultiSelect, () => setAllowMultiSelect(!allowMultiSelect))}
                     </Stack>
                 </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={() => setIsCreateOpen(false)} sx={{ color: themeVar("mutedForeground") }}>Cancel</Button>
-                    <Button onClick={handleCreate} variant="contained" disabled={!question.trim() || options.filter(o => o.trim()).length < 2} sx={{ bgcolor: themeVar("primary") }}>
+                <DialogActions sx={{ p: 2.5, gap: 1.5 }}>
+                    <Button
+                        onClick={() => setIsCreateOpen(false)}
+                        sx={{ color: themeVar("mutedForeground"), fontWeight: 700, textTransform: "none" }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleCreate}
+                        disabled={!question.trim() || options.filter(o => o.trim()).length < 2}
+                        sx={{
+                            bgcolor: themeVar("primary"),
+                            color: "white",
+                            fontWeight: 900,
+                            px: 3,
+                            borderRadius: 2,
+                            textTransform: "none",
+                            "&:hover": { bgcolor: themeVar("primary"), filter: "brightness(1.1)" }
+                        }}
+                    >
                         Create Poll
                     </Button>
                 </DialogActions>
@@ -324,7 +400,15 @@ export function PollsTab({ space, role, userRole }: PollsTabProps) {
             <Dialog
                 open={Boolean(pollToDelete)}
                 onClose={() => setPollToDelete(null)}
-                PaperProps={{ sx: { bgcolor: themeVar("muted"), color: themeVar("foreground"), backgroundImage: "none", border: `1px solid ${themeVar("border")}`, borderRadius: 3 } }}
+                PaperProps={{
+                    sx: {
+                        bgcolor: themeVar("background"),
+                        color: themeVar("foreground"),
+                        backgroundImage: "none",
+                        border: `1px solid ${themeVar("border")}`,
+                        borderRadius: 3
+                    }
+                }}
             >
                 <DialogTitle sx={{ fontWeight: 900 }}>Delete Poll?</DialogTitle>
                 <DialogContent>

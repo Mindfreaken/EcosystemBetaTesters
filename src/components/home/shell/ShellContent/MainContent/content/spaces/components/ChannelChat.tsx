@@ -1,5 +1,8 @@
 "use client";
 
+import "../styles/RoleEffects.css";
+
+
 import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -30,6 +33,8 @@ import { EMOJI_CATEGORIES } from "@/constants/emojis";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import MemberNotesDialog from "./MemberNotesDialog";
+import SpaceMemberProfile from "./SpaceMemberProfile";
+import RulesChannelView from "./RulesChannelView";
 
 const COMMON_EMOJIS = ["👍", "❤️", "😂", "🔥", "😮", "🚀"];
 
@@ -59,6 +64,10 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
 
     // Current user membership
     const membership = useQuery(api.spaces.members.getSpaceMember, { spaceId: channel.spaceId, userId: me?._id as Id<"users"> });
+
+    // Roles for this space
+    const roles = useQuery(api.spaces.roles.getSpaceRoles, { spaceId: channel.spaceId });
+
 
     // Auto-scroll logic
     useLayoutEffect(() => {
@@ -131,6 +140,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
     const [isProcessingMod, setIsProcessingMod] = useState(false);
     const [notesDialogOpen, setNotesDialogOpen] = useState(false);
     const [externalLink, setExternalLink] = useState<{ url: string, text: string } | null>(null);
+    const [profileTarget, setProfileTarget] = useState<Id<"users"> | null>(null);
 
     const handleReactionClick = (event: React.MouseEvent<HTMLElement>, msgId: Id<"spaceChannelMessages">) => {
         setAnchorEl(event.currentTarget);
@@ -228,19 +238,13 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                     <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
                         <Typography sx={{ color: themeVar("mutedForeground") }}>Loading messages...</Typography>
                     </Box>
-                ) : messages.length === 0 ? (
-                    isDocumentChannel ? (
-                        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                            <Typography sx={{ color: themeVar("mutedForeground") }}>No document content available.</Typography>
-                        </Box>
-                    ) : (
-                        <Box sx={{ mt: "auto", mb: 4, px: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 1, opacity: 0.4 }}>
-                            <Box sx={{ width: 40, height: 1, bgcolor: themeVar("border") }} />
-                            <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", fontSize: "0.65rem" }}>
-                                No messages yet
-                            </Typography>
-                        </Box>
-                    )
+                ) : !isDocumentChannel && messages.length === 0 ? (
+                    <Box sx={{ mt: "auto", mb: 4, px: 2, display: "flex", flexDirection: "column", alignItems: "center", gap: 1, opacity: 0.4 }}>
+                        <Box sx={{ width: 40, height: 1, bgcolor: themeVar("border") }} />
+                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", fontSize: "0.65rem" }}>
+                            No messages yet
+                        </Typography>
+                    </Box>
                 ) : (
                     <>
                         {!isDocumentChannel && (
@@ -267,6 +271,22 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                             const canMod = (userRole ? ["owner", "admin", "moderator"].includes(userRole) : false) && m.senderId !== me?._id;
                             const canDelete = isMine || canMod;
 
+                            // Find the system role that matches this sender's base role
+                            const systemRole = roles?.find(r => r.isSystem && r.systemKey === m.sender?.role);
+                            
+                            // Find the highest custom role (including non-hoisted) for name coloring
+                            const senderCustomRoles = m.sender?.roles || [];
+                            const sortedCustomRoles = [...senderCustomRoles].sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+                            
+                            // The "highest" role is either the top custom role or the system role
+                            const customRole = sortedCustomRoles[0];
+                            const nameColorRole = (customRole && (!systemRole || customRole.order < systemRole.order)) 
+                                ? customRole 
+                                : systemRole;
+
+                            const nameColor = nameColorRole?.color || themeVar("foreground");
+
+
                             return (
                                 <Box key={m._id} sx={{
                                     display: "flex",
@@ -281,8 +301,15 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                     {!isDocumentChannel && (
                                         <Avatar
                                             src={m.sender?.avatarUrl}
-                                            sx={{ width: 40, height: 40, borderRadius: 2, bgcolor: themeVar("muted") }}
+                                            sx={{ 
+                                                width: 40, 
+                                                height: 40, 
+                                                borderRadius: 2, 
+                                                bgcolor: themeVar("muted"),
+                                                border: `1px solid ${nameColorRole?.color || 'transparent'}`,
+                                            }}
                                         >
+
                                             {m.sender?.displayName?.[0]}
                                         </Avatar>
                                     )}
@@ -290,9 +317,27 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                         {!isDocumentChannel && (
                                             <Box sx={{ display: "flex", alignItems: "baseline", gap: 1.5, mb: 0.5 }}>
                                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                                    <Typography sx={{ fontWeight: 800, color: isMine ? themeVar("primary") : themeVar("foreground"), fontSize: "0.95rem" }}>
+                                                    <Typography 
+                                                        className={nameColorRole?.style === "gradient" && nameColorRole.gradientConfig?.isAnimated ? "vibrant-gradient-text" : ""}
+                                                        data-text={m.sender?.displayName}
+                                                        onClick={() => m.senderId && setProfileTarget(m.senderId)}
+                                                        sx={{ 
+                                                            fontWeight: 800, 
+                                                            color: nameColor, 
+                                                            fontSize: "0.95rem",
+                                                            cursor: "pointer",
+                                                            "&:hover": { textDecoration: "underline" },
+                                                            ...(nameColorRole?.style === "gradient" && nameColorRole.gradientConfig ? {
+                                                                backgroundImage: `linear-gradient(${nameColorRole.gradientConfig.angle}deg, ${nameColorRole.gradientConfig.color1}, ${nameColorRole.gradientConfig.color2}, ${nameColorRole.gradientConfig.color1}, ${nameColorRole.gradientConfig.color2}, ${nameColorRole.gradientConfig.color1})`,
+                                                                backgroundSize: "300% auto",
+                                                                WebkitBackgroundClip: "text",
+                                                                WebkitTextFillColor: "transparent",
+                                                            } : {})
+                                                        }}
+                                                    >
                                                         {m.sender?.displayName || "Unknown User"}
                                                     </Typography>
+
                                                     {m.sender?.timeoutUntil && m.sender.timeoutUntil > Date.now() && (
                                                         <Tooltip title="Timed Out" arrow>
                                                             <Box sx={{ display: "flex", alignItems: "center", color: themeVar("chart4") }}>
@@ -557,7 +602,17 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                 </Button>
                             </DialogActions>
                         </Dialog>
+
+                        <SpaceMemberProfile
+                            open={Boolean(profileTarget)}
+                            onClose={() => setProfileTarget(null)}
+                            spaceId={channel.spaceId}
+                            userId={profileTarget!}
+                        />
                     </>
+                )}
+                {isDocumentChannel && (
+                    <RulesChannelView spaceId={channel.spaceId} canEdit={userRole === "owner" || userRole === "admin"} />
                 )}
             </Box>
 

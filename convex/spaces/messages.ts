@@ -45,6 +45,15 @@ export const getChannelMessages = query({
                     .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", m.senderId))
                     .unique();
 
+                const roleAssociations = await ctx.db
+                    .query("spaceMemberRoles")
+                    .withIndex("by_space_user", (q) => q.eq("spaceId", channel.spaceId).eq("userId", m.senderId))
+                    .collect();
+                
+                const customRoles = await Promise.all(
+                    roleAssociations.map(async (ra) => await ctx.db.get(ra.roleId))
+                );
+
                 // Override assistant avatar with space logo
                 let avatarUrl = sender?.avatarUrl;
                 if (sender?.clerkUserId === SPACE_ASSISTANT_ID) {
@@ -58,6 +67,8 @@ export const getChannelMessages = query({
                         username: sender.username,
                         avatarUrl: avatarUrl,
                         timeoutUntil: senderMembership?.timeoutUntil,
+                        role: senderMembership?.role || "member",
+                        roles: customRoles.filter(Boolean),
                     } : null,
                     reactions: reactions.map(r => ({
                         userId: r.userId,

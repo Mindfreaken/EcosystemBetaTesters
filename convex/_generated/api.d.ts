@@ -113,6 +113,8 @@ import type * as spaces_messages from "../spaces/messages.js";
 import type * as spaces_moderation from "../spaces/moderation.js";
 import type * as spaces_notes from "../spaces/notes.js";
 import type * as spaces_polls from "../spaces/polls.js";
+import type * as spaces_roles from "../spaces/roles.js";
+import type * as spaces_rules from "../spaces/rules.js";
 import type * as spaces_schedule from "../spaces/schedule.js";
 import type * as spaces_voice from "../spaces/voice.js";
 import type * as spaces_voiceToken from "../spaces/voiceToken.js";
@@ -273,6 +275,8 @@ declare const fullApi: ApiFromModules<{
   "spaces/moderation": typeof spaces_moderation;
   "spaces/notes": typeof spaces_notes;
   "spaces/polls": typeof spaces_polls;
+  "spaces/roles": typeof spaces_roles;
+  "spaces/rules": typeof spaces_rules;
   "spaces/schedule": typeof spaces_schedule;
   "spaces/voice": typeof spaces_voice;
   "spaces/voiceToken": typeof spaces_voiceToken;
