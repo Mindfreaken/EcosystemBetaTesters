@@ -24,10 +24,15 @@ import {
     useParticipantInfo,
     useEnsureTrackRef,
     useRoomContext,
+    VideoTrack,
+    ParticipantName,
+    useLayoutContext,
+    useIsSpeaking,
 } from "@livekit/components-react";
-import { Track, ConnectionState, Participant, RemoteAudioTrack, RoomEvent } from "livekit-client";
+import { Track, ConnectionState, Participant, RemoteAudioTrack, RoomEvent, ParticipantEvent } from "livekit-client";
 import { isEqualTrackRef, isTrackReference, TrackReferenceOrPlaceholder } from '@livekit/components-core';
-import { PhoneCall, Maximize, Minimize } from "lucide-react";
+import { PhoneCall, Maximize, Minimize, LayoutGrid, Monitor, Users, UserCheck } from "lucide-react";
+import ParticipantContextMenu from "./ParticipantContextMenu";
 
 interface VoiceRoomProps {
     roomId: string;
@@ -198,16 +203,29 @@ function ParticipantVolumeControl({ clerkUserId, participant }: { clerkUserId: s
         }
     }, [volume, volumes]);
 
-    // Apply volume directly to the LiveKit Audio Track whenever volume changes!
+    // Apply volume directly to all LiveKit Audio Tracks (Microphone, Screen Share Audio, etc)
     React.useEffect(() => {
         if (!participant) return;
-        const pub = participant.getTrackPublication(Track.Source.Microphone);
-        const audioTrack = pub?.track;
-        if (audioTrack && audioTrack.kind === "audio") {
-            // LiveKit applies volume on HTMLAudioElement for Remote Audio Tracks
-            (audioTrack as RemoteAudioTrack).setVolume(volume);
-        }
-    }, [participant, volume]);
+
+        const applyVolumeToTracks = () => {
+            const publications = Array.from(participant.audioTrackPublications.values());
+            publications.forEach(pub => {
+                if (pub.track && pub.track.kind === "audio" && typeof (pub.track as any).setVolume === "function") {
+                    (pub.track as RemoteAudioTrack).setVolume(localVolume / 100);
+                }
+            });
+        };
+
+        // Apply immediately for currently subscribed tracks
+        applyVolumeToTracks();
+
+        // Also listen for new tracks (like if they start sharing screen audio later)
+        participant.on(ParticipantEvent.TrackSubscribed, applyVolumeToTracks);
+        
+        return () => {
+            participant.off(ParticipantEvent.TrackSubscribed, applyVolumeToTracks);
+        };
+    }, [participant, localVolume]);
 
     const handleVolumeChange = (event: Event, newValue: number | number[]) => {
         setLocalVolume(newValue as number);
@@ -269,12 +287,18 @@ function ParticipantVolumeControl({ clerkUserId, participant }: { clerkUserId: s
  */
 const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
     ({ trackRef, ...props }, ref) => {
+        const [contextMenu, setContextMenu] = React.useState<{ mouseX: number; mouseY: number } | null>(null);
         const trackReference = useEnsureTrackRef(trackRef);
+        const layoutContext = useLayoutContext();
+
+        if (!trackReference) return null;
+
         const participant = trackReference.participant;
 
         // Ensure identity is fetched reactively from LiveKit's observer in case it arrives late
         const participantInfo = useParticipantInfo({ participant: participant as Participant });
         const clerkUserId = participantInfo?.identity;
+        const isSpeaking = useIsSpeaking(participant);
 
         // Evaluate if this specific track tile should show a camera placeholder
         const isCameraTrack = trackReference.source === Track.Source.Camera;
@@ -289,7 +313,9 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
 
         // Prevent duplicate tiles: if this is a Camera or Placeholder track, but the user is ScreenSharing, hide this specific tile natively
         const screenShareTracks = useTracks([Track.Source.ScreenShare]);
-        const isScreenSharing = screenShareTracks.some(t => t.participant.identity === clerkUserId);
+        const isScreenSharing = React.useMemo(() => 
+            screenShareTracks.some(t => t.participant.identity === clerkUserId),
+        [screenShareTracks, clerkUserId]);
         const isHiddenDuplicate = isCameraTrack && isScreenSharing;
 
         // Fetch true Convex Avatar (undefined = loading, null = not found)
@@ -305,13 +331,33 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
             <Box
                 ref={ref}
                 {...props}
+                onClick={() => {
+                    if (layoutContext) {
+                        layoutContext.pin.dispatch?.({ msg: 'set_pin', trackReference: trackReference });
+                    }
+                }}
+                onContextMenu={(e) => {
+                    e.preventDefault();
+                    setContextMenu({ mouseX: e.clientX, mouseY: e.clientY });
+                }}
                 sx={{
                     position: 'relative', width: '100%', height: '100%', overflow: 'hidden',
                     display: isHiddenDuplicate ? 'none' : undefined,
+                    cursor: layoutContext ? 'pointer' : 'default',
                     '&:hover .volume-slider-overlay': { opacity: 1 }
                 }}
             >
-                <ParticipantTile trackRef={trackRef} style={{ width: '100%', height: '100%' }} />
+                <ParticipantTile 
+                    trackRef={trackReference} 
+                    style={{ width: '100%', height: '100%' }}
+                >
+                    {isTrackReference(trackReference) && (
+                        <VideoTrack trackRef={trackReference} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    )}
+                    <div className="lk-participant-placeholder">
+                        <ParticipantName />
+                    </div>
+                </ParticipantTile>
 
                 {(!isLocalUser && participant && clerkUserId) && (
                     <ParticipantVolumeControl clerkUserId={clerkUserId} participant={participant} />
@@ -338,8 +384,11 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
                                     height: { xs: 80, sm: 100, md: 120 },
                                     borderRadius: '50%',
                                     objectFit: 'cover',
-                                    boxShadow: '0px 0px 24px rgba(0,0,0,0.5)',
-                                    bgcolor: 'var(--card)'
+                                    boxShadow: isSpeaking ? '0px 0px 30px rgba(34, 197, 94, 0.6)' : '0px 0px 24px rgba(0,0,0,0.5)',
+                                    border: isSpeaking ? '4px solid #22c55e' : 'none',
+                                    bgcolor: 'var(--card)',
+                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    transform: isSpeaking ? 'scale(1.05)' : 'scale(1)',
                                 }}
                             />
                         ) : (
@@ -354,7 +403,11 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
                                     justifyContent: 'center',
                                     fontSize: '2rem',
                                     fontWeight: 700,
-                                    color: 'var(--muted-foreground)'
+                                    color: 'var(--muted-foreground)',
+                                    boxShadow: isSpeaking ? '0px 0px 30px rgba(34, 197, 94, 0.6)' : 'none',
+                                    border: isSpeaking ? '4px solid #22c55e' : 'none',
+                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    transform: isSpeaking ? 'scale(1.05)' : 'scale(1)',
                                 }}
                             >
                                 {userProfile?.displayName?.charAt(0) || userProfile?.username?.charAt(0) || participant?.name?.charAt(0) || "?"}
@@ -362,6 +415,13 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
                         )}
                     </Box>
                 )}
+
+                <ParticipantContextMenu 
+                    anchorPosition={contextMenu}
+                    onClose={() => setContextMenu(null)}
+                    participant={participant}
+                    clerkUserId={clerkUserId || ""}
+                />
             </Box>
         );
     }
@@ -375,6 +435,8 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
 
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [isFullscreen, setIsFullscreen] = React.useState(false);
+    const [layoutMode, setLayoutMode] = React.useState<'stage' | 'grid'>('grid');
+    const [showNonVideo, setShowNonVideo] = React.useState(false);
 
     // Join Sound Logic
     React.useEffect(() => {
@@ -439,13 +501,27 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
     };
 
     // Grab all active tracks (camera, screen share, etc)
-    const tracks = useTracks(
+    const allTracks = useTracks(
         [
             { source: Track.Source.Camera, withPlaceholder: true },
             { source: Track.Source.ScreenShare, withPlaceholder: false },
-        ],
-        { onlySubscribed: false }
+        ]
     );
+
+    // Filter tracks based on showNonVideo setting, but fall back to showing everyone if no video is active
+    const tracks = React.useMemo(() => {
+        const videoTracks = allTracks.filter(track => {
+            if (!track || !track.participant) return false;
+            const source = isTrackReference(track) ? track.publication.source : track.source;
+            if (source === Track.Source.ScreenShare) return true;
+            return track.participant.isCameraEnabled;
+        });
+
+        // If user wants to see everyone, OR if there's literally no video content to show, show everything
+        if (showNonVideo || videoTracks.length === 0) return allTracks;
+        
+        return videoTracks;
+    }, [allTracks, showNonVideo]);
 
     const layoutContext = useCreateLayoutContext();
 
@@ -453,13 +529,31 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
         .filter(isTrackReference)
         .filter((track) => track.publication.source === Track.Source.ScreenShare);
 
-    const focusTrack = usePinnedTracks(layoutContext)?.[0];
-    const carouselTracks = tracks.filter((track) => !isEqualTrackRef(track, focusTrack));
+    const pinnedTrack = usePinnedTracks(layoutContext)?.[0];
+    
+    // Ensure focusTrack is actually one of our filtered tracks.
+    // If someone is pinned but filtered out (e.g. non-video), we clear the focus.
+    const focusTrack = React.useMemo(() => {
+        if (!pinnedTrack) return undefined;
+        return tracks.find(t => isEqualTrackRef(t, pinnedTrack));
+    }, [pinnedTrack, tracks]);
+
+    const carouselTracks = React.useMemo(() => 
+        tracks.filter((track) => !isEqualTrackRef(track, focusTrack)),
+    [tracks, focusTrack]);
 
     // Auto-pin screen share
     const lastAutoFocusedScreenShareTrack = React.useRef<TrackReferenceOrPlaceholder | null>(null);
 
     React.useEffect(() => {
+        const hasNewScreenShare = screenShareTracks.length > 0 && 
+            !screenShareTracks.some(t => t.publication.trackSid === lastAutoFocusedScreenShareTrack.current?.publication?.trackSid);
+
+        // ONLY auto-switch to stage mode if a NEW screenshare appears that we haven't seen yet
+        if (hasNewScreenShare && layoutMode === 'grid') {
+            setLayoutMode('stage');
+        }
+
         if (
             screenShareTracks.some((track) => track.publication.isSubscribed) &&
             lastAutoFocusedScreenShareTrack.current === null
@@ -477,7 +571,7 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
             layoutContext.pin.dispatch?.({ msg: 'clear_pin' });
             lastAutoFocusedScreenShareTrack.current = null;
         }
-    }, [screenShareTracks, focusTrack, tracks, layoutContext]);
+    }, [screenShareTracks, layoutContext, layoutMode]);
 
     return (
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%", width: "100%", position: "relative" }}>
@@ -539,25 +633,54 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
                             .lk-video-conference { width: 100%; height: 100%; display: flex; flex-direction: column; }
                             .lk-video-conference-inner { flex: 1; display: flex; flex-direction: column; min-height: 0; }
                             
+                            /* Zoom-like Grid Layout stacking */
+                            .lk-grid-layout { 
+                                display: flex !important; 
+                                flex-wrap: wrap !important; 
+                                align-content: center !important; 
+                                justify-content: center !important; 
+                                gap: 12px !important; 
+                                padding: 12px !important;
+                                height: 100% !important;
+                                width: 100% !important;
+                                overflow-y: auto !important;
+                            }
+                            .lk-grid-layout > * { 
+                                flex: 1 1 calc(33.333% - 24px) !important; 
+                                min-width: 250px !important; 
+                                max-width: 800px !important;
+                                aspect-ratio: 16/10 !important;
+                                height: auto !important;
+                                border-radius: 12px !important;
+                                overflow: hidden !important;
+                            }
+
                             /* Ensure control bar floats correctly in fullscreen natively */
                             .lk-control-bar { z-index: 10 !important; }
                         `}</style>
                         <LayoutContextProvider value={layoutContext}>
-                            <div className="lk-video-conference-inner" style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column' }}>
-                                {!focusTrack ? (
-                                    <div className="lk-grid-layout-wrapper" style={{ height: '100%', width: '100%', flex: 1 }}>
+                            <div className="lk-video-conference-inner" style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                {layoutMode === 'grid' || !focusTrack ? (
+                                    <div className="lk-grid-layout-wrapper" style={{ height: '100%', width: '100%', flex: 1, minHeight: 0, overflow: 'hidden' }}>
                                         <GridLayout tracks={tracks} style={{ height: "100%" }}>
                                             <CustomParticipantTile />
                                         </GridLayout>
                                     </div>
                                 ) : (
-                                    <div className="lk-focus-layout-wrapper" style={{ height: '100%', width: '100%', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                                        <FocusLayoutContainer style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column", flex: 1 }}>
-                                            <CarouselLayout tracks={carouselTracks}>
-                                                <CustomParticipantTile />
-                                            </CarouselLayout>
+                                    <div className="lk-focus-layout-wrapper" style={{ height: '100%', width: '100%', flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                        <FocusLayoutContainer style={{ height: "100%", width: "100%", display: "flex", flexDirection: "column", flex: 1, overflow: 'hidden' }}>
+                                            {carouselTracks.length > 0 && (
+                                                <Box sx={{ height: 'clamp(80px, 15vh, 140px)', width: '100%', flexShrink: 0 }}>
+                                                    <CarouselLayout 
+                                                        key={`carousel-${focusTrack ? (isTrackReference(focusTrack) ? focusTrack.publication.trackSid : focusTrack.participant.identity) : 'none'}`}
+                                                        tracks={carouselTracks}
+                                                    >
+                                                        <CustomParticipantTile />
+                                                    </CarouselLayout>
+                                                </Box>
+                                            )}
                                             {focusTrack && (
-                                                <Box sx={{ flex: 1, width: '100%', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+                                                <Box sx={{ flex: 1, width: '100%', minHeight: 0, position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
                                                     <CustomParticipantTile trackRef={focusTrack} style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
                                                 </Box>
                                             )}
@@ -571,9 +694,29 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
             </Box>
 
             {/* Internal Room Controls overlay */}
-            <Box sx={{ position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)" }}>
+            <Box sx={{ position: "absolute", bottom: 16, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 1, alignItems: "center", bgcolor: "rgba(0,0,0,0.5)", p: 0.5, borderRadius: 2, zIndex: 100 }}>
                 {connectionState === ConnectionState.Connected && (
-                    <ControlBar controls={{ microphone: true, screenShare: true, camera: true, leave: false }} />
+                    <>
+                        <ControlBar controls={{ microphone: true, screenShare: true, camera: true, leave: false }} />
+                        
+                        <Box sx={{ width: "1px", height: "24px", bgcolor: "rgba(255,255,255,0.2)", mx: 1 }} />
+                        
+                        <IconButton 
+                            onClick={() => setLayoutMode(prev => prev === 'grid' ? 'stage' : 'grid')}
+                            title={layoutMode === 'grid' ? "Switch to Stage View" : "Switch to Grid View"}
+                            sx={{ color: "white", "&:hover": { bgcolor: "rgba(255,255,255,0.1)" } }}
+                        >
+                            {layoutMode === 'grid' ? <Monitor size={20} /> : <LayoutGrid size={20} />}
+                        </IconButton>
+
+                        <IconButton 
+                            onClick={() => setShowNonVideo(prev => !prev)}
+                            title={showNonVideo ? "Hide Non-Video Participants" : "Show Non-Video Participants"}
+                            sx={{ color: showNonVideo ? "var(--primary)" : "white", "&:hover": { bgcolor: "rgba(255,255,255,0.1)" } }}
+                        >
+                            {showNonVideo ? <Users size={20} /> : <UserCheck size={20} />}
+                        </IconButton>
+                    </>
                 )}
             </Box>
         </Box>

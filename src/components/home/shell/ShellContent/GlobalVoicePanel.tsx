@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography, IconButton, Stack } from "@mui/material";
 import { Mic, MicOff, Headphones, PhoneOff, Signal } from "lucide-react";
 import { useVoiceContext } from "@/context/VoiceContext";
-import { useConnectionState, useRoomInfo, useTrackToggle, RoomAudioRenderer, ConnectionStateToast } from "@livekit/components-react";
+import { useConnectionState, useRoomInfo, useTrackToggle, RoomAudioRenderer, ConnectionStateToast, useLocalParticipant } from "@livekit/components-react";
 import { ConnectionState, Track } from "livekit-client";
 import { useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
@@ -10,44 +10,58 @@ import { Id } from "convex/_generated/dataModel";
 import { useShellView } from "./viewContext";
 
 export default function GlobalVoicePanel() {
-    const { roomName, channelName, spaceId, token, leaveRoom } = useVoiceContext();
+    const { roomName, channelName, spaceId, token, leaveRoom, isDeafened, toggleDeafen } = useVoiceContext();
 
     // We only conditionally call LiveKit hooks if we're actually connected 
     // to avoid errors when LiveKitRoom is not in the tree
     if (!roomName || !token) return null;
 
-    return <ActiveVoiceControls leaveRoom={leaveRoom} roomId={roomName} channelName={channelName || ""} spaceId={spaceId} />;
+    return <ActiveVoiceControls leaveRoom={leaveRoom} roomId={roomName} channelName={channelName || ""} spaceId={spaceId} isDeafened={isDeafened} toggleDeafen={toggleDeafen} />;
 }
 
 // Rendered inside LiveKitRoom context
-function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leaveRoom: () => void, roomId: string, channelName: string, spaceId: string | null }) {
+function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId, isDeafened, toggleDeafen }: { leaveRoom: () => void, roomId: string, channelName: string, spaceId: string | null, isDeafened: boolean, toggleDeafen: () => void }) {
     const connectionState = useConnectionState();
     const { setView, setSelectedSpaceId } = useShellView();
     // LiveKit hook to automatically toggle and read local mic state
     const { buttonProps, enabled } = useTrackToggle({ source: Track.Source.Microphone });
     const isMuted = !enabled;
+    const { localParticipant } = useLocalParticipant();
+    const isStreaming = localParticipant?.isScreenShareEnabled || localParticipant?.isCameraEnabled;
 
     const isConnected = connectionState === ConnectionState.Connected;
     const heartbeat = useMutation(api.spaces.voice.heartbeatVoicePresence);
     const leavePresence = useMutation(api.spaces.voice.leaveVoicePresence);
 
-    // Run heartbeat every 10 seconds while connected
+    // Run heartbeat every 10 seconds while connected, and immediately on state changes
     React.useEffect(() => {
         if (!isConnected) return;
 
         const hb = () => {
-            heartbeat({ channelId: roomId as Id<"spaceChannels"> }).catch(() => { });
+            heartbeat({ 
+                channelId: roomId as Id<"spaceChannels">,
+                isMuted,
+                isDeafened,
+                isStreaming
+            }).catch(() => { });
         };
 
-        hb(); // Run once immediately on connect
+        hb(); // Run once immediately on connect or state change
         const interval = setInterval(hb, 10000);
 
         return () => {
             clearInterval(interval);
-            // Try to explicitly leave when component unmounts
-            leavePresence({ channelId: roomId as Id<"spaceChannels"> }).catch(() => { });
         };
-    }, [isConnected, heartbeat, leavePresence, roomId]);
+    }, [isConnected, heartbeat, roomId, isMuted, isDeafened, isStreaming]);
+
+    // Separate effect for cleanup on unmount/disconnect
+    React.useEffect(() => {
+        return () => {
+            if (roomId) {
+                leavePresence({ channelId: roomId as Id<"spaceChannels"> }).catch(() => { });
+            }
+        };
+    }, [leavePresence, roomId]);
 
     const handleNavigate = () => {
         if (spaceId) {
@@ -68,7 +82,7 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
                 gap: 1,
             }}
         >
-            <RoomAudioRenderer />
+            {!isDeafened && <RoomAudioRenderer />}
             <ConnectionStateToast />
 
             <Stack
@@ -124,8 +138,9 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId }: { leav
 
                 <IconButton
                     size="small"
+                    onClick={() => toggleDeafen()}
                     sx={{
-                        color: "var(--muted-foreground)",
+                        color: isDeafened ? "var(--destructive)" : "var(--muted-foreground)",
                         "&:hover": { backgroundColor: "rgba(255,255,255,0.05)" }
                     }}
                 >

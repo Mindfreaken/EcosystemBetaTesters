@@ -10,10 +10,14 @@ import { ensureUserActive } from "../auth/helpers";
 export const heartbeatVoicePresence = mutation({
     args: {
         channelId: v.id("spaceChannels"),
+        isMuted: v.optional(v.boolean()),
+        isDeafened: v.optional(v.boolean()),
+        isStreaming: v.optional(v.boolean()),
     },
     handler: async (ctx, args) => {
+        const { channelId, isMuted, isDeafened, isStreaming } = args;
         const user = await ensureUserActive(ctx);
-        const channel = await ctx.db.get(args.channelId);
+        const channel = await ctx.db.get(channelId);
         if (!channel) return;
 
         const now = Date.now();
@@ -39,16 +43,24 @@ export const heartbeatVoicePresence = mutation({
         if (!existing) {
             await ctx.db.insert("spaceVoicePresence", {
                 spaceId: channel.spaceId,
-                channelId: args.channelId,
+                channelId: channelId,
                 userId: user._id,
                 joinedAt: now,
                 lastSeen: now,
+                isMuted,
+                isDeafened,
+                isStreaming,
             });
         } else {
             const elapsedMs = now - existing.lastSeen;
             const elapsedMins = elapsedMs / (1000 * 60);
 
-            await ctx.db.patch(existing._id, { lastSeen: now });
+            await ctx.db.patch(existing._id, { 
+                lastSeen: now,
+                isMuted,
+                isDeafened,
+                isStreaming
+            });
 
             // Track analytics
             const day = new Date(now).toISOString().split("T")[0];
@@ -111,17 +123,37 @@ export const getVoicePresence = query({
         const now = Date.now();
         const active = presences.filter(p => now - p.lastSeen < 30000);
 
-        // Fetch their associated user data
+        // Fetch their associated user data and roles
         return await Promise.all(
             active.map(async (p) => {
                 const user = await ctx.db.get(p.userId);
+                
+                // Get member roles for this user in this space
+                const roleAssociations = await ctx.db
+                    .query("spaceMemberRoles")
+                    .withIndex("by_space_user", (q) => q.eq("spaceId", args.spaceId).eq("userId", p.userId))
+                    .collect();
+                
+                const roles = (await Promise.all(
+                    roleAssociations.map(async (ra) => await ctx.db.get(ra.roleId))
+                )).filter((r): r is NonNullable<typeof r> => !!r);
+
+                // Find the highest role (most specific or highest order)
+                const sortedRoles = roles.sort((a, b) => (a.order || 0) - (b.order || 0));
+                const topRole = sortedRoles[0];
+
                 return {
                     ...p,
                     user: user ? {
                         _id: user._id,
+                        clerkUserId: user.clerkUserId,
                         displayName: user.displayName,
                         avatarUrl: user.avatarUrl,
                         username: user.username,
+                    } : null,
+                    topRole: topRole ? {
+                        name: topRole.name,
+                        color: topRole.color,
                     } : null
                 };
             })

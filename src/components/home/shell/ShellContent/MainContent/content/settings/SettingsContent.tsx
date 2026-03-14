@@ -74,7 +74,7 @@ export default function SettingsContent() {
   const [showClerkProfile, setShowClerkProfile] = React.useState(false);
 
   const settings = useQuery(api.users.settings.getSettings);
-  const updateSettings = useMutation(api.users.settings.updateSettings);
+  const updateSettings = useMutation(api.users.settings.updateUserSettings);
 
   const handleDeviceChange = (kind: 'audioinput' | 'videoinput' | 'audiooutput', deviceId: string) => {
     const field = kind === 'audioinput' ? 'preferredMicrophoneId'

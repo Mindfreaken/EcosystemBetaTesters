@@ -17,7 +17,7 @@ const ThemeCtx = createContext<ThemeCtxValue | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const settings = useQuery(api.users.settings.getSettings, {});
-  const updateSettings = useMutation(api.users.settings.updateSettings);
+  const updateSettings = useMutation(api.users.settings.updateUserSettings);
 
   const [currentThemeId, setCurrentThemeId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);

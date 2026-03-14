@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import { LiveKitRoom } from "@livekit/components-react";
-import { useQuery, useAction } from "convex/react";
+import { useQuery, useAction, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 
 interface VoiceContextType {
@@ -17,6 +17,8 @@ interface VoiceContextType {
     clearPrefetchedTokensForSpace: (spaceId: string) => void;
     prefetchedTokens: Record<string, string>;
     me: any;
+    isDeafened: boolean;
+    toggleDeafen: () => void;
 }
 
 const VoiceContext = createContext<VoiceContextType | undefined>(undefined);
@@ -83,6 +85,17 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
         }));
     }, [setPrefetchedTokens, generateToken]);
 
+    const settings = useQuery(api.users.settings.getSettings);
+    const updateSettings = useMutation(api.users.settings.updateUserSettings);
+
+    const isDeafened = settings?.isDeafened ?? false;
+
+    const toggleDeafen = React.useCallback(async () => {
+        await updateSettings({
+            settings: { isDeafened: !isDeafened }
+        });
+    }, [isDeafened, updateSettings]);
+
     const clearPrefetchedTokensForSpace = React.useCallback((sId: string) => {
         // Just clear all tokens to avoid memory leaks when leaving space.
         // We do this to ensure tokens don't expire for spaces we left and re-entered.
@@ -90,7 +103,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     }, [setPrefetchedTokens]);
 
     return (
-        <VoiceContext.Provider value={{ roomName, channelName, spaceId, token, joinRoom, leaveRoom, prefetchToken, prefetchTokensForSpace, clearPrefetchedTokensForSpace, prefetchedTokens, me }}>
+        <VoiceContext.Provider value={{ roomName, channelName, spaceId, token, joinRoom, leaveRoom, prefetchToken, prefetchTokensForSpace, clearPrefetchedTokensForSpace, prefetchedTokens, me, isDeafened, toggleDeafen }}>
             <LiveKitRoom
                 video={false}
                 audio={false} // By setting this to false, LiveKit does not force-publish default audio on connect, allowing saved user choices in MediaDeviceMenu to be respected without being overridden. Users can still toggle audio via the UI buttons which publish using their saved device.

@@ -17,7 +17,7 @@ export default function ThemeContent() {
   const userVotes = useQuery(api.community.themeVotes.getUserVotes, {}) ?? {};
   const userSettings = useQuery(api.users.settings.getSettings, {});
   const castVote = useMutation(api.community.themeVotes.castVote);
-  const updateSettings = useMutation(api.users.settings.updateSettings);
+  const updateSettings = useMutation(api.users.settings.updateUserSettings);
   const [voted, setVoted] = useState<Record<string, "up" | "down" | null>>({});
   const [confirmState, setConfirmState] = useState<{
     open: boolean;

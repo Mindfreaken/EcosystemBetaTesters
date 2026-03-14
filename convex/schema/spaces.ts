@@ -151,6 +151,9 @@ export const spacesTables = {
         userId: v.id("users"),
         joinedAt: v.number(),
         lastSeen: v.number(),
+        isMuted: v.optional(v.boolean()),
+        isDeafened: v.optional(v.boolean()),
+        isStreaming: v.optional(v.boolean()),
     })
         .index("by_space", ["spaceId"])
         .index("by_channel", ["channelId"])

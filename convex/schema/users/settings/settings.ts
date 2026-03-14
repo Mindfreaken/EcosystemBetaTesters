@@ -16,6 +16,7 @@ export const userSettingTables = {
     preferredMicrophoneId: v.optional(v.string()),
     preferredCameraId: v.optional(v.string()),
     preferredSpeakerId: v.optional(v.string()),
+    isDeafened: v.optional(v.boolean()),
   }).index("by_clerk_id_unique", ["clerkUserId"]),
 
   userVoiceSettings: defineTable({

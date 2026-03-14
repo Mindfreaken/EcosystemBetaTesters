@@ -1,6 +1,7 @@
 import { query, mutation } from "../_generated/server";
 import { v } from "convex/values";
 import { ensureUserActive } from "../auth/helpers";
+// Force sync after schema update
 
 export const getSettings = query({
   args: {},
@@ -20,6 +21,7 @@ export const getSettings = query({
     preferredMicrophoneId: v.optional(v.string()),
     preferredCameraId: v.optional(v.string()),
     preferredSpeakerId: v.optional(v.string()),
+    isDeafened: v.optional(v.boolean()),
   })),
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -45,6 +47,7 @@ export const getSettings = query({
       preferredMicrophoneId: result.preferredMicrophoneId,
       preferredCameraId: result.preferredCameraId,
       preferredSpeakerId: result.preferredSpeakerId,
+      isDeafened: result.isDeafened,
     };
   },
 });
@@ -93,7 +96,7 @@ export const updateCallNotificationPreference = mutation({
   },
 });
 
-export const updateSettings = mutation({
+export const updateUserSettings = mutation({
   args: {
     settings: v.object({
       theme: v.optional(v.string()),
@@ -106,6 +109,8 @@ export const updateSettings = mutation({
       preferredMicrophoneId: v.optional(v.string()),
       preferredCameraId: v.optional(v.string()),
       preferredSpeakerId: v.optional(v.string()),
+      isDeafened: v.optional(v.boolean()),
+      forceSync: v.optional(v.boolean()),
     })
   },
   returns: v.null(),

@@ -4,6 +4,7 @@ import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
+import Stack from "@mui/material/Stack";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Id } from "convex/_generated/dataModel";
@@ -21,6 +22,10 @@ import PollsChannel from "./components/PollsChannel";
 import VoiceRoom from "./components/VoiceRoom";
 import UserMembersPortal from "./components/UserMembersPortal";
 import SpaceMembersSidebar from "./components/SpaceMembersSidebar";
+import RoleTag from "./components/RoleTag";
+import { MicOff, Headphones, Monitor, Gamepad2, Sofa } from "lucide-react";
+import VoiceParticipantRow from "./components/VoiceParticipantRow";
+import { useParticipants } from "@livekit/components-react";
 import { useVoiceContext } from "@/context/VoiceContext";
 import { useShellView } from "../../../viewContext";
 
@@ -38,7 +43,9 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
     const { prefetchTokensForSpace, clearPrefetchedTokensForSpace } = useVoiceContext();
     const channels = useQuery(api.spaces.channels.getChannels, { spaceId: sId });
     const categories = useQuery(api.spaces.channels.getCategories, { spaceId: sId });
-    const voicePresence = useQuery(api.spaces.voice.getVoicePresence, { spaceId: sId });
+    const selectedSpaceId = (useShellView() as any).selectedSpaceId;
+    const voicePresence = useQuery(api.spaces.voice.getVoicePresence, { spaceId: selectedSpaceId });
+    const participants = useParticipants();
     const events = useQuery(api.spaces.schedule.getEvents, { spaceId: sId });
     const unreadStatuses = useQuery(api.spaces.channels.getUnreadStatuses, { spaceId: sId });
     const trackView = useMutation(api.spaces.analytics.trackSpaceView);
@@ -115,7 +122,18 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
     }
 
     return (
-        <Box sx={{ display: "flex", height: "100%", overflow: "hidden" }}>
+        <Box sx={{ display: "flex", flex: 1, overflow: "hidden", bgcolor: "var(--background)", position: "relative" }}>
+            <style>{`
+                @keyframes speaking-pulse {
+                    0% { transform: scale(1); opacity: 0.7; }
+                    100% { transform: scale(1.4); opacity: 0; }
+                }
+                @keyframes live-pulse {
+                    0% { opacity: 1; }
+                    50% { opacity: 0.6; }
+                    100% { opacity: 1; }
+                }
+            `}</style>
             {/* Space Sidebar (Channels/Categories) */}
             <Box
                 sx={{
@@ -171,14 +189,9 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                         onClick={() => handleChannelClick(channel._id)}
                                     />
                                     {channel.type === "voice" && voicePresence && voicePresence.filter((p: any) => p.channelId === channel._id).length > 0 && (
-                                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, pl: 4, mb: 1 }}>
+                                        <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25, pl: 4, mb: 1, pr: 1 }}>
                                             {voicePresence.filter((p: any) => p.channelId === channel._id).map((p: any) => (
-                                                <Avatar
-                                                    key={p.userId}
-                                                    src={p.user?.avatarUrl}
-                                                    alt={p.user?.displayName || "User"}
-                                                    sx={{ width: 24, height: 24, border: `2px solid ${themeVar("muted")}` }}
-                                                />
+                                                <VoiceParticipantRow key={p.userId} p={p} participants={participants} />
                                             ))}
                                         </Box>
                                     )}
@@ -221,14 +234,9 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                                     indent={true}
                                                 />
                                                 {channel.type === "voice" && voicePresence && voicePresence.filter((p: any) => p.channelId === channel._id).length > 0 && (
-                                                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, pl: 5, mb: 1 }}>
+                                                    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25, pl: 5, mb: 1, pr: 1 }}>
                                                         {voicePresence.filter((p: any) => p.channelId === channel._id).map((p: any) => (
-                                                            <Avatar
-                                                                key={p.userId}
-                                                                src={p.user?.avatarUrl}
-                                                                alt={p.user?.displayName || "User"}
-                                                                sx={{ width: 24, height: 24, border: `2px solid ${themeVar("muted")}` }}
-                                                            />
+                                                            <VoiceParticipantRow key={p.userId} p={p} participants={participants} />
                                                         ))}
                                                     </Box>
                                                 )}
