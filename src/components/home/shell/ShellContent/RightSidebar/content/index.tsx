@@ -36,6 +36,7 @@ export default function RightSidebarContent({ onClose }: RightSidebarContentProp
         <IconButton
           size="small"
           onClick={onClose}
+          aria-label="Close sidebar"
           sx={{
             p: 0.5,
             color: "var(--muted-foreground)",

@@ -18,6 +18,7 @@ export const chatReportTables = {
     resolutionAction: v.optional(v.string()),
     resolutionTimestamp: v.optional(v.number()),
     resolutionModActions: v.optional(v.array(v.string())),
+    resolvedById: v.optional(v.id("users")),
   })
     .index("by_status", ["status"])
     .index("by_message", ["messageId"])

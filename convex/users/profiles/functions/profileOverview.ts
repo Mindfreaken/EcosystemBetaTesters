@@ -59,6 +59,10 @@ export const getProfile = query({
       })
     );
 
+    // Determine if the viewer is the profile owner
+    const identity = await ctx.auth.getUserIdentity();
+    const isOwner = identity?.subject === user.clerkUserId;
+
     // Get recent activity
     const activities = await ctx.db
       .query("activities")
@@ -66,11 +70,15 @@ export const getProfile = query({
       .order("desc")
       .take(10);
 
-    // Exclude punishment-related activities from user-facing activity
+    // Filter activities: exclude punishments from everyone, and system alerts from non-owners
     const filteredActivities = activities.filter(a => {
       const t = String(a.type || "").toLowerCase();
       const title = String(a.title || "").toLowerCase();
-      return !t.includes("punishment") && !title.includes("punishment");
+      
+      if (t.includes("punishment") || title.includes("punishment")) return false;
+      if (t === "system_alert" && !isOwner) return false;
+      
+      return true;
     });
 
     // Transform activities to match frontend type
@@ -112,7 +120,6 @@ export const getProfile = query({
     const isMaxScore = currentScore === 10000;
 
     // Get friend status if viewing user is provided
-    const identity = await ctx.auth.getUserIdentity();
     const viewingUserId = identity?.subject;
     let isFollowing = false;
     let isFriend = false;
@@ -167,7 +174,6 @@ export const getProfile = query({
       username: user.username,
       displayName: user.displayName,
       email: user.email,
-      dateOfBirth: user.dateOfBirth,
       role: user.role,
       avatarUrl: user.avatarUrl,
       coverUrl: user.coverUrl,

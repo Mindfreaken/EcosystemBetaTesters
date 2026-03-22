@@ -50,6 +50,47 @@ function inferCategoryFromId(game?: string, id?: number): string | null {
   }
 }
 
+/**
+ * Standard Wordle-style scoring algorithm.
+ * 1. Pass 1: Exact matches (Correct)
+ * 2. Pass 2: Remaining matches (Present)
+ * @param guess - Normalized uppercase guess (letters only)
+ * @param answer - Normalized uppercase answer (letters only)
+ */
+function calculateScore(guess: string, answer: string): TileStatus[] {
+  const len = answer.length;
+  const res: TileStatus[] = Array(len).fill("absent");
+  const gArr = Array.from(guess);
+  const aArr = Array.from(answer);
+
+  // Count available letters in answer
+  const counts: Record<string, number> = {};
+  for (const ch of aArr) {
+    counts[ch] = (counts[ch] || 0) + 1;
+  }
+
+  // Pass 1: Correct positions
+  for (let i = 0; i < len; i++) {
+    if (gArr[i] === aArr[i]) {
+      res[i] = "correct";
+      counts[gArr[i]]--;
+    }
+  }
+
+  // Pass 2: Present in other positions
+  for (let i = 0; i < len; i++) {
+    if (res[i] !== "correct") {
+      const ch = gArr[i];
+      if (counts[ch] > 0) {
+        res[i] = "present";
+        counts[ch]--;
+      }
+    }
+  }
+
+  return res;
+}
+
 export default function NerdleGameBoard({
   puzzle,
   baseGuesses = 6,
@@ -317,26 +358,7 @@ export default function NerdleGameBoard({
       }
       const normalized = t.replace(/[^A-Za-z]/g, "").toUpperCase();
       if (normalized.length === lettersOnlyCount) {
-        const rowScore = ((): Array<TileStatus> => {
-          const res: Array<TileStatus> = Array(lettersOnlyCount).fill("absent");
-          const ansArr = Array.from(normalizedAnswer);
-          const used: boolean[] = Array(lettersOnlyCount).fill(false);
-          const gArr = Array.from(normalized);
-          for (let i = 0; i < lettersOnlyCount; i++) {
-            if (gArr[i] === ansArr[i]) { res[i] = "correct"; used[i] = true; gArr[i] = "\u0000"; }
-          }
-          for (let i = 0; i < lettersOnlyCount; i++) {
-            if (res[i] === "correct") continue;
-            const ch = gArr[i];
-            if (!ch || ch === "\u0000") continue;
-            let found = -1;
-            for (let j = 0; j < lettersOnlyCount; j++) {
-              if (!used[j] && ansArr[j] === ch) { found = j; break; }
-            }
-            if (found !== -1) { res[i] = "present"; used[found] = true; }
-          }
-          return res;
-        })();
+        const rowScore = calculateScore(normalized, normalizedAnswer);
         computedScores.push(rowScore);
       } else {
         // Not full length: treat as empty row for now
@@ -396,35 +418,7 @@ export default function NerdleGameBoard({
     });
   };
   const scoreGuess = (guess: string): Array<TileStatus> => {
-    const res: Array<TileStatus> = Array(lettersOnlyCount).fill("absent");
-    const ansArr = Array.from(normalizedAnswer);
-    const used: boolean[] = Array(lettersOnlyCount).fill(false);
-    const gArr = Array.from(guess.toUpperCase());
-    // pass 1: correct
-    for (let i = 0; i < lettersOnlyCount; i++) {
-      if (gArr[i] === ansArr[i]) {
-        res[i] = "correct";
-        used[i] = true;
-        gArr[i] = "\u0000"; // mark consumed
-      }
-    }
-    // pass 2: present
-    for (let i = 0; i < lettersOnlyCount; i++) {
-      if (res[i] === "correct") continue;
-      const ch = gArr[i];
-      if (!ch || ch === "\u0000") continue;
-      let found = -1;
-      for (let j = 0; j < lettersOnlyCount; j++) {
-        if (!used[j] && ansArr[j] === ch) {
-          found = j; break;
-        }
-      }
-      if (found !== -1) {
-        res[i] = "present";
-        used[found] = true;
-      }
-    }
-    return res;
+    return calculateScore(guess.toUpperCase(), normalizedAnswer);
   };
 
   const handleEnter = async () => {
@@ -433,8 +427,20 @@ export default function NerdleGameBoard({
     setValidationError(null);
     setValidating(true);
     try {
-      const checkRes = await checkWords({ words: [currentGuess] });
-      if (!checkRes[currentGuess]) {
+      let wordsToCheck = [currentGuess];
+      if (tokenLengths.length > 1) {
+        wordsToCheck = [];
+        let start = 0;
+        for (const len of tokenLengths) {
+          wordsToCheck.push(currentGuess.slice(start, start + len));
+          start += len;
+        }
+      }
+
+      const checkRes = await checkWords({ words: wordsToCheck });
+      const allValid = wordsToCheck.every(w => checkRes[w]);
+
+      if (!allValid) {
         setValidationError("Not in word list");
         setValidating(false);
         return;
@@ -897,11 +903,11 @@ function Tile({
   let border = `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 22%)`;
 
   if (status === "correct") {
-    bg = `linear-gradient(180deg, color-mix(in oklab, ${themeVar("chart2")}, transparent 75%), color-mix(in oklab, ${themeVar("chart2")}, transparent 92%))`;
-    border = `1px solid color-mix(in oklab, ${themeVar("chart2")}, transparent 15%)`;
-  } else if (status === "present") {
     bg = `linear-gradient(180deg, color-mix(in oklab, ${themeVar("chart3")}, transparent 75%), color-mix(in oklab, ${themeVar("chart3")}, transparent 92%))`;
     border = `1px solid color-mix(in oklab, ${themeVar("chart3")}, transparent 15%)`;
+  } else if (status === "present") {
+    bg = `linear-gradient(180deg, color-mix(in oklab, ${themeVar("chart4")}, transparent 75%), color-mix(in oklab, ${themeVar("chart4")}, transparent 92%))`;
+    border = `1px solid color-mix(in oklab, ${themeVar("chart4")}, transparent 15%)`;
   } else if (status === "absent") {
     bg = `linear-gradient(180deg, color-mix(in oklab, ${themeVar("muted")}, transparent 80%), transparent)`;
     border = `1px solid color-mix(in oklab, ${themeVar("border")}, transparent 35%)`;
@@ -960,12 +966,12 @@ function Key({
   let color = themeVar("mutedForeground");
 
   if (status === "correct") {
-    const c = themeVar("chart2");
+    const c = themeVar("chart3");
     bg = `linear-gradient(180deg, ${c}, color-mix(in oklab, ${c}, transparent 30%))`;
     border = `1px solid color-mix(in oklab, ${c}, transparent 20%)`;
     color = themeVar("foreground"); // or white if background is dark
   } else if (status === "present") {
-    const c = themeVar("chart3");
+    const c = themeVar("chart4");
     bg = `linear-gradient(180deg, ${c}, color-mix(in oklab, ${c}, transparent 30%))`;
     border = `1px solid color-mix(in oklab, ${c}, transparent 20%)`;
     color = themeVar("foreground");

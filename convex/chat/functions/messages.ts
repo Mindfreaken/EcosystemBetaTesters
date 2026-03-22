@@ -16,6 +16,11 @@ export const sendMessage = mutation({
         ciphertext: v.string(),
         type: v.number(),
       })),
+      fileKeys: v.optional(v.array(v.object({
+        deviceId: v.string(),
+        ciphertext: v.string(),
+        type: v.number(),
+      }))),
       senderDeviceId: v.string(),
     })),
     attachments: v.optional(v.array(v.object({
@@ -64,6 +69,11 @@ export const replyToMessage = mutation({
         ciphertext: v.string(),
         type: v.number(),
       })),
+      fileKeys: v.optional(v.array(v.object({
+        deviceId: v.string(),
+        ciphertext: v.string(),
+        type: v.number(),
+      }))),
       senderDeviceId: v.string(),
     })),
   },
@@ -143,6 +153,11 @@ export const getThreadMessagesPaginated = query({
           ciphertext: v.string(),
           type: v.number(),
         })),
+        fileKeys: v.optional(v.array(v.object({
+          deviceId: v.string(),
+          ciphertext: v.string(),
+          type: v.number(),
+        }))),
         senderDeviceId: v.string(),
       })),
       isPinned: v.optional(v.boolean()),

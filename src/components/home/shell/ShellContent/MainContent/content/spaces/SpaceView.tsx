@@ -191,7 +191,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                     {channel.type === "voice" && voicePresence && voicePresence.filter((p: any) => p.channelId === channel._id).length > 0 && (
                                         <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25, pl: 4, mb: 1, pr: 1 }}>
                                             {voicePresence.filter((p: any) => p.channelId === channel._id).map((p: any) => (
-                                                <VoiceParticipantRow key={p.userId} p={p} participants={participants} />
+                                                <VoiceParticipantRow key={p.userId} p={p} participants={participants} spaceId={sId} />
                                             ))}
                                         </Box>
                                     )}
@@ -206,7 +206,15 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                 return (
                                     <Box key={category._id} sx={{ mt: 2 }}>
                                         <Box
+                                            role="button"
+                                            tabIndex={0}
                                             onClick={() => toggleCategory(category._id)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter" || e.key === " ") {
+                                                    e.preventDefault();
+                                                    toggleCategory(category._id);
+                                                }
+                                            }}
                                             sx={{
                                                 display: "flex",
                                                 alignItems: "center",
@@ -236,7 +244,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                                                 {channel.type === "voice" && voicePresence && voicePresence.filter((p: any) => p.channelId === channel._id).length > 0 && (
                                                     <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25, pl: 5, mb: 1, pr: 1 }}>
                                                         {voicePresence.filter((p: any) => p.channelId === channel._id).map((p: any) => (
-                                                            <VoiceParticipantRow key={p.userId} p={p} participants={participants} />
+                                                            <VoiceParticipantRow key={p.userId} p={p} participants={participants} spaceId={sId} />
                                                         ))}
                                                     </Box>
                                                 )}
@@ -271,10 +279,19 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                 >
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                         <Box
+                            role="button"
+                            tabIndex={0}
                             sx={{ display: "flex", alignItems: "center", gap: 1, cursor: "pointer" }}
                             onClick={() => {
                                 if (activeChannelId) setCurrentView("chat");
                                 else setCurrentView("main");
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    if (activeChannelId) setCurrentView("chat");
+                                    else setCurrentView("main");
+                                }
                             }}
                         >
                             {currentView === "owner" ? (
@@ -366,6 +383,7 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
                     </Box>
                     <IconButton
                         size="small"
+                        aria-label="Toggle members sidebar"
                         onClick={() => setShowMembersSidebar(v => !v)}
                         sx={{
                             color: "var(--muted-foreground)",
@@ -543,7 +561,15 @@ export default function SpaceView({ spaceId }: SpaceViewProps) {
 function ChannelItem({ icon, label, active = false, unread = false, onClick, indent = false }: { icon: React.ReactNode; label: string; active?: boolean; unread?: boolean; onClick?: () => void; indent?: boolean }) {
     return (
         <Box
+            role="button"
+            tabIndex={0}
             onClick={onClick}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onClick?.();
+                }
+            }}
             sx={{
                 display: "flex",
                 alignItems: "center",

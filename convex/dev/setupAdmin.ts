@@ -12,10 +12,10 @@ export const createDashboardAdmin = mutation({
 
         if (existingUser) {
             await ctx.db.patch(existingUser._id, {
-                overseeradmin: true,
+                role: "admin",
                 displayName: "Dashboard Admin"
             });
-            return "Existing user 'fake_id' updated to Overseer Admin.";
+            return "Existing user 'fake_id' updated to Admin.";
         } else {
             await ctx.db.insert("users", {
                 clerkUserId: fakeId,
@@ -26,14 +26,10 @@ export const createDashboardAdmin = mutation({
                 email: "admin@example.com",
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
-                overseeradmin: true,
                 isBanned: false,
-                // Add other required fields with defaults
                 role: "admin",
                 storageStatus: "free",
                 totalStorageAllocatedGB: 10,
-                currentStorageUsedGB: 0,
-                xp: 0,
             });
             return "Created new Admin user with clerkUserId: 'fake_id'";
         }

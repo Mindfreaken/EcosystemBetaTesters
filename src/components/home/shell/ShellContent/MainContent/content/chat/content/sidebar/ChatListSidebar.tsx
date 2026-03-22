@@ -117,6 +117,7 @@ export default function ChatListSidebar({
             )}
             <IconButton
               size="small"
+              aria-label="New chat"
               sx={{
                 color: themeVar("secondary"),
                 '&:hover': {
@@ -150,6 +151,14 @@ export default function ChatListSidebar({
                   <Avatar
                     src={c.avatarUrl}
                     alt={c.name}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onSelect?.({ _id: c._id, name: c.name });
+                      }
+                    }}
                     sx={{ width: 36, height: 36, cursor: 'pointer' }}
                     onClick={() => onSelect?.({ _id: c._id, name: c.name })}
                   />
@@ -200,6 +209,14 @@ export default function ChatListSidebar({
                   "&:hover::before": {
                     transform: "translateX(0)",
                   },
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelect?.({ _id: c._id, name: c.name });
+                  }
                 }}
                 onClick={() => onSelect?.({ _id: c._id, name: c.name })}
               >

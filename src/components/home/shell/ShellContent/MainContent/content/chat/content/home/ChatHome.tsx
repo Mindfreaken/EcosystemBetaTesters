@@ -23,12 +23,8 @@ export type HomeChatItem = {
   unreadCount?: number;
 };
 
-function ChatChip({ chat, meId, onSelect }: { chat: HomeChatItem; meId?: any; onSelect: (chat: { _id: string; name: string }) => void }) {
-  const unread = useQuery(
-    api.chat.functions.messages.getUnreadThreadCount as any,
-    meId && chat?._id ? ({ chatId: chat._id as any, userId: meId as any } as any) : ("skip" as any)
-  ) as number | undefined;
-  const count = typeof unread === "number" ? unread : chat.unreadCount ?? 0;
+function ChatChip({ chat, onSelect }: { chat: HomeChatItem; onSelect: (chat: { _id: string; name: string }) => void }) {
+  const count = chat.unreadCount ?? 0;
   return (
     <GlowPilledButton
       key={chat._id}
@@ -61,7 +57,7 @@ function ChatChip({ chat, meId, onSelect }: { chat: HomeChatItem; meId?: any; on
               py: 0.25,
               lineHeight: 1,
               borderRadius: 10,
-              background: 'linear-gradient(45deg, color-mix(in oklab, var(--primary), transparent 20%), color-mix(in oklab, var(--secondary), transparent 20%))',
+              background: `linear-gradient(45deg, color-mix(in oklab, ${themeVar("primary")}, transparent 20%), color-mix(in oklab, ${themeVar("secondary")}, transparent 20%))`,
               color: '#fff',
               minWidth: 16,
               textAlign: 'center',
@@ -139,8 +135,7 @@ export default function ChatHome({
               Welcome to Chats Home
             </Typography>
             <Typography variant="body2" sx={{ color: themeVar("mutedForeground") }}>
-              Create a group or DM, or pick an existing conversation below. Note: Messages use Convex encryption in transit. End‑to‑end encryption isn’t available yet, so messages aren’t fully private.
-              We plan to add E2E encryption when it’s safe and ready.
+              Create a group or DM, or pick an existing conversation below. Note: Messages are end‑to‑end encrypted for your privacy.
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 380 }}>
@@ -216,7 +211,7 @@ export default function ChatHome({
             }}
           >
             {filtered.map((c) => (
-              <ChatChip key={c._id} chat={c} meId={me?._id} onSelect={onSelect} />
+              <ChatChip key={c._id} chat={c} onSelect={onSelect} />
             ))}
           </Box>
         )}

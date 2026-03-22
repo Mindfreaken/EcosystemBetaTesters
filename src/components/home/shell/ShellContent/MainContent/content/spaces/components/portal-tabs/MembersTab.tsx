@@ -175,7 +175,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                     </Box>
 
                                     <Tooltip title="View Notes">
-                                        <IconButton size="small" sx={{ color: themeVar("mutedForeground"), "&:hover": { bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 90%)`, color: themeVar("foreground") } }} onClick={() => { setNotesDialogMember(member); setNotesDialogOpen(true); }}>
+                                        <IconButton size="small" aria-label="View member notes" sx={{ color: themeVar("mutedForeground"), "&:hover": { bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 90%)`, color: themeVar("foreground") } }} onClick={() => { setNotesDialogMember(member); setNotesDialogOpen(true); }}>
                                             <FileText size={18} />
                                         </IconButton>
                                     </Tooltip>
@@ -198,6 +198,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                                     <Tooltip title={`Promote to ${role === "owner" ? "Admin" : "Moderator"}`}>
                                                         <IconButton
                                                             size="small"
+                                                            aria-label={`Promote to ${role === "owner" ? "Admin" : "Moderator"}`}
                                                             sx={{ color: themeVar("chart4") }}
                                                             onClick={() => {
                                                                 const promoteTo = role === "owner" ? "admin" : "moderator";
@@ -215,6 +216,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                                     <Tooltip title="Promote to Admin">
                                                         <IconButton
                                                             size="small"
+                                                            aria-label="Promote to Admin"
                                                             sx={{ color: themeVar("secondary") }}
                                                             onClick={() => {
                                                                 setConfirmDialog({
@@ -231,6 +233,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                                     <Tooltip title="Demote to Member">
                                                         <IconButton
                                                             size="small"
+                                                            aria-label="Demote to Member"
                                                             sx={{ color: themeVar("mutedForeground") }}
                                                             onClick={() => {
                                                                 setConfirmDialog({
@@ -246,7 +249,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
 
                                                 <Tooltip title="Kick Member">
                                                     <IconButton
-                                                        size="small" sx={{ color: themeVar("destructive") }}
+                                                        size="small" aria-label="Kick member" sx={{ color: themeVar("destructive") }}
                                                         onClick={() => {
                                                             setConfirmDialog({
                                                                 open: true, title: "Kick Member", message: `Are you sure you want to kick ${member.user?.displayName}? They will need a new invite to join back.`, confirmLabel: "Kick", isDanger: true,
@@ -297,7 +300,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                     </Tooltip>
                                     <Tooltip title="Revoke All Active Invites">
                                         <span>
-                                            <IconButton size="small" onClick={() => {
+                                            <IconButton size="small" aria-label="Revoke all invites" onClick={() => {
                                                 setConfirmDialog({
                                                     open: true, title: "Revoke All Invites", message: "Are you sure you want to revoke all active invite codes? Existing users are not affected, but all outstanding links will become invalid.", confirmLabel: "Revoke All", isDanger: true,
                                                     onConfirm: async () => { await revokeAllInvites({ spaceId: space._id }); setConfirmDialog(prev => ({ ...prev, open: false })); }
@@ -309,7 +312,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                     </Tooltip>
                                     <Tooltip title="Create New Invite">
                                         <span>
-                                            <IconButton size="small" disabled={creatingInvite || space.allowInvites === false} onClick={handleCreateInviteCode} sx={{ color: themeVar("primary") }}>
+                                            <IconButton size="small" aria-label="Create new invite" disabled={creatingInvite || space.allowInvites === false} onClick={handleCreateInviteCode} sx={{ color: themeVar("primary") }}>
                                                 <Plus size={20} />
                                             </IconButton>
                                         </span>
@@ -369,6 +372,7 @@ export default function MembersTab({ space, role, userRole }: MembersTabProps) {
                                             <Tooltip title="Revoke Invite">
                                                 <IconButton 
                                                     size="small" 
+                                                    aria-label="Revoke invite"
                                                     onClick={() => revokeInvite({ spaceId: space._id, inviteId: invite._id })}
                                                     sx={{ color: themeVar("destructive"), "&:hover": { bgcolor: "rgba(255,0,0,0.1)" } }}
                                                 >

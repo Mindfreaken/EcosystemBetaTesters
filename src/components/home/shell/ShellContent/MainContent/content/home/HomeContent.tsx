@@ -101,29 +101,37 @@ export default function HomeContent() {
             >
               <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
                 {spaces.slice(0, 4).map((space: any) => (
-                  <Box
-                    key={space._id}
-                    onClick={() => {
-                      setSelectedSpaceId(space._id);
-                      setView("spaces");
-                    }}
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 97%)`,
-                      border: `1px solid ${themeVar("border")}`,
-                      cursor: "pointer",
-                      transition: "all 0.2s ease",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
-                      "&:hover": {
-                        bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 94%)`,
-                        borderColor: themeVar("primary"),
-                        transform: "translateX(4px)"
-                      }
-                    }}
-                  >
+                    <Box
+                      key={space._id}
+                      onClick={() => {
+                        setSelectedSpaceId(space._id);
+                        setView("spaces");
+                      }}
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === ' ' || e.key === 'Enter') {
+                          e.preventDefault();
+                          setSelectedSpaceId(space._id);
+                          setView("spaces");
+                        }
+                      }}
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 97%)`,
+                        border: `1px solid ${themeVar("border")}`,
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        "&:hover": {
+                          bgcolor: `color-mix(in oklab, ${themeVar("foreground")}, transparent 94%)`,
+                          borderColor: themeVar("primary"),
+                          transform: "translateX(4px)"
+                        }
+                      }}
+                    >
                     <Avatar
                       src={space.avatarUrl}
                       variant="rounded"
@@ -169,6 +177,7 @@ export default function HomeContent() {
                   size="small"
                   onClick={() => {
                     setSelectedDailyId("nerdle");
+                    setNerdleVariant(null);
                     setView("dailies");
                   }}
                   sx={{ color: themeVar("chart3"), fontWeight: 800 }}
@@ -183,6 +192,15 @@ export default function HomeContent() {
                     setSelectedDailyId("nerdle");
                     setNerdleVariant("valorant");
                     setView("dailies");
+                  }}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                      e.preventDefault();
+                      setSelectedDailyId("nerdle");
+                      setNerdleVariant("valorant");
+                      setView("dailies");
+                    }
                   }}
                   sx={{
                     p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("chart3")}, transparent 92%)`,
@@ -207,6 +225,15 @@ export default function HomeContent() {
                     setSelectedDailyId("nerdle");
                     setNerdleVariant("minecraft");
                     setView("dailies");
+                  }}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                      e.preventDefault();
+                      setSelectedDailyId("nerdle");
+                      setNerdleVariant("minecraft");
+                      setView("dailies");
+                    }
                   }}
                   sx={{
                     p: 2, borderRadius: 2, bgcolor: `color-mix(in oklab, ${themeVar("secondary")}, transparent 92%)`,

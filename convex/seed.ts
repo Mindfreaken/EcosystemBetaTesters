@@ -51,11 +51,9 @@ export const seedSystemParameters = internalMutation({
           bio: "Welcome to Ecosystem! I'm here to help you get started.",
           createdAt: Date.now(),
           updatedAt: Date.now(),
-          overseeradmin: true,
           isBanned: false,
           storageStatus: 'free',
           totalStorageAllocatedGB: 0,
-          currentStorageUsedGB: 0
         });
         
         // Verify the user was created

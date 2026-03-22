@@ -21,9 +21,9 @@ export async function ensureAdmin(ctx: QueryCtx | MutationCtx): Promise<Doc<"use
     throw new Error("Unauthorized: Platform user profile not found");
   }
 
-  // Use overseeradmin role for dashboard access
-  if (!user.overseeradmin) {
-    throw new Error(`Unauthorized: Overseer Administrative privileges required for ${user.username}`);
+  // Use role for dashboard access
+  if (user.role !== 'admin') {
+    throw new Error(`Unauthorized: Administrative privileges required for ${user.username}`);
   }
 
   return user;
@@ -35,7 +35,7 @@ export async function ensureAdmin(ctx: QueryCtx | MutationCtx): Promise<Doc<"use
 export async function ensureOverseer(ctx: QueryCtx | MutationCtx): Promise<Doc<"users">> {
   const user = await ensureAdmin(ctx);
   
-  if (!user.overseer && !user.overseeradmin) {
+  if (user.role !== 'admin') {
     throw new Error(`Unauthorized: Overseer privileges required for ${user.username}`);
   }
 

@@ -84,4 +84,36 @@ http.route({
   }),
 });
 
+// Stripe Webhooks
+http.route({
+  path: "/stripe/webhook",
+  method: "POST",
+  handler: httpAction(async (ctx, req) => {
+    console.log("Stripe webhook request received at /stripe/webhook");
+    const signature = req.headers.get("stripe-signature");
+    if (!signature) {
+      return new Response("Missing stripe-signature header", { status: 400 });
+    }
+
+    const payload = await req.text();
+    try {
+      const result = await ctx.runAction(api.stripe.handleWebhook, {
+        signature,
+        payload,
+      });
+
+      return new Response(JSON.stringify({ ok: true, result }), {
+        status: result.status,
+        headers: { "content-type": "application/json" },
+      });
+    } catch (e: any) {
+      console.error("Webhook processing failed:", e);
+      return new Response(JSON.stringify({ ok: false, error: "Internal Server Error" }), {
+        status: 500,
+        headers: { "content-type": "application/json" },
+      });
+    }
+  }),
+});
+
 export default http;

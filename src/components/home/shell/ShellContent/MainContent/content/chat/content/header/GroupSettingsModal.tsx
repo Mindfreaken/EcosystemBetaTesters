@@ -234,6 +234,7 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
           Group settings
           <IconButton
             size="small"
+            aria-label="Close"
             onClick={onClose}
             sx={{ color: themeVar("mutedForeground"), ml: 1, '&:hover': { color: themeVar("foreground"), backgroundColor: 'transparent' } }}
           >
@@ -332,6 +333,7 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
                               <IconButton 
                                 edge="end" 
                                 size="small" 
+                                aria-label="Transfer Ownership"
                                 onClick={() => handleTransferOwnership(m._id)}
                                 title="Transfer Ownership"
                                 sx={{ color: themeVar("primary") }}
@@ -341,6 +343,7 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
                               <IconButton 
                                 edge="end" 
                                 size="small" 
+                                aria-label="Kick Member"
                                 onClick={() => handleKickMember(m._id)}
                                 title="Kick Member"
                                 sx={{ color: themeVar("destructive") }}
@@ -419,6 +422,7 @@ export default function GroupSettingsModal({ open, onClose, chatId, meId }: Grou
                         <IconButton 
                           edge="end" 
                           size="small"
+                          aria-label="Add Member"
                           disabled={(chatDetails?.participants?.length ?? 0) >= 10}
                           onClick={() => handleAddMember(f.userId)}
                           sx={{ color: themeVar("primary") }}

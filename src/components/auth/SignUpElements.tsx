@@ -31,7 +31,7 @@ export default function SignUpElements({
   // Local mirrors of Clerk fields for validation and UX
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [dobInput, setDobInput] = useState(""); // yyyy-mm-dd
+
   const [usernameTaken, setUsernameTaken] = useState(false);
   const [displayNameTaken, setDisplayNameTaken] = useState(false);
   const [checkingAvailability, setCheckingAvailability] = useState(false);
@@ -83,30 +83,13 @@ export default function SignUpElements({
         const resolvedDisplayName = (displayNameMeta && displayNameMeta.trim().length > 0)
           ? displayNameMeta
           : clerkUsername || email.split("@")[0] || "User";
-        const dobMeta = (user?.publicMetadata as any)?.dateOfBirth as string | number | undefined;
-        let dateOfBirth: number | undefined = undefined;
-        if (typeof dobMeta === "number") {
-          dateOfBirth = dobMeta;
-        } else if (typeof dobMeta === "string" && dobMeta) {
-          const t = Date.parse(dobMeta);
-          if (!Number.isNaN(t)) dateOfBirth = t;
-        }
-        // Normalize to ms timestamp (convert seconds -> ms if needed)
-        if (typeof dateOfBirth === 'number' && dateOfBirth > 0 && dateOfBirth < 1e12) {
-          dateOfBirth = Math.floor(dateOfBirth * 1000);
-        }
-        // If username is provided by Clerk but DOB is missing, block onboarding so DOB doesn't save as 0
-        if (clerkUsername && (dateOfBirth === undefined || Number.isNaN(dateOfBirth as any))) {
-          setSignupError("Please provide a valid date of birth to continue.");
-          return;
-        }
+
 
         // Call Convex to ensure/create the user
         await convex.mutation(api.users.onboarding.onboarding.ensureUser, {
           email,
           displayName: resolvedDisplayName,
           username: clerkUsername,
-          dateOfBirth,
         });
 
         hasOnboardedRef.current = true;
@@ -286,15 +269,7 @@ export default function SignUpElements({
                 <p className="text-xs text-red-400">This display name is already taken.</p>
               )}
 
-              <ClerkElements.Field name="publicMetadata.dateOfBirth">
-                <ClerkElements.Label className="block text-sm">Date of birth</ClerkElements.Label>
-                <ClerkElements.Input
-                  type="date"
-                  className={inputClass}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDobInput(e.target.value)}
-                />
-                <ClerkElements.FieldError className="text-sm text-red-400" />
-              </ClerkElements.Field>
+
 
               <div className="flex items-start gap-2 py-1">
                 <input
@@ -318,7 +293,6 @@ export default function SignUpElements({
                   displayNameTaken ||
                   !username.trim() ||
                   !displayName.trim() ||
-                  !dobInput.trim() ||
                   username.length > 20 ||
                   displayName.length > 20
                 }

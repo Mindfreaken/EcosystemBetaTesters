@@ -545,10 +545,11 @@ export default function CommunityActionsContent() {
                                                         border: `1px solid ${themeVar("foreground")}0d`,
                                                         animation: 'fade-in 0.2s ease-out'
                                                     }}>
-                                                        <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 800, textTransform: 'uppercase', mb: 1, display: 'block', letterSpacing: 1 }}>
+                                                        <Typography id="moderation-reason-label" variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 800, textTransform: 'uppercase', mb: 1, display: 'block', letterSpacing: 1 }}>
                                                             Moderation Reason {selectedActionType !== "mod_action" && "(Sent to user)"}
                                                         </Typography>
                                                         <textarea
+                                                            aria-labelledby="moderation-reason-label"
                                                             value={moderationReason}
                                                             onChange={(e) => setModerationReason(e.target.value)}
                                                             placeholder={`Enter the reason for ${selectedActionType}...`}
@@ -576,10 +577,10 @@ export default function CommunityActionsContent() {
                                                                 border: `1px solid ${themeVar("chart1")}26`,
                                                                 mt: 2
                                                             }}>
-                                                                <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 800, textTransform: 'uppercase', mb: 2, display: 'block', letterSpacing: 1 }}>
+                                                                <Typography id="mod-action-selector-label" variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 800, textTransform: 'uppercase', mb: 2, display: 'block', letterSpacing: 1 }}>
                                                                     Select attributes to enforce change:
                                                                 </Typography>
-                                                                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 1.5, mb: 2.5 }}>
+                                                                <Box role="group" aria-labelledby="mod-action-selector-label" sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 1.5, mb: 2.5 }}>
                                                                     {[
                                                                         { id: 'displayName', label: 'Display Name' },
                                                                         { id: 'username', label: 'Username' },
@@ -589,11 +590,17 @@ export default function CommunityActionsContent() {
                                                                     ].map((attr) => (
                                                                         <Box
                                                                             key={attr.id}
-                                                                            onClick={() => {
-                                                                                const next = new Set(selectedModActions);
-                                                                                if (next.has(attr.id)) next.delete(attr.id);
-                                                                                else next.add(attr.id);
-                                                                                setSelectedModActions(next);
+                                                                            role="checkbox"
+                                                                            aria-checked={selectedModActions.has(attr.id)}
+                                                                            tabIndex={0}
+                                                                            onKeyDown={(e: React.KeyboardEvent) => {
+                                                                                if (e.key === ' ' || e.key === 'Enter') {
+                                                                                    e.preventDefault();
+                                                                                    const next = new Set(selectedModActions);
+                                                                                    if (next.has(attr.id)) next.delete(attr.id);
+                                                                                    else next.add(attr.id);
+                                                                                    setSelectedModActions(next);
+                                                                                }
                                                                             }}
                                                                             sx={{
                                                                                 p: 1.5,
@@ -661,7 +668,7 @@ export default function CommunityActionsContent() {
                                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                                             <UserCircle2 size={18} style={{ color: themeVar("mutedForeground") }} />
                                                             <Typography variant="body2" sx={{ fontWeight: 800, color: themeVar("mutedForeground"), textTransform: 'uppercase', letterSpacing: 1 }}>
-                                                                Verdict: <span style={{ color: themeVar("foreground") }}>{r.myVote}</span>
+                                                                Verdict: <span style={{ color: themeVar("foreground") }}>{r.resolutionAction}</span>
                                                             </Typography>
                                                         </Box>
                                                         <Chip

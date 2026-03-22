@@ -11,6 +11,7 @@ import LeftSidebar from "./ShellContent/LeftSidebar";
 import MainContent from "./ShellContent/MainContent";
 import GlobalVoicePanel from "./ShellContent/GlobalVoicePanel";
 import { ShellViewProvider, ShellView } from "./ShellContent/viewContext";
+import { GlobalNotificationListener } from "../GlobalNotificationListener";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
@@ -75,6 +76,7 @@ export function ShellLayout({ children, headerRight }: ShellLayoutProps) {
 
   return (
     <ShellViewProvider initialView={viewParam}>
+      <GlobalNotificationListener />
       <Box
         sx={{
           flex: 1,

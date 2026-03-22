@@ -9,6 +9,7 @@ import { fileTables } from "./schema/files.schema";
 import { leagueTables } from "./schema/league.schema";
 import { analyticsTables } from "./schema/analytics.schema";
 import { spacesTables } from "./schema/spaces";
+import { notesTables } from "./schema/notes.schema";
 
 export default defineSchema({
   // Games
@@ -29,5 +30,6 @@ export default defineSchema({
   ...analyticsTables,
   // Spaces domain
   ...spacesTables,
-
+  // Notes domain
+  ...notesTables,
 });

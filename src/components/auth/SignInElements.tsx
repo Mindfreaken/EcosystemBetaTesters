@@ -49,22 +49,7 @@ export default function SignInElements({
         const displayName = (displayNameMeta && displayNameMeta.trim().length > 0)
           ? displayNameMeta
           : username || email.split("@")[0] || "User";
-        const dobMeta = (user?.publicMetadata as any)?.dateOfBirth as string | number | undefined;
-        let dateOfBirth: number | undefined = undefined;
-        if (typeof dobMeta === "number") {
-          dateOfBirth = dobMeta;
-        } else if (typeof dobMeta === "string" && dobMeta) {
-          const t = Date.parse(dobMeta);
-          if (!Number.isNaN(t)) dateOfBirth = t;
-        }
-        // If not available, leave undefined (do not coerce to 0)
-        if (dateOfBirth === undefined || Number.isNaN(dateOfBirth as any)) {
-          dateOfBirth = undefined;
-        }
-        // Normalize to ms timestamp (convert seconds -> ms if needed)
-        if (typeof dateOfBirth === 'number' && dateOfBirth > 0 && dateOfBirth < 1e12) {
-          dateOfBirth = Math.floor(dateOfBirth * 1000);
-        }
+
 
         // No username confirmation required in sign-in flow
 
@@ -72,7 +57,6 @@ export default function SignInElements({
           email,
           displayName,
           username,
-          dateOfBirth,
         });
         hasOnboardedRef.current = true;
         router.replace(redirectUrl);
@@ -224,8 +208,9 @@ export default function SignInElements({
           {forgotMode === "request" ? (
             <form onSubmit={submitForgotRequest} className="space-y-4 w-[320px]">
               <div className="space-y-2">
-                <label className="block text-sm">Email</label>
+                <label htmlFor="reset-request-email" className="block text-sm">Email</label>
                 <input
+                  id="reset-request-email"
                   type="email"
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
@@ -285,8 +270,9 @@ export default function SignInElements({
           ) : (
             <form onSubmit={submitPasswordReset} className="space-y-4 w-[320px]">
               <div className="space-y-2">
-                <label className="block text-sm">Verification code</label>
+                <label htmlFor="reset-code" className="block text-sm">Verification code</label>
                 <input
+                  id="reset-code"
                   type="text"
                   value={resetCode}
                   onChange={(e) => setResetCode(e.target.value)}
@@ -296,8 +282,9 @@ export default function SignInElements({
                 />
               </div>
               <div className="space-y-2">
-                <label className="block text-sm">New password</label>
+                <label htmlFor="reset-new-password" className="block text-sm">New password</label>
                 <input
+                  id="reset-new-password"
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}

@@ -103,7 +103,7 @@ const FriendCodeModal: React.FC<FriendCodeModalProps> = ({ show, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-zinc-800 px-5 py-4">
           <h2 className="text-lg font-semibold">My Friend Code</h2>
-          <UiIconButton size="sm" variant="ghost" onClick={onClose} title="Close">
+          <UiIconButton size="sm" variant="ghost" aria-label="Close" onClick={onClose} title="Close">
             <CloseIcon className="!text-[1.1rem]" />
           </UiIconButton>
         </div>
@@ -128,6 +128,7 @@ const FriendCodeModal: React.FC<FriendCodeModalProps> = ({ show, onClose }) => {
               </span>
               <div className="flex items-center gap-1">
                 <UiIconButton
+                  aria-label={showActualCode ? "Hide code" : "Show code"}
                   onClick={handleToggleCodeVisibility}
                   title={showActualCode ? "Hide code" : "Show code"}
                   disabled={!activeCode || isLoading}
@@ -141,11 +142,12 @@ const FriendCodeModal: React.FC<FriendCodeModalProps> = ({ show, onClose }) => {
                   )}
                 </UiIconButton>
                 {activeCode && (
-                  <UiIconButton onClick={handleCopyCode} title="Copy code" size="sm" variant="ghost">
+                  <UiIconButton aria-label="Copy code" onClick={handleCopyCode} title="Copy code" size="sm" variant="ghost">
                     <ContentCopyIcon className="!text-[1rem]" />
                   </UiIconButton>
                 )}
                 <UiIconButton
+                  aria-label={isLoading ? "Loading..." : activeCode ? "Generate new code" : "Generate code"}
                   onClick={handleGenerateCode}
                   title={isLoading ? "Loading..." : activeCode ? "Generate new code" : "Generate code"}
                   disabled={isLoading}

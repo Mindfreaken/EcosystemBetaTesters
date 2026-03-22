@@ -151,6 +151,7 @@ export default function NewChatModal({
         </Box>
         <IconButton
           size="small"
+          aria-label="Close"
           onClick={handleClose}
           sx={{
             color: themeVar("mutedForeground"),

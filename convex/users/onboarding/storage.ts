@@ -21,12 +21,8 @@ export const updateUserStorage = internalMutation({
     // Convert bytes to GB
     const totalGBUsed = totalBytesUsed / BYTES_PER_GB;
 
-    // Update the user's record
-    await ctx.db.patch(userId, {
-      currentStorageUsedGB: totalGBUsed,
-    });
-
-    console.log(`Updated storage for user ${userId} to ${totalGBUsed.toFixed(4)} GB.`);
+    // Update the user's record (removed currentStorageUsedGB as it is gone from schema)
+    console.log(`Calculated storage for user ${userId} to ${totalGBUsed.toFixed(4)} GB.`);
   },
 });
 
@@ -63,7 +59,9 @@ export const getUserStorageInfo = query({
         ? user.totalStorageAllocatedGB
         : systemParams.freeUserStorageLimitGB;
 
-    const currentStorageUsedBytes = Math.round((user.currentStorageUsedGB ?? 0) * BYTES_PER_GB);
+    // Calculate current storage on the fly since currentStorageUsedGB was removed from schema
+    const files = await ctx.db.query("files").withIndex("by_user", q => q.eq("uploadedBy", user._id)).collect();
+    const currentStorageUsedBytes = files.reduce((acc, f) => acc + (f.fileSize || 0), 0);
     const storageLimitBytes = storageLimitGB * BYTES_PER_GB;
 
     return {

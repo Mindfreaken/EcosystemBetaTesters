@@ -10,20 +10,16 @@ export const createUser = mutation({
     email: v.string(),
     displayName: v.string(),
     username: v.string(),
-    dateOfBirth: v.number(),
     createdAt: v.number(),
-    // Optional: normalized E.164 phone from Clerk, and original formatted number
-    phoneE164: v.optional(v.string()),
-    phoneNumber: v.optional(v.string()),
   },
   returns: v.null(),
-  handler: async (ctx, { email, displayName, username, dateOfBirth, createdAt, phoneE164, phoneNumber }) => {
+  handler: async (ctx, { email, displayName, username, createdAt }) => {
     const identity = await ctx.auth.getUserIdentity?.();
     if (!identity) {
       throw new Error("Unauthorized: missing Clerk identity");
     }
     const clerkUserId = identity.subject; // Clerk user ID
-    console.log("createUser called with:", { clerkUserId, email, displayName, username, dateOfBirth, createdAt });
+    console.log("createUser called with:", { clerkUserId, email, displayName, username, createdAt });
 
     // Normalize and validate username/displayName lengths (<= 20)
     const normalizedUsername = username.trim();
@@ -35,7 +31,7 @@ export const createUser = mutation({
       throw new Error("Display name must be at most 20 characters");
     }
 
-    // 0. Check for existing username/display name/email/phone (case-insensitive/normalized)
+    // 0. Check for existing username/display name/email (case-insensitive/normalized)
     const existingUserCheck = await ctx.db
       .query("users")
       .withIndex("by_username_lower", (q) => q.eq("usernameLower", normalizedUsername.toLowerCase()))
@@ -64,16 +60,6 @@ export const createUser = mutation({
       throw new Error(`Email is already in use`);
     }
 
-    if (phoneE164) {
-      const existingPhoneCheck = await ctx.db
-        .query("users")
-        .withIndex("by_phone_e164", (q) => q.eq("phoneE164", phoneE164))
-        .first();
-      if (existingPhoneCheck) {
-        throw new Error(`Phone number is already in use`);
-      }
-    }
-
     // 1. Initialize master data (do this first)
     await ctx.runMutation(api.users.achievements.achievementDefs.initializeAchievementDefs);
     await ctx.runMutation(api.users.profiles.functions.profileTypes.initializeProfileTypes);
@@ -95,9 +81,6 @@ export const createUser = mutation({
       displayNameLower: normalizedDisplayName.toLowerCase(),
       email,
       emailLower: email.toLowerCase(),
-      phoneNumber: phoneNumber ?? undefined,
-      phoneE164: phoneE164 ?? undefined,
-      dateOfBirth: dateOfBirth,
       role: 'user',
       ecosystemdevs: false,
       avatarUrl: defaultAvatarUrl,
@@ -111,10 +94,6 @@ export const createUser = mutation({
       suspensionStatus: undefined, // undefined = Active/Normal
       storageStatus: 'free',
       totalStorageAllocatedGB: 2, // Default free tier storage
-      currentStorageUsedGB: 0,
-      xp: 0,
-      overseer: false,
-      overseerPoints: 0
     });
     console.log("User inserted with Convex ID:", userId, "for Clerk ID:", clerkUserId);
 
@@ -200,12 +179,9 @@ export const createUser = mutation({
 // Ensure a user exists, creating them if necessary
 export const ensureUser = mutation({
   args: {
-    // Clerk identity will be used to identify the user; no external id in args
     email: v.string(),
     displayName: v.string(),
     username: v.optional(v.string()),
-    dateOfBirth: v.optional(v.number()),
-    phoneE164: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     console.log("ensureUser called with args:", args);
@@ -244,20 +220,6 @@ export const ensureUser = mutation({
     }
 
     if (existingUser === null) {
-      // Normalize dateOfBirth to a DB-friendly ms timestamp if provided
-      const normalizeDob = (val: unknown): number | undefined => {
-        if (typeof val === "number") {
-          // If looks like seconds (10 digits), convert to ms
-          if (val > 0 && val < 1e12) return Math.floor(val * 1000);
-          return val > 0 ? Math.floor(val) : undefined;
-        }
-        if (typeof val === "string" && val.trim()) {
-          const t = Date.parse(val);
-          return Number.isNaN(t) ? undefined : t;
-        }
-        return undefined;
-      };
-      const normalizedDob = normalizeDob(args.dateOfBirth);
       // Check if username already exists (case-insensitive)
       if (args.username) {
         const username = args.username.trim();
@@ -310,39 +272,15 @@ export const ensureUser = mutation({
           email: args.email,
           displayName: (args.displayName ?? "").trim(),
           username: (args.username ?? "").trim(),
-          dateOfBirth: normalizedDob ?? 0,
           createdAt: Date.now(),
-          phoneE164: args.phoneE164,
         });
       } else {
-        // Do not auto-create without a confirmed username (and DOB). Wait for full registration flow.
+        // Do not auto-create without a confirmed username. Wait for full registration flow.
         console.log("ensureUser: Username not provided; skipping user creation for Clerk ID:", clerkUserId);
         return;
       }
     } else {
       console.log("ensureUser: Existing user found for Clerk ID:", clerkUserId, "User ID:", existingUser._id);
-      // Normalize and patch DOB if provided and stored is missing/invalid
-      const normalizeDob = (val: unknown): number | undefined => {
-        if (typeof val === "number") {
-          if (val > 0 && val < 1e12) return Math.floor(val * 1000);
-          return val > 0 ? Math.floor(val) : undefined;
-        }
-        if (typeof val === "string" && val.trim()) {
-          const t = Date.parse(val);
-          return Number.isNaN(t) ? undefined : t;
-        }
-        return undefined;
-      };
-      const normalizedDob = normalizeDob(args.dateOfBirth);
-      const providedDobValid = typeof normalizedDob === "number" && normalizedDob > 0;
-      const storedDobValid = typeof (existingUser as any).dateOfBirth === "number" && (existingUser as any).dateOfBirth > 0;
-      if (providedDobValid && !storedDobValid) {
-        await ctx.db.patch(existingUser._id, {
-          dateOfBirth: normalizedDob,
-          updatedAt: Date.now(),
-        });
-        console.log("ensureUser: Updated missing dateOfBirth for existing user:", existingUser._id);
-      }
       console.log(`User already exists for Clerk ID: ${clerkUserId}`);
     }
   },

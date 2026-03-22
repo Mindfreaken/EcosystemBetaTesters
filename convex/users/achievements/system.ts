@@ -5,7 +5,7 @@ export const SYSTEM_ACHIEVEMENTS: AchievementFields[] = [
     name: "Community Member",
     description: "Joined the community",
     category: "Community",
-    imageUrl: "/achievements/users-group.svg",
+    imageUrl: "/achievements/community_member_joined_achievement.png",
     rarity: "common",
   },
   {

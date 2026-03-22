@@ -179,7 +179,7 @@ export default function VoiceRoom({ roomId, roomName, spaceId }: VoiceRoomProps)
     // If connected, render the LiveKit participant grid!
     // Note: We do NOT need <LiveKitRoom> here because it is rendering globally in our layout.
     // The hooks and components from @livekit/components-react will automatically find it.
-    return <ActiveRoom roomName={roomName} onLeave={handleLeave} />;
+    return <ActiveRoom roomName={roomName} onLeave={handleLeave} spaceId={spaceId} />;
 }
 
 /**
@@ -286,7 +286,7 @@ function ParticipantVolumeControl({ clerkUserId, participant }: { clerkUserId: s
  * if their camera is muted (or missing), instead of the default LiveKit generic silhouette.
  */
 const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
-    ({ trackRef, ...props }, ref) => {
+    ({ trackRef, spaceId, ...props }, ref) => {
         const [contextMenu, setContextMenu] = React.useState<{ mouseX: number; mouseY: number } | null>(null);
         const trackReference = useEnsureTrackRef(trackRef);
         const layoutContext = useLayoutContext();
@@ -421,6 +421,9 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
                     onClose={() => setContextMenu(null)}
                     participant={participant}
                     clerkUserId={clerkUserId || ""}
+                    spaceId={spaceId}
+                    userId={userProfile?._id}
+                    isSelf={isLocalUser}
                 />
             </Box>
         );
@@ -428,7 +431,7 @@ const CustomParticipantTile = React.forwardRef<HTMLDivElement, any>(
 );
 CustomParticipantTile.displayName = "CustomParticipantTile";
 
-function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => void }) {
+function ActiveRoom({ roomName, onLeave, spaceId }: { roomName: string, onLeave: () => void, spaceId: string }) {
     const connectionState = useConnectionState();
     const roomContext = useRoomContext();
     const hasPlayedOwnJoinSound = React.useRef(false);
@@ -597,6 +600,7 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
 
                 {/* Fullscreen Toggle */}
                 <IconButton
+                    aria-label={isFullscreen ? "Exit Fullscreen" : "Toggle Fullscreen"}
                     onClick={toggleFullscreen}
                     title="Toggle Fullscreen"
                     sx={{
@@ -663,7 +667,7 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
                                 {layoutMode === 'grid' || !focusTrack ? (
                                     <div className="lk-grid-layout-wrapper" style={{ height: '100%', width: '100%', flex: 1, minHeight: 0, overflow: 'hidden' }}>
                                         <GridLayout tracks={tracks} style={{ height: "100%" }}>
-                                            <CustomParticipantTile />
+                                            <CustomParticipantTile spaceId={spaceId} />
                                         </GridLayout>
                                     </div>
                                 ) : (
@@ -675,13 +679,13 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
                                                         key={`carousel-${focusTrack ? (isTrackReference(focusTrack) ? focusTrack.publication.trackSid : focusTrack.participant.identity) : 'none'}`}
                                                         tracks={carouselTracks}
                                                     >
-                                                        <CustomParticipantTile />
+                                                        <CustomParticipantTile spaceId={spaceId} />
                                                     </CarouselLayout>
                                                 </Box>
                                             )}
                                             {focusTrack && (
                                                 <Box sx={{ flex: 1, width: '100%', minHeight: 0, position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
-                                                    <CustomParticipantTile trackRef={focusTrack} style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
+                                                    <CustomParticipantTile spaceId={spaceId} trackRef={focusTrack} style={{ height: '100%', width: '100%', objectFit: 'contain' }} />
                                                 </Box>
                                             )}
                                         </FocusLayoutContainer>
@@ -702,6 +706,7 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
                         <Box sx={{ width: "1px", height: "24px", bgcolor: "rgba(255,255,255,0.2)", mx: 1 }} />
                         
                         <IconButton 
+                            aria-label={layoutMode === 'grid' ? "Switch to Stage View" : "Switch to Grid View"}
                             onClick={() => setLayoutMode(prev => prev === 'grid' ? 'stage' : 'grid')}
                             title={layoutMode === 'grid' ? "Switch to Stage View" : "Switch to Grid View"}
                             sx={{ color: "white", "&:hover": { bgcolor: "rgba(255,255,255,0.1)" } }}
@@ -710,6 +715,7 @@ function ActiveRoom({ roomName, onLeave }: { roomName: string, onLeave: () => vo
                         </IconButton>
 
                         <IconButton 
+                            aria-label={showNonVideo ? "Hide Non-Video Participants" : "Show Non-Video Participants"}
                             onClick={() => setShowNonVideo(prev => !prev)}
                             title={showNonVideo ? "Hide Non-Video Participants" : "Show Non-Video Participants"}
                             sx={{ color: showNonVideo ? "var(--primary)" : "white", "&:hover": { bgcolor: "rgba(255,255,255,0.1)" } }}

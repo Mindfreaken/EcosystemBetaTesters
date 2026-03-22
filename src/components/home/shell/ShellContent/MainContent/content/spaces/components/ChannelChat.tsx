@@ -412,12 +412,13 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                         p: 0.5,
                                         zIndex: 1
                                     }}>
-                                        <IconButton size="small" onClick={(e) => handleReactionClick(e, m._id)} sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("primary") } }}>
+                                        <IconButton size="small" aria-label="Add reaction" onClick={(e) => handleReactionClick(e, m._id)} sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("primary") } }}>
                                             <Smile size={18} />
                                         </IconButton>
                                         {canMod && (
                                             <IconButton
                                                 size="small"
+                                                aria-label="Moderator actions"
                                                 onClick={(e) => setModMenuAnchor({ el: e.currentTarget, msgId: m._id, userId: m.senderId, username: m.sender?.displayName || "User", avatarUrl: m.sender?.avatarUrl })}
                                                 sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("chart4") } }}
                                             >
@@ -427,6 +428,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                                         {canDelete && (
                                             <IconButton
                                                 size="small"
+                                                aria-label="Delete message"
                                                 onClick={() => deleteMessage({ messageId: m._id })}
                                                 sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("destructive") } }}
                                             >
@@ -664,6 +666,7 @@ export default function ChannelChat({ channel, userRole = "member" }: ChannelCha
                         />
                         <IconButton
                             size="small"
+                            aria-label="Send message"
                             onClick={handleSend}
                             disabled={!canSend}
                             sx={{

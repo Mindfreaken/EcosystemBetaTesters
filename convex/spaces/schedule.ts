@@ -87,11 +87,9 @@ export const createEvent = mutation({
                 avatarUrl: "/avatars/default/default_001.jpg",
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
-                overseeradmin: true,
                 isBanned: false,
                 storageStatus: 'free',
                 totalStorageAllocatedGB: 0,
-                currentStorageUsedGB: 0
             });
             assistant = await ctx.db.get(assistantId);
         }

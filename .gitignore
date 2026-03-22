@@ -64,3 +64,6 @@ next-env.d.ts
 # Large installer binaries (served via Vercel Blob, not committed to repo)
 /public/downloads/*.exe
 /public/downloads/*.msi
+
+# Personal Notes
+VERSIONING_STRATEGY.md

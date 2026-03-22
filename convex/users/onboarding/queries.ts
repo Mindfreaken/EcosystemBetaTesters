@@ -17,13 +17,9 @@ export const getUserByClerkId = query({
       email: v.string(),
       avatarUrl: v.optional(v.string()),
       coverUrl: v.optional(v.string()),
-      overseeradmin: v.optional(v.boolean()),
-      lastSeen: v.optional(v.number()),
       status: v.optional(v.string()),
       customStatus: v.optional(v.string()),
       bio: v.optional(v.string()),
-      location: v.optional(v.string()),
-      dateOfBirth: v.optional(v.number()),
       createdAt: v.number(),
       updatedAt: v.number(),
       joinNumber: v.optional(v.number()),
@@ -47,13 +43,9 @@ export const getUserByClerkId = query({
         email: user.email,
         avatarUrl: user.avatarUrl,
         coverUrl: user.coverUrl,
-        overseeradmin: user.overseeradmin,
-        lastSeen: user.lastSeen,
         status: user.status,
         customStatus: user.customStatus,
         bio: user.bio,
-        location: user.location,
-        dateOfBirth: user.dateOfBirth,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         joinNumber: user.joinNumber,
@@ -81,7 +73,7 @@ export const getActiveUserCount = query({
     const active = all.filter((u) => {
       // Exclude system user(s)
       if (u.role === 'system') return false;
-      const last = u.lastSeen ?? u.updatedAt ?? u.createdAt;
+      const last = (u as any).lastSeen ?? u.updatedAt ?? u.createdAt;
       return typeof last === 'number' && last >= threshold;
     });
     return active.length;

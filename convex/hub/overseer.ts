@@ -6,6 +6,7 @@ import { SUSPENSION_STAGES } from "../lib/permissions_utils";
 import { Doc } from "../_generated/dataModel";
 import { ensureOverseer } from "../lib/admin";
 import { SYSTEM_USER_ID } from "../seed";
+import { sendSystemDM } from "../chat/system";
 
 // Get the count of pending reports
 export const getPendingReportCount = query({
@@ -101,14 +102,6 @@ export const getReportFeed = query({
         const activeReports = reports
             .sort((a, b) => a.timestamp - b.timestamp);
 
-        // Get user's existing votes to show status
-        const userVotes = await ctx.db
-            .query("overseerVotes")
-            .withIndex("by_overseer", (q) => q.eq("overseerId", user._id))
-            .collect();
-
-        const votedReports = new Set(userVotes.map((v) => v.reportId));
-
         // Return data with reporter and target user details
         return Promise.all(activeReports.map(async (r) => {
             let targetUser = null;
@@ -141,7 +134,6 @@ export const getReportFeed = query({
                 content: r.content,
                 timestamp: r.timestamp,
                 type: r.messageId ? "message" : r.fileId ? "file" : "user",
-                hasVoted: votedReports.has(r._id),
                 expiresAt: r.timestamp, // No longer expires
                 reporters: filteredReporters,
                 reporter: filteredReporters[0] || null, // For backward compatibility
@@ -321,61 +313,9 @@ async function applyResolution(
         resolutionTimestamp: now,
         resolutionAction: args.action,
         resolutionReason,
+        resolvedById: user._id,
     });
 }
-
-/**
- * Send a DM from the System user to a target user.
- */
-async function sendSystemDM(ctx: MutationCtx, targetUserId: Id<"users">, content: string) {
-    const systemUser = await ctx.db
-        .query("users")
-        .withIndex("by_clerk_id", (q) => q.eq("clerkUserId", SYSTEM_USER_ID))
-        .unique();
-
-    if (!systemUser) {
-        console.error("System user not found. DM not sent.");
-        return;
-    }
-
-    // Find DM chat
-    const chats = await ctx.db
-        .query("chats")
-        .withIndex("by_isGroup", (q) => q.eq("isGroup", false))
-        .collect();
-    
-    let chat = chats.find(c => 
-        c.participants.length === 2 && 
-        c.participants.includes(systemUser._id) && 
-        c.participants.includes(targetUserId)
-    );
-
-    let chatId: Id<"chats">;
-    if (!chat) {
-        chatId = await ctx.db.insert("chats", {
-            participants: [systemUser._id, targetUserId],
-            isGroup: false,
-            createdBy: systemUser._id,
-            status: "active",
-            createdAt: Date.now(),
-            lastActivityAt: Date.now(),
-        });
-    } else {
-        chatId = chat._id;
-        await ctx.db.patch(chatId, { lastActivityAt: Date.now() });
-    }
-
-    // Send message
-    await ctx.db.insert("messages", {
-        chatId,
-        content,
-        senderId: systemUser._id,
-        sentAt: Date.now(),
-        isEdited: false,
-        isDeleted: false,
-    });
-}
-
 
 // Cast a vote on a report - NOW IMMEDIATE RESOLUTION
 export const castVote = mutation({
@@ -387,26 +327,17 @@ export const castVote = mutation({
     },
     handler: async (ctx, args) => {
         const user = await ensureOverseer(ctx);
-        const now = Date.now();
-
         const report = await ctx.db.get(args.reportId);
         if (!report) throw new Error("Report not found");
         if (report.status !== "pending") throw new Error(`Report is already ${report.status}`);
 
-        // Record the action in overseerVotes for history/points
-        await ctx.db.insert("overseerVotes", {
-            reportId: args.reportId,
-            overseerId: user._id,
-            vote: args.vote as any,
-            modActions: args.modActions,
-            timestamp: now,
-        });
+        // Record the action in history handled by applyResolution now (resolvedById)
 
-        // Award point
-        const currentPoints = user.overseerPoints ?? 0;
-        await ctx.db.patch(user._id, {
-            overseerPoints: currentPoints + 1,
-        });
+        // Award point (removed overseerPoints as it is gone from schema)
+        // const currentPoints = user.overseerPoints ?? 0;
+        // await ctx.db.patch(user._id, {
+        //     overseerPoints: currentPoints + 1,
+        // });
 
         // IMMEDIATELY APPLY RESOLUTION
         await applyResolution(ctx, user, {
@@ -440,17 +371,12 @@ export const resolveReportDirectly = mutation({
 export const getOverseerDashboard = query({
     args: {},
     handler: async (ctx) => {
-        const user = await ensureOverseer(ctx);
-
-        const votes = await ctx.db
-            .query("overseerVotes")
-            .withIndex("by_overseer", (q) => q.eq("overseerId", user._id))
-            .collect();
+        await ensureOverseer(ctx);
 
         return {
-            points: user.overseerPoints ?? 0,
-            totalVotes: votes.length,
-            recentVotes: votes.slice(-5).reverse(),
+            points: 0,
+            totalVotes: 0,
+            recentVotes: [],
         };
     },
 });
@@ -473,20 +399,17 @@ export const isOverseer = query({
 export const getResolvedReportFeed = query({
     args: {},
     handler: async (ctx) => {
-        const user = await ensureOverseer(ctx);
+        await ensureOverseer(ctx);
 
-        // Get all votes by this overseer
-        const votes = await ctx.db
-            .query("overseerVotes")
-            .withIndex("by_overseer", (q) => q.eq("overseerId", user._id))
+        // Get recent resolved reports
+        const reports = await ctx.db
+            .query("chatReports")
+            .withIndex("by_status", (q) => q.eq("status", "resolved"))
             .collect();
 
-        const reportIds = votes.map((v) => v.reportId);
-
-        const resolvedReports = await Promise.all(reportIds.map(async (reportId) => {
-            const report = await ctx.db.get(reportId);
-            if (report && (report.status === "resolved" || report.status === "dismissed")) {
-                const myVote = votes.find((v) => v.reportId === reportId)?.vote;
+        const resolvedReports = await Promise.all(reports.map(async (report) => {
+            if (report) {
+                const myVote = report.resolutionAction;
 
                 const allReporterIds = [...new Set([report.reporterId, ...(report.reporterIds || [])])];
                 const reporters = await Promise.all(allReporterIds.map(async (id) => {
@@ -794,9 +717,9 @@ export const listUsers = query({
                 username: u.username,
                 displayName: u.displayName,
                 avatarUrl: u.avatarUrl,
-                overseeradmin: u.overseeradmin,
                 isBanned: (u.bannedUntil ?? 0) > Date.now(),
                 suspensionStatus: u.suspensionStatus,
+                role: u.role,
                 socialScore: socialScore?.score ?? 10000,
             };
         }));

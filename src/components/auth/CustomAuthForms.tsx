@@ -37,8 +37,9 @@ export const SignInForm: React.FC<{ redirectUrl?: string }> = ({ redirectUrl = "
   return (
     <form onSubmit={onSubmit} className="space-y-4 w-[320px]">
       <div className="space-y-2">
-        <label className="block text-sm">Email</label>
+        <label htmlFor="signin-email" className="block text-sm">Email</label>
         <input
+          id="signin-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -48,8 +49,9 @@ export const SignInForm: React.FC<{ redirectUrl?: string }> = ({ redirectUrl = "
         />
       </div>
       <div className="space-y-2">
-        <label className="block text-sm">Password</label>
+        <label htmlFor="signin-password" className="block text-sm">Password</label>
         <input
+          id="signin-password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -139,8 +141,9 @@ export const SignUpForm: React.FC<{
       <form onSubmit={verifyCode} className="space-y-4 w-[320px]">
         <p className="text-sm text-gray-300">We sent a 6-digit code to {email}. Enter it below to verify your email.</p>
         <div className="space-y-2">
-          <label className="block text-sm">Verification code</label>
+          <label htmlFor="verify-code" className="block text-sm">Verification code</label>
           <input
+            id="verify-code"
             type="text"
             inputMode="numeric"
             value={code}
@@ -165,8 +168,9 @@ export const SignUpForm: React.FC<{
   return (
     <form onSubmit={startSignUp} className="space-y-4 w-[320px]">
       <div className="space-y-2">
-        <label className="block text-sm">Email</label>
+        <label htmlFor="signup-email" className="block text-sm">Email</label>
         <input
+          id="signup-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -176,8 +180,9 @@ export const SignUpForm: React.FC<{
         />
       </div>
       <div className="space-y-2">
-        <label className="block text-sm">Password</label>
+        <label htmlFor="signup-password" className="block text-sm">Password</label>
         <input
+          id="signup-password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}

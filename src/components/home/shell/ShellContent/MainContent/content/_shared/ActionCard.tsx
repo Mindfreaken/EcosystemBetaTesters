@@ -29,6 +29,13 @@ export default function ActionCard({
     return (
         <Box
             onClick={!disabled ? onClick : undefined}
+            tabIndex={!disabled ? 0 : -1}
+            onKeyDown={!disabled ? (e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    onClick?.();
+                }
+            } : undefined}
             sx={{
                 position: "relative",
                 p: 3,

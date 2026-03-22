@@ -26,7 +26,7 @@ export default function AdminLayout({
     }
 
     if (user !== undefined && user !== null) {
-      if (!user.overseeradmin) {
+      if (user.role !== 'admin') {
         router.push("/home");
       }
     }
@@ -43,13 +43,13 @@ export default function AdminLayout({
            />
         </div>
         <Spinner size="large" />
-        <p className="text-muted-foreground text-sm font-medium tracking-wide italic">SECURE GATEWAY: VERIFYING OVERSEER STATUS...</p>
+        <p className="text-muted-foreground text-sm font-medium tracking-wide italic">SECURE GATEWAY: VERIFYING ADMIN STATUS...</p>
       </div>
     );
   }
 
   // Unauthorized state (will redirect)
-  if (!isAuthLoading && (!isAuthenticated || user === null || (user && !user.overseeradmin))) {
+  if (!isAuthLoading && (!isAuthenticated || user === null || (user && user.role !== 'admin'))) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-background gap-4">
          <div className="text-destructive font-black text-2xl tracking-[0.2em]">ACCESS DENIED</div>
@@ -73,7 +73,7 @@ export default function AdminLayout({
             <h1 className="text-2xl font-black tracking-tighter uppercase italic">
               Ecosystem <span className="text-primary">Admin</span>
             </h1>
-            <span className="text-[10px] font-bold tracking-[0.3em] text-secondary uppercase opacity-80 pl-1">Overseer Console</span>
+            <span className="text-[10px] font-bold tracking-[0.3em] text-secondary uppercase opacity-80 pl-1">Console</span>
           </div>
         </div>
 
@@ -114,7 +114,7 @@ export default function AdminLayout({
               <div className="flex flex-col items-end">
                 <span className="text-xs font-bold leading-tight">{user.username}</span>
                 <span className="text-[9px] font-black uppercase text-primary leading-none tracking-tighter">
-                  {user.overseeradmin ? "Overseer Admin" : "System Admin"}
+                  {user.role === 'admin' ? "System Admin" : "Staff"}
                 </span>
               </div>
             </div>

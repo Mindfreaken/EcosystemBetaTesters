@@ -33,11 +33,9 @@ export const sendWelcomeDm = internalMutation({
             bio: "Welcome to Ecosystem! I'm here to help you get started.",
             createdAt: Date.now(),
             updatedAt: Date.now(),
-            overseeradmin: true,
             isBanned: false,
             storageStatus: 'free',
             totalStorageAllocatedGB: 0,
-            currentStorageUsedGB: 0
           });
           systemUser = await ctx.db.get(sysId);
           if (!systemUser) return null;

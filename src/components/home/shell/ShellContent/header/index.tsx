@@ -105,6 +105,8 @@ export default function Header(props: HeaderContentProps) {
       >
         {friendsCount > 0 && !isFriendsView && (
           <span
+            role="status"
+            aria-label={`${friendsCount} pending friend requests`}
             style={{
               position: "absolute",
               top: -5,
@@ -142,6 +144,8 @@ export default function Header(props: HeaderContentProps) {
       >
         {unreadMessagesCount > 0 && !isChatView && (
           <span
+            role="status"
+            aria-label={`${unreadMessagesCount} unread messages`}
             style={{
               position: "absolute",
               top: -5,

@@ -44,7 +44,7 @@ export default function ProfileHeader() {
       <Box sx={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", mt: -6, px: { xs: 2, sm: 3 } }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Avatar
-            alt="User avatar"
+            alt={`${displayName}'s avatar`}
             src={avatarUrl}
             sx={{ width: 96, height: 96, border: "3px solid var(--background)", boxShadow: `0 8px 24px rgba(0,0,0,.35)` }}
           />
@@ -90,7 +90,7 @@ export default function ProfileHeader() {
           <Typography variant="overline" sx={{ color: "var(--muted-foreground)", letterSpacing: ".12em" }}>
             Stats
           </Typography>
-          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1, mt: 0.5 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 1, mt: 0.5 }}>
             <Box>
               <Typography variant="caption" sx={{ color: "var(--muted-foreground)" }}>Followers</Typography>
               <Typography variant="subtitle2" sx={{ color: "var(--foreground)", fontWeight: 800 }}>{(overview as any)?.stats?.followers ?? 0}</Typography>
@@ -98,10 +98,6 @@ export default function ProfileHeader() {
             <Box>
               <Typography variant="caption" sx={{ color: "var(--muted-foreground)" }}>Following</Typography>
               <Typography variant="subtitle2" sx={{ color: "var(--foreground)", fontWeight: 800 }}>{(overview as any)?.stats?.following ?? 0}</Typography>
-            </Box>
-            <Box>
-              <Typography variant="caption" sx={{ color: "var(--muted-foreground)" }}>XP</Typography>
-              <Typography variant="subtitle2" sx={{ color: "var(--foreground)", fontWeight: 800 }}>{(me as any)?.xp ?? 0}</Typography>
             </Box>
           </Box>
         </MuiCard>

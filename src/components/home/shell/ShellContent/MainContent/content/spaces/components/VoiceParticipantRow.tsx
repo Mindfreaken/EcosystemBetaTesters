@@ -9,9 +9,14 @@ import { MicOff, Headphones } from "lucide-react";
 import { useIsSpeaking } from "@livekit/components-react";
 import ParticipantContextMenu from "./ParticipantContextMenu";
 
+import { Id } from "convex/_generated/dataModel";
+import { useQuery } from "convex/react";
+import { api } from "convex/_generated/api";
+
 interface VoiceParticipantRowProps {
     p: any;
     participants: any[];
+    spaceId: Id<"spaces">;
 }
 
 const SpeakingAvatar = ({ lkParticipant, avatarUrl, displayName, isStreaming, topRoleColor }: { lkParticipant?: any, avatarUrl?: string, displayName: string, isStreaming: boolean, topRoleColor: string }) => {
@@ -61,8 +66,10 @@ const SpeakingName = ({ lkParticipant, displayName, topRoleColor }: { lkParticip
     );
 };
 
-const VoiceParticipantRow = ({ p, participants }: VoiceParticipantRowProps) => {
+const VoiceParticipantRow = ({ p, participants, spaceId }: VoiceParticipantRowProps) => {
     const [contextMenu, setContextMenu] = React.useState<{ mouseX: number; mouseY: number } | null>(null);
+    const me = useQuery(api.spaces.core.getMe);
+    const isSelf = me?._id === p.userId;
 
     const displayName = p.user?.displayName || p.user?.username || "Unknown";
     
@@ -169,7 +176,10 @@ const VoiceParticipantRow = ({ p, participants }: VoiceParticipantRowProps) => {
                 anchorPosition={contextMenu}
                 onClose={() => setContextMenu(null)}
                 participant={lkParticipant}
-                clerkUserId={p.userId}
+                clerkUserId={p.user?.clerkUserId || p.userId}
+                spaceId={spaceId}
+                userId={p.userId}
+                isSelf={isSelf}
             />
         </Box>
     );

@@ -11,7 +11,7 @@ export const DEFAULT_ACHIEVEMENT_DEFS = [
     requirements: JSON.stringify({ type: "automatic" }),
     rewardType: "Badge",
     rewardValue: "community_badge",
-    iconUrl: "/achievements/users-group.svg",
+    iconUrl: "/achievements/community_member_joined_achievement.png",
     createdAt: Date.now(),
   },
   {
@@ -19,13 +19,13 @@ export const DEFAULT_ACHIEVEMENT_DEFS = [
     name: "Early Adopter",
     description: "One of the first 2,000 members to join",
     category: "Community",
-    requirements: JSON.stringify({ 
-      type: "join_position", 
-      maxPosition: 2000 
+    requirements: JSON.stringify({
+      type: "join_position",
+      maxPosition: 2000
     }),
     rewardType: "Badge",
     rewardValue: "early_adopter_badge",
-    iconUrl: "/achievements/early_adopter_sticker.png", 
+    iconUrl: "/achievements/early_adopter_sticker.png",
     createdAt: Date.now(),
   },
   {
@@ -33,7 +33,7 @@ export const DEFAULT_ACHIEVEMENT_DEFS = [
     name: "Identity Established",
     description: "Completed all profile sections",
     category: "Profile",
-    requirements: JSON.stringify({ 
+    requirements: JSON.stringify({
       type: "profile_fields",
       fields: ["bio", "avatarUrl", "customStatus", "profileTypeId"]
     }),
@@ -47,7 +47,7 @@ export const DEFAULT_ACHIEVEMENT_DEFS = [
     name: "Friendly",
     description: "Made your first friend connection",
     category: "Social",
-    requirements: JSON.stringify({ 
+    requirements: JSON.stringify({
       type: "friend_count",
       min: 1
     }),
@@ -59,17 +59,17 @@ export const DEFAULT_ACHIEVEMENT_DEFS = [
 ];
 
 const achievementDefReturnType = v.object({
-    _id: v.id("achievementsDefs"),
-    _creationTime: v.number(),
-    key: v.string(),
-    name: v.string(),
-    description: v.string(),
-    category: v.string(),
-    requirements: v.string(),
-    rewardType: v.optional(v.string()),
-    rewardValue: v.optional(v.string()),
-    iconUrl: v.optional(v.string()),
-    createdAt: v.number(),
+  _id: v.id("achievementsDefs"),
+  _creationTime: v.number(),
+  key: v.string(),
+  name: v.string(),
+  description: v.string(),
+  category: v.string(),
+  requirements: v.string(),
+  rewardType: v.optional(v.string()),
+  rewardValue: v.optional(v.string()),
+  iconUrl: v.optional(v.string()),
+  createdAt: v.number(),
 });
 
 // Initialize default achievement definitions
@@ -78,14 +78,14 @@ export const initializeAchievementDefs = mutation({
   returns: v.null(),
   handler: async (ctx) => {
     for (const achievementDef of DEFAULT_ACHIEVEMENT_DEFS) {
-        const existing = await ctx.db
-            .query("achievementsDefs")
-            .withIndex("by_key", (q) => q.eq("key", achievementDef.key))
-            .unique();
-        
-        if (!existing) {
-            await ctx.db.insert("achievementsDefs", achievementDef);
-        }
+      const existing = await ctx.db
+        .query("achievementsDefs")
+        .withIndex("by_key", (q) => q.eq("key", achievementDef.key))
+        .unique();
+
+      if (!existing) {
+        await ctx.db.insert("achievementsDefs", achievementDef);
+      }
     }
     return null;
   },

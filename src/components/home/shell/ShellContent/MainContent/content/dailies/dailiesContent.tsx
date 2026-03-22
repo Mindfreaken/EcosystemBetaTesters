@@ -28,11 +28,14 @@ const items = [
 ];
 
 export default function DailiesContent() {
-  const { selectedDailyId: selectedId, setSelectedDailyId } = useShellView();
+  const { selectedDailyId: selectedId, setSelectedDailyId, setNerdleVariant } = useShellView();
   // Map back to our old object structure for compatibility with existing code
   const selected = items.find(it => it.id === selectedId) || null;
   const setSelected = (val: { id: string; name: string } | null) => {
     setSelectedDailyId(val?.id || null);
+    if (val?.id === "nerdle") {
+      setNerdleVariant(null);
+    }
   };
 
   // Increment this when the same item is selected again to force a remount of the detail view

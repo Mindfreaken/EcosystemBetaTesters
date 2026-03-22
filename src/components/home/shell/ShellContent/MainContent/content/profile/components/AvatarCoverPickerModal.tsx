@@ -110,6 +110,7 @@ export default function AvatarCoverPickerModal({ show, mode, onClose }: AvatarCo
           <button
             className="inline-flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
             onClick={onClose}
+            aria-label="Close"
           >
             <CloseIcon className="!text-[1.1rem]" />
           </button>
@@ -149,10 +150,11 @@ export default function AvatarCoverPickerModal({ show, mode, onClose }: AvatarCo
         ) : (
           <div className="px-6 pb-6">
             <div className={mode === "avatar" ? "grid grid-cols-6 gap-3" : "grid grid-cols-3 gap-3"}>
-              {defaults.map((src) => (
+              {defaults.map((src, idx) => (
                 <button
                   key={src}
                   onClick={() => void handlePickDefault(src)}
+                  aria-label={`Select default ${mode} ${idx + 1}`}
                   className={
                     mode === "avatar"
                       ? "group relative overflow-hidden rounded-full border border-zinc-800 hover:border-zinc-700 w-20 h-20"
@@ -162,7 +164,7 @@ export default function AvatarCoverPickerModal({ show, mode, onClose }: AvatarCo
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={src}
-                    alt="default"
+                    alt={`${label} default ${idx + 1}`}
                     className={
                       mode === "avatar"
                         ? "block h-full w-full object-cover"

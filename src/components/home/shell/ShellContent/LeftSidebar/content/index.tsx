@@ -272,7 +272,7 @@ export default function LeftSidebarContent({ state }: LeftSidebarContentProps) {
                 <Box sx={{ fontSize: 0, display: "grid", placeItems: "center", minWidth: 24 }}>{item.icon}</Box>
                 <Typography variant="body2">{item.label}</Typography>
                 {/* WIP badge for non-core items */}
-                {item.label !== "Home" && item.label !== "Dailies" && (
+                {item.label !== "Home" && item.label !== "Dailies" && item.label !== "Spaces" && (
                   <Box
                     sx={{
                       ml: "auto",
@@ -285,7 +285,7 @@ export default function LeftSidebarContent({ state }: LeftSidebarContentProps) {
                       letterSpacing: 0.4,
                     }}
                   >
-                    {item.label === "Gaming" ? "MOCK" : "WIP"}
+                    {item.label === "Gaming" ? "MOCK" : "SOON"}
                   </Box>
                 )}
               </Box>
@@ -303,40 +303,41 @@ export default function LeftSidebarContent({ state }: LeftSidebarContentProps) {
               size="small"
               sx={{ backgroundColor: "color-mix(in oklab, var(--primary), transparent 85%)", color: "var(--primary) !important" }}
               onClick={navigateHome}
+              aria-label="Home"
             >
               <Home size={16} />
             </IconButton>
-            <IconButton size="small" onClick={navigateSpaces}>
+            <IconButton size="small" onClick={navigateSpaces} aria-label="Spaces">
               <Users size={16} />
             </IconButton>
-            <IconButton size="small" onClick={navigateGaming}>
+            <IconButton size="small" onClick={navigateGaming} aria-label="Gaming">
               <Joystick size={16} />
             </IconButton>
-            <IconButton size="small" onClick={navigateDailies}>
+            <IconButton size="small" onClick={navigateDailies} aria-label="Dailies">
               <Gamepad2 size={16} />
             </IconButton>
-            <IconButton size="small" onClick={navigateLive}>
+            <IconButton size="small" onClick={navigateLive} aria-label="Live">
               <Radio size={16} />
             </IconButton>
-            <IconButton size="small" onClick={navigateView}>
+            <IconButton size="small" onClick={navigateView} aria-label="View">
               <PlayCircle size={16} />
             </IconButton>
-            <IconButton size="small" onClick={navigateCampaigns}>
+            <IconButton size="small" onClick={navigateCampaigns} aria-label="Campaigns">
               <Megaphone size={16} />
             </IconButton>
-            <IconButton size="small" onClick={navigateMusic}>
+            <IconButton size="small" onClick={navigateMusic} aria-label="Music">
               <Music size={16} />
             </IconButton>
-            <IconButton size="small" onClick={navigateHire}>
+            <IconButton size="small" onClick={navigateHire} aria-label="Hire">
               <Briefcase size={16} />
             </IconButton>
-            <IconButton size="small" onClick={navigateDocs}>
+            <IconButton size="small" onClick={navigateDocs} aria-label="Docs">
               <FileText size={16} />
             </IconButton>
-            <IconButton size="small">
+            <IconButton size="small" aria-label="User Profile">
               <User size={16} />
             </IconButton>
-            <IconButton size="small">
+            <IconButton size="small" aria-label="Settings">
               <Settings size={16} />
             </IconButton>
           </Box>

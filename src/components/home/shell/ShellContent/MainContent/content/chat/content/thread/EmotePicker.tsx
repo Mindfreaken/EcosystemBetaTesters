@@ -136,6 +136,7 @@ export default function EmotePicker({ onSelect, anchorEl, open, onClose }: Emote
                             {cat.emojis.map((emoji) => (
                                 <IconButton
                                     key={emoji}
+                                    aria-label={`Select ${emoji}`}
                                     onClick={() => {
                                         onSelect(emoji, false);
                                         onClose();
@@ -179,6 +180,7 @@ export default function EmotePicker({ onSelect, anchorEl, open, onClose }: Emote
                             {emojis.map((emoji) => (
                                 <Tooltip key={emoji._id} title={`:${emoji.name}:`} arrow placement="top">
                                     <IconButton
+                                        aria-label={`Select ${emoji.name} emote`}
                                         onClick={() => {
                                             onSelect(emoji.name, true, emoji.url);
                                             onClose();

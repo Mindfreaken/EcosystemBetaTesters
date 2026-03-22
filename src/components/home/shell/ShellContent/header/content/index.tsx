@@ -21,6 +21,7 @@ export default function HeaderContent({ onToggleLeft, headerRight, title = "EcoS
         <IconButton
           size="small"
           onClick={onToggleLeft}
+          aria-label="Toggle sidebar"
           sx={{
             color: "var(--muted-foreground)",
             "&:hover": {

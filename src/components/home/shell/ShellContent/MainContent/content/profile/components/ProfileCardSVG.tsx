@@ -10,7 +10,6 @@ export interface ProfileCardProps {
   title: string;
   followers: string;   // format strings (e.g., "12.4k")
   projects: string;
-  xp: string;
   about: string;
   footerLabel: string;
   footerBadge: string;
@@ -24,7 +23,6 @@ export default function ProfileCardSVG({
   title,
   followers,
   projects,
-  xp,
   about,
   footerLabel,
   footerBadge,
@@ -39,9 +37,13 @@ export default function ProfileCardSVG({
       width="400"
       height="600"
       viewBox="0 0 400 600"
+      role="img"
+      aria-labelledby="profile-card-title profile-card-desc"
       data-tier={tier}
       style={{ ["--card-bg" as any]: "#0b0f1a", ["--text" as any]: "#e8ecf1", ["--muted" as any]: "#a6b0c3" }}
     >
+      <title id="profile-card-title">{displayName}'s Profile Card</title>
+      <desc id="profile-card-desc">A collectible profile card showing {displayName}'s stats and achievements.</desc>
       <defs>
         <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="10" stdDeviation="12" floodColor="#000" floodOpacity="0.35" />
@@ -110,6 +112,7 @@ export default function ProfileCardSVG({
         <rect x="20" y="20" width="360" height="560" rx="24" ry="24" className="bg" />
         {/* Cover */}
         <g clipPath="url(#card-clip)">
+          <title>Profile Cover Image</title>
           <image x="20" y="20" width="360" height="140" preserveAspectRatio="xMidYMid slice" href={coverUrl} />
           <rect x="20" y="20" width="360" height="140" className="cover-tint" />
           <rect x="20" y="20" width="360" height="140" fill="url(#cover-shade)" />
@@ -137,6 +140,7 @@ export default function ProfileCardSVG({
       {/* Avatar */}
       <g>
         <circle cx="200" cy="170" r="60" fill="rgba(255,255,255,.06)" stroke="var(--accent)" strokeWidth="1" />
+        <title>User Avatar</title>
         <image x="140" y="110" width="120" height="120" href={avatarUrl} clipPath="url(#avatar-clip)" preserveAspectRatio="xMidYMid slice" />
       </g>
 

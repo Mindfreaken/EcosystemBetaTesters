@@ -84,7 +84,7 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                                 className="mx-auto mb-4 p-4 rounded-full w-fit flex items-center justify-center"
                                 style={{ backgroundColor: "color-mix(in oklab, var(--danger), transparent 80%)" }}
                             >
-                                <Lock className="w-12 h-12" style={{ color: "var(--danger)" }} />
+                                <Lock className="w-12 h-12" style={{ color: "var(--danger)" }} aria-hidden="true" />
                             </div>
                             <h1 className="text-3xl font-bold tracking-tight" style={{ color: "var(--danger)" }}>
                                 {title}
@@ -133,10 +133,11 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                             <div className="space-y-4 pt-4 border-t" style={{ borderColor: "var(--border)" }}>
                                 <h3 className="font-semibold text-lg" style={{ color: "var(--foreground)" }}>Submit Appeal</h3>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium" style={{ color: "var(--muted-foreground)" }}>
+                                    <label htmlFor="appeal-reason" className="text-sm font-medium" style={{ color: "var(--muted-foreground)" }}>
                                         Why should this suspension be lifted?
                                     </label>
                                     <textarea
+                                        id="appeal-reason"
                                         placeholder="Explain your case..."
                                         value={appealReason}
                                         onChange={(e) => setAppealReason(e.target.value)}
@@ -150,10 +151,11 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium" style={{ color: "var(--muted-foreground)" }}>
+                                    <label htmlFor="appeal-proof" className="text-sm font-medium" style={{ color: "var(--muted-foreground)" }}>
                                         Proof Link (Optional)
                                     </label>
                                     <input
+                                        id="appeal-proof"
                                         className="flex h-9 w-full rounded-md px-3 py-1 text-sm"
                                         placeholder="https://..."
                                         value={appealLink}
@@ -217,7 +219,7 @@ export function BannedScreen({ status, reason, bannedUntil }: BannedScreenProps)
                 >
                     <div className="p-6">
                         <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: "var(--foreground)" }}>
-                            <Clock className="w-5 h-5" />
+                            <Clock className="w-5 h-5" aria-hidden="true" />
                             Suspension History
                         </h2>
 

@@ -111,7 +111,15 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
 
     const renderToggle = (label: string, value: boolean, onChange: () => void) => (
         <Box
+            role="button"
+            tabIndex={0}
             onClick={onChange}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onChange();
+                }
+            }}
             sx={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 p: 2, borderRadius: 3,
@@ -208,10 +216,10 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
                                         )}
                                     </Box>
                                     <Box sx={{ display: "flex", gap: 0.5 }}>
-                                        <IconButton size="small" onClick={() => handleOpenEdit(event)} sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("foreground") } }}>
+                                        <IconButton size="small" aria-label="Edit event" onClick={() => handleOpenEdit(event)} sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("foreground") } }}>
                                             <Edit2 size={16} />
                                         </IconButton>
-                                        <IconButton size="small" onClick={() => setEventToDelete(event._id)} sx={{ color: themeVar("destructive"), "&:hover": { bgcolor: "rgba(255,0,0,0.1)" } }}>
+                                        <IconButton size="small" aria-label="Delete event" onClick={() => setEventToDelete(event._id)} sx={{ color: themeVar("destructive"), "&:hover": { bgcolor: "rgba(255,0,0,0.1)" } }}>
                                             <Trash2 size={16} />
                                         </IconButton>
                                     </Box>
@@ -261,6 +269,7 @@ export default function ScheduleManager({ spaceId }: ScheduleManagerProps) {
                     {editingEventId ? "Edit Event" : "Create Event"}
                     <IconButton
                         size="small"
+                        aria-label="Close"
                         onClick={() => setIsCreateOpen(false)}
                         sx={{
                             color: themeVar("mutedForeground"),

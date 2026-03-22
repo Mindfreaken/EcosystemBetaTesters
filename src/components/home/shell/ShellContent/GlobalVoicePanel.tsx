@@ -89,8 +89,16 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId, isDeafen
                 direction="row"
                 alignItems="center"
                 spacing={1.5}
-                sx={{ minWidth: 0, flex: 1, cursor: "pointer", "&:hover": { opacity: 0.8 } }}
+                tabIndex={0}
+                onKeyDown={(e: React.KeyboardEvent) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
+                        handleNavigate();
+                    }
+                }}
+                sx={{ minWidth: 0, flex: 1, cursor: "pointer", "&:hover": { opacity: 0.8 }, borderRadius: 1 }}
                 onClick={handleNavigate}
+                aria-label="Go to space"
             >
                 <Box sx={{ position: "relative", display: "flex" }}>
                     <Signal size={20} color={isConnected ? "var(--success, #22c55e)" : "var(--muted-foreground)"} />
@@ -128,6 +136,7 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId, isDeafen
                 <IconButton
                     size="small"
                     onClick={buttonProps.onClick}
+                    aria-label={isMuted ? "Unmute microphone" : "Mute microphone"}
                     sx={{
                         color: isMuted ? "var(--destructive)" : "var(--muted-foreground)",
                         "&:hover": { backgroundColor: "rgba(255,255,255,0.05)" }
@@ -139,6 +148,7 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId, isDeafen
                 <IconButton
                     size="small"
                     onClick={() => toggleDeafen()}
+                    aria-label={isDeafened ? "Undeafen audio" : "Deafen audio"}
                     sx={{
                         color: isDeafened ? "var(--destructive)" : "var(--muted-foreground)",
                         "&:hover": { backgroundColor: "rgba(255,255,255,0.05)" }
@@ -150,6 +160,7 @@ function ActiveVoiceControls({ leaveRoom, roomId, channelName, spaceId, isDeafen
                 <IconButton
                     size="small"
                     onClick={() => leaveRoom()}
+                    aria-label="Leave voice channel"
                     sx={{
                         color: "var(--destructive)",
                         "&:hover": { backgroundColor: "rgba(239, 68, 68, 0.1)" }

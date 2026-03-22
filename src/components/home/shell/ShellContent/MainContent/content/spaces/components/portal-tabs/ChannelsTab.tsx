@@ -204,7 +204,15 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
 
     const renderToggle = (label: string, value: boolean, onChange: () => void) => (
         <Box
+            role="button"
+            tabIndex={0}
             onClick={onChange}
+            onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onChange();
+                }
+            }}
             sx={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 p: 2, borderRadius: 3,
@@ -308,7 +316,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                         pb: 1
                     }}>
                         Create Category
-                        <IconButton size="small" onClick={() => { setCreatingCategory(false); setNewCategoryName(""); }} sx={{ color: themeVar("mutedForeground") }}>
+                        <IconButton size="small" aria-label="Close modal" onClick={() => { setCreatingCategory(false); setNewCategoryName(""); }} sx={{ color: themeVar("mutedForeground") }}>
                             <X size={18} />
                         </IconButton>
                     </DialogTitle>
@@ -362,7 +370,7 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                         pb: 1
                     }}>
                         Create Channel
-                        <IconButton size="small" onClick={() => { setCreatingChannel(false); setNewChannelName(""); }} sx={{ color: themeVar("mutedForeground") }}>
+                        <IconButton size="small" aria-label="Close modal" onClick={() => { setCreatingChannel(false); setNewChannelName(""); }} sx={{ color: themeVar("mutedForeground") }}>
                             <X size={18} />
                         </IconButton>
                     </DialogTitle>
@@ -492,8 +500,8 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                                                     {editingCategoryId === category._id ? (
                                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1, flex: 1, mr: 2 }}>
                                                             <TextField size="small" value={editingCategoryName} onChange={e => setEditingCategoryName(e.target.value)} autoFocus InputProps={{ sx: { color: themeVar("foreground"), height: 32, bgcolor: "rgba(0,0,0,0.2)" } }} />
-                                                            <IconButton size="small" onClick={handleUpdateCategory} sx={{ color: themeVar("primary") }}><Check size={16} /></IconButton>
-                                                            <IconButton size="small" onClick={() => { setEditingCategoryId(null); setEditingCategoryName(""); }} sx={{ color: themeVar("destructive") }}><X size={16} /></IconButton>
+                                                            <IconButton size="small" aria-label="Save category name" onClick={handleUpdateCategory} sx={{ color: themeVar("primary") }}><Check size={16} /></IconButton>
+                                                            <IconButton size="small" aria-label="Cancel editing" onClick={() => { setEditingCategoryId(null); setEditingCategoryName(""); }} sx={{ color: themeVar("destructive") }}><X size={16} /></IconButton>
                                                         </Box>
                                                     ) : (
                                                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -503,8 +511,8 @@ export default function ChannelsTab({ space, role, userRole, canManageChannels }
                                                     )}
                                                     {editingCategoryId !== category._id && (
                                                         <Box className="cat-actions" sx={{ opacity: 0.5, transition: "opacity 0.2s", display: "flex", gap: 0.5 }}>
-                                                            <IconButton size="small" onClick={() => { setEditingCategoryId(category._id); setEditingCategoryName(category.name); }}><Edit2 size={14} color={themeVar("mutedForeground")} /></IconButton>
-                                                            <IconButton size="small" onClick={() => setCategoryToDelete({ id: category._id, name: category.name })}><Trash2 size={14} color={themeVar("destructive")} /></IconButton>
+                                                            <IconButton size="small" aria-label="Edit category" onClick={() => { setEditingCategoryId(category._id); setEditingCategoryName(category.name); }}><Edit2 size={14} color={themeVar("mutedForeground")} /></IconButton>
+                                                            <IconButton size="small" aria-label="Delete category" onClick={() => setCategoryToDelete({ id: category._id, name: category.name })}><Trash2 size={14} color={themeVar("destructive")} /></IconButton>
                                                         </Box>
                                                     )}
                                                 </Box>
@@ -678,11 +686,11 @@ export function RenderChannelItem({
                         <MenuItem key={cat._id} value={cat._id}>{cat.name}</MenuItem>
                     ))}
                 </Select>
-                <IconButton onClick={() => onChangeIsReadOnly(!editingIsReadOnly)} sx={{ color: editingIsReadOnly ? themeVar("destructive") : themeVar("mutedForeground") }} title="Toggle Read-Only">
+                <IconButton aria-label="Toggle read-only" onClick={() => onChangeIsReadOnly(!editingIsReadOnly)} sx={{ color: editingIsReadOnly ? themeVar("destructive") : themeVar("mutedForeground") }} title="Toggle Read-Only">
                     <Lock size={16} />
                 </IconButton>
-                <IconButton onClick={onSaveEdit} sx={{ color: themeVar("primary") }}><Check size={18} /></IconButton>
-                <IconButton onClick={onCancelEdit} sx={{ color: themeVar("destructive") }}><X size={18} /></IconButton>
+                <IconButton aria-label="Save channel edits" onClick={onSaveEdit} sx={{ color: themeVar("primary") }}><Check size={18} /></IconButton>
+                <IconButton aria-label="Cancel channel edits" onClick={onCancelEdit} sx={{ color: themeVar("destructive") }}><X size={18} /></IconButton>
             </Box>
         );
     }
@@ -719,10 +727,10 @@ export function RenderChannelItem({
                         )}
                     </Box>
                     <Box>
-                        <IconButton size="small" onClick={() => onStartEdit(channel._id, channel.name, channel.categoryId, channel.isReadOnly)} sx={{ color: themeVar("chart4"), opacity: 0.5, "&:hover": { opacity: 1 } }}>
+                        <IconButton size="small" aria-label="Edit channel" onClick={() => onStartEdit(channel._id, channel.name, channel.categoryId, channel.isReadOnly)} sx={{ color: themeVar("chart4"), opacity: 0.5, "&:hover": { opacity: 1 } }}>
                             <Edit2 size={16} />
                         </IconButton>
-                        <IconButton size="small" onClick={onDelete} sx={{ color: themeVar("destructive"), opacity: 0.5, "&:hover": { opacity: 1 } }}>
+                        <IconButton size="small" aria-label="Delete channel" onClick={onDelete} sx={{ color: themeVar("destructive"), opacity: 0.5, "&:hover": { opacity: 1 } }}>
                             <Trash2 size={16} />
                         </IconButton>
                     </Box>

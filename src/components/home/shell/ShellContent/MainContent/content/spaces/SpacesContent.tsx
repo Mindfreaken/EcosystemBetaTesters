@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
+import Chip from "@mui/material/Chip";
 import UiButton from "@/components/ui/UiButton";
 import ContentTemplate from "../_shared/ContentTemplate";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,7 +12,7 @@ import { useShellView } from "../../../viewContext";
 import { themeVar } from "@/theme/registry";
 
 import { Plus, Users, Shield, Zap, Layout } from "lucide-react";
-import { useQuery } from "convex/react";
+import { useQuery, useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 import ActionCard from "../_shared/ActionCard";
 import CreateSpaceModal from "./components/CreateSpaceModal";
@@ -23,11 +24,15 @@ export default function SpacesContent() {
   const { setView, setSelectedSpaceId } = useShellView();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+  const [isUpgrading, setIsUpgrading] = useState(false);
 
-  const ownedSpacesCount = useQuery(api.spaces.core.getUserOwnedSpacesCount) ?? 0;
+  const createCheckoutSession = useAction(api.billing.createCheckoutSession);
+
+  const ownedSpacesData = useQuery(api.spaces.core.getUserOwnedSpacesCount) ?? { count: 0, max: 5 };
+  const { count: ownedSpacesCount, max: maxSpaces } = ownedSpacesData;
   const userSpaces = useQuery(api.spaces.core.getUserSpaces);
-  const maxFreeSpaces = 5;
-  const isAtLimit = ownedSpacesCount >= maxFreeSpaces;
+  const isAtLimit = ownedSpacesCount >= maxSpaces;
+  const isPaidTier = maxSpaces > 5;
 
 
   const handleCreateSpace = () => {
@@ -48,6 +53,21 @@ export default function SpacesContent() {
 
   const handleJoinSpace = () => {
     setIsJoinModalOpen(true);
+  };
+
+  const handleUpgrade = async () => {
+    try {
+      setIsUpgrading(true);
+      const { url } = await createCheckoutSession({});
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error("Failed to create checkout session:", error);
+      // Note: User will need to set STRIPE_SECRET_KEY in Convex dashboard
+    } finally {
+      setIsUpgrading(false);
+    }
   };
 
   return (
@@ -104,22 +124,32 @@ export default function SpacesContent() {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Shield size={16} style={{ color: themeVar("secondary") }} />
                   <Typography variant="caption" sx={{ color: themeVar("mutedForeground"), fontWeight: 600 }}>
-                    {ownedSpacesCount} / {maxFreeSpaces} Free Spaces Used
+                    {ownedSpacesCount} / {maxSpaces} Spaces Used
                   </Typography>
                 </Box>
-                {isAtLimit && (
-                  <Box
-                    sx={{
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: 1,
-                      bgcolor: `color-mix(in oklab, ${themeVar("chart4")}, transparent 90%)`,
-                      border: `1px solid ${themeVar("chart4")}`,
-                      color: themeVar("chart4"),
+                {isPaidTier ? (
+                  <Chip
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    icon={<Zap size={14} />}
+                    label="Expanded Spaces Active"
+                    sx={{ fontWeight: "bold" }}
+                  />
+                ) : (
+                  <UiButton
+                    variant={isAtLimit ? "primary" : "outline"}
+                    size="sm"
+                    pill
+                    loading={isUpgrading}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUpgrade();
                     }}
+                    startIcon={<Zap size={14} />}
                   >
-                    <Typography variant="caption" sx={{ fontWeight: 700 }}>Limit Reached</Typography>
-                  </Box>
+                    {isAtLimit ? "Add More Spaces" : "Upgrade Plan"}
+                  </UiButton>
                 )}
               </Box>
             }

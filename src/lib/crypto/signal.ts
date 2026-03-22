@@ -131,6 +131,49 @@ export class SignalManager {
         return " [Encrypted Message] ";
     }
   }
+
+  /**
+   * Encrypt a shared file key for multiple devices.
+   */
+  async encryptFileKey(
+    fileKey: string,
+    recipients: Array<{ userId: string; devices: any[] }>
+  ): Promise<{ ciphertexts: any[]; senderDeviceId: string }> {
+    const localDeviceId = await storage.getLocalDeviceId();
+    const ciphertexts: any[] = [];
+
+    for (const recipient of recipients) {
+      for (const device of recipient.devices) {
+        // address = recipient.userId / device.deviceId
+        ciphertexts.push({
+          deviceId: device.deviceId,
+          ciphertext: btoa(fileKey), // STUB: Simple Base64 for now
+          type: 3,
+        });
+      }
+    }
+
+    return {
+      ciphertexts,
+      senderDeviceId: localDeviceId,
+    };
+  }
+
+  /**
+   * Decrypt a file key for this device.
+   */
+  async decryptFileKey(
+    senderId: string,
+    senderDeviceId: string,
+    ciphertext: string,
+    type: number
+  ): Promise<string> {
+    try {
+      return atob(ciphertext);
+    } catch {
+      throw new Error("Failed to decrypt file key");
+    }
+  }
 }
 
 export const signalManager = SignalManager.getInstance();

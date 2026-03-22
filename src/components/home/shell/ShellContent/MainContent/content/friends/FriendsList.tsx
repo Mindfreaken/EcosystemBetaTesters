@@ -149,6 +149,7 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
                   <UiIconButton 
                     variant="primary" 
                     size="sm" 
+                    aria-label="Message"
                     onClick={() => onMessage(friend)} 
                     title="Message"
                     className="shadow-sm transition-transform active:scale-95"
@@ -159,6 +160,7 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
                   <UiIconButton 
                     variant="secondary" 
                     size="sm" 
+                    aria-label="View Full Profile"
                     onClick={() => onViewFullProfile(friend)} 
                     title="View Full Profile"
                     className="shadow-sm transition-transform active:scale-95"
@@ -169,6 +171,7 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
                   <UiIconButton 
                     variant="ghost" 
                     size="sm" 
+                    aria-label="More actions"
                     onClick={() => onMoreActions(friend)} 
                     title="More"
                     className="opacity-70 hover:opacity-100 transition-all"
@@ -212,13 +215,13 @@ const FriendsList = forwardRef<FriendsListRef, FriendsListProps>((props, ref) =>
                   </div>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <UiIconButton variant="secondary" size="sm" title="View Profile Card" onClick={() => onViewProfileCard(friend)}>
+                  <UiIconButton variant="secondary" size="sm" aria-label="View Profile Card" title="View Profile Card" onClick={() => onViewProfileCard(friend)}>
                     <AccountBoxIcon className="!text-[1.1rem]" />
                   </UiIconButton>
-                  <UiIconButton variant="primary" size="sm" title="Accept" onClick={() => onAcceptRequest(friend)}>
+                  <UiIconButton variant="primary" size="sm" aria-label="Accept friend request" title="Accept" onClick={() => onAcceptRequest(friend)}>
                     <CheckIcon className="!text-[1.1rem]" />
                   </UiIconButton>
-                  <UiIconButton variant="danger" size="sm" title="Reject" onClick={() => onRejectRequest(friend)}>
+                  <UiIconButton variant="danger" size="sm" aria-label="Reject friend request" title="Reject" onClick={() => onRejectRequest(friend)}>
                     <CloseIcon className="!text-[1.1rem]" />
                   </UiIconButton>
                 </div>

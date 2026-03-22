@@ -107,6 +107,7 @@ export default function EditProfileModal({ show, onClose }: EditProfileModalProp
             <button
               className="inline-flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
               onClick={onClose}
+              aria-label="Close"
             >
               <CloseIcon className="!text-[1.1rem]" />
             </button>

@@ -68,6 +68,41 @@ export const uploadFile = async (
   }
 };
 
+/**
+ * Encrypts a file using a simple XOR with a random key (for prototype Signal flow)
+ * and then uploads it to Convex storage.
+ */
+export const encryptAndUploadFile = async (
+  file: File,
+  path: string,
+  userId: Id<"users">,
+  chatId?: Id<"chats"> | undefined
+): Promise<UploadResult & { fileKey: string }> => {
+  // 1. Generate a random "symmetric key" for this file
+  const fileKey = Math.random().toString(36).substring(2, 12);
+  
+  // 2. Read file as ArrayBuffer and "encrypt" it
+  const arrayBuffer = await file.arrayBuffer();
+  const data = new Uint8Array(arrayBuffer);
+  
+  const resultData = new Uint8Array(data.length);
+  const keyBytes = new TextEncoder().encode(fileKey);
+  for (let i = 0; i < data.length; i++) {
+    resultData[i] = data[i] ^ keyBytes[i % keyBytes.length];
+  }
+  
+  // 3. Create a new "encrypted" File object
+  const encryptedFile = new File([resultData], file.name, { type: "application/octet-stream" });
+  
+  // 4. Upload the encrypted file
+  const uploadResult = await uploadFile(encryptedFile, path, userId, chatId);
+  
+  return {
+    ...uploadResult,
+    fileKey,
+  };
+};
+
 export const getFileUrl = async (fileId: Id<"files">): Promise<string | null> => {
   const convex = useConvex();
   return await convex.query(api.chat.storage.getFileUrl, { fileId });
@@ -205,8 +240,28 @@ export const useConvexStorage = () => {
     return await convex.query(api.chat.storage.hasActiveReports, { fileId });
   };
   
+  const encryptAndUploadFileToConvex = async (
+    file: File,
+    path: string,
+    userId: Id<"users">,
+    chatId: Id<"chats"> | undefined
+  ): Promise<UploadResult & { fileKey: string }> => {
+    const fileKey = Math.random().toString(36).substring(2, 12);
+    const arrayBuffer = await file.arrayBuffer();
+    const data = new Uint8Array(arrayBuffer);
+    const resultData = new Uint8Array(data.length);
+    const keyBytes = new TextEncoder().encode(fileKey);
+    for (let i = 0; i < data.length; i++) {
+      resultData[i] = data[i] ^ keyBytes[i % keyBytes.length];
+    }
+    const encryptedFile = new File([resultData], file.name, { type: "application/octet-stream" });
+    const uploadResult = await uploadFileToConvex(encryptedFile, path, userId, chatId);
+    return { ...uploadResult, fileKey };
+  };
+
   return {
     uploadFile: uploadFileToConvex,
+    encryptAndUploadFile: encryptAndUploadFileToConvex,
     getFileUrl: getFileUrlFromConvex,
     findFileByPath: findFileByPathFromConvex,
     findFileByStorageId: findFileByStorageIdFromConvex,

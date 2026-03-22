@@ -13,17 +13,19 @@ import { UserProfile } from "@clerk/clerk-react";
 import UiButton from "@/components/ui/UiButton";
 import { MuiCard } from "@/components/ui/MuiCard";
 import { useMediaDeviceSelect } from "@livekit/components-react";
-import { useQuery, useMutation } from "convex/react";
+import { useQuery, useMutation, useAction } from "convex/react";
 import { api } from "convex/_generated/api";
 
 function ConvexMediaDeviceSelect({
   kind,
   value,
-  onChange
+  onChange,
+  ariaLabel
 }: {
   kind: 'audioinput' | 'videoinput' | 'audiooutput',
   value?: string | null,
-  onChange: (id: string) => void
+  onChange: (id: string) => void,
+  ariaLabel?: string
 }) {
   const { devices, activeDeviceId, setActiveMediaDevice } = useMediaDeviceSelect({ kind });
 
@@ -52,6 +54,7 @@ function ConvexMediaDeviceSelect({
       value={value || activeDeviceId || ""}
       onChange={handleChange}
       className="themed-input"
+      aria-label={ariaLabel}
       style={{
         width: '100%',
         padding: '8px',
@@ -75,6 +78,8 @@ export default function SettingsContent() {
 
   const settings = useQuery(api.users.settings.getSettings);
   const updateSettings = useMutation(api.users.settings.updateUserSettings);
+  const [isOpeningPortal, setIsOpeningPortal] = React.useState(false);
+  const createCustomerPortalSession = useAction(api.billing.createCustomerPortalSession);
 
   const handleDeviceChange = (kind: 'audioinput' | 'videoinput' | 'audiooutput', deviceId: string) => {
     const field = kind === 'audioinput' ? 'preferredMicrophoneId'
@@ -109,8 +114,24 @@ export default function SettingsContent() {
           <UiButton variant="primary" pill style={{ marginRight: 12 }} onClick={() => setShowClerkProfile(true)}>
             Auth (Clerk)
           </UiButton>
-          <UiButton variant="outline" pill>
-            Subscriptions (Polar) — WIP
+          <UiButton 
+            variant="outline" 
+            pill
+            loading={isOpeningPortal}
+            onClick={async () => {
+              try {
+                setIsOpeningPortal(true);
+                const { url } = await createCustomerPortalSession({});
+                if (url) window.location.href = url;
+              } catch (e: any) {
+                console.error(e);
+                // Optional: alert user if they don't have a subscription
+              } finally {
+                setIsOpeningPortal(false);
+              }
+            }}
+          >
+            Manage Billing (Stripe)
           </UiButton>
         </MuiCard>
 
@@ -125,6 +146,7 @@ export default function SettingsContent() {
               <Typography variant="caption" sx={{ color: "var(--muted-foreground)", display: 'block', mb: 0.5 }}>Microphone</Typography>
               <ConvexMediaDeviceSelect
                 kind="audioinput"
+                ariaLabel="Select Microphone"
                 value={settings?.preferredMicrophoneId}
                 onChange={(id) => handleDeviceChange('audioinput', id)}
               />
@@ -133,6 +155,7 @@ export default function SettingsContent() {
               <Typography variant="caption" sx={{ color: "var(--muted-foreground)", display: 'block', mb: 0.5 }}>Camera</Typography>
               <ConvexMediaDeviceSelect
                 kind="videoinput"
+                ariaLabel="Select Camera"
                 value={settings?.preferredCameraId}
                 onChange={(id) => handleDeviceChange('videoinput', id)}
               />
@@ -141,6 +164,7 @@ export default function SettingsContent() {
               <Typography variant="caption" sx={{ color: "var(--muted-foreground)", display: 'block', mb: 0.5 }}>Output (Speakers)</Typography>
               <ConvexMediaDeviceSelect
                 kind="audiooutput"
+                ariaLabel="Select Speaker"
                 value={settings?.preferredSpeakerId}
                 onChange={(id) => handleDeviceChange('audiooutput', id)}
               />

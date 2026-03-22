@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
-import { Send, Smile, X } from "lucide-react";
+import { Send, Smile, X, Image as ImageIcon } from "lucide-react";
 import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "convex/_generated/api";
 import Dialog from "@mui/material/Dialog";
@@ -17,6 +17,7 @@ import EmotePicker from "./EmotePicker";
 import { themeVar } from "@/theme/registry";
 import { useToast } from "@/hooks/use-toast";
 import { signalManager } from "@/lib/crypto/signal";
+import { useConvexStorage } from "@/services/convexStorage";
 
 export type MinimalChat = { _id: string; name: string };
 
@@ -33,6 +34,11 @@ export default function ChatThread({
   const prependLoadRef = useRef(false);
   const prevScrollHeightRef = useRef(0);
   const markedReadRef = useRef<Set<string>>(new Set());
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { encryptAndUploadFile } = useConvexStorage();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [reactionsModalMessageId, setReactionsModalMessageId] = useState<string | null>(null);
 
 
   // Current user
@@ -186,30 +192,72 @@ export default function ChatThread({
 
   const sendMessage = useMutation(api.chat.functions.messages.sendMessage);
   const toggleReaction = useMutation(api.chat.functions.messages.toggleReaction);
-  const canSend = !!chat && !isSystemChat && !!me && input.trim().length > 0;
+  const canSend = !!chat && !isSystemChat && !!me && (input.trim().length > 0 || !!selectedFile);
+
+  const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setSelectedFile(file);
+  };
 
   const handleSend = async () => {
     if (!canSend || !chat || !me || !userDevicesAndKeys) return;
+    setIsUploading(true);
     const content = input.trim();
+    
     try {
-      // Encrypt for all participants' devices
-      const encryptionMetadata = await signalManager.encryptMessage(content, userDevicesAndKeys);
+      let attachments: any[] = [];
+      let fileKeysMetadata: any[] = [];
+
+      if (selectedFile) {
+        // 1. Encrypt and upload the file
+        const { fileId, downloadUrl, fileName, fileKey } = await encryptAndUploadFile(
+          selectedFile,
+          `chats/${chat._id}/messages`,
+          me._id,
+          chat._id as any
+        );
+
+        attachments = [{
+          type: "file",
+          fileName,
+          fileUrl: downloadUrl,
+          mimeType: selectedFile.type,
+          size: selectedFile.size,
+          fileId,
+        }];
+
+        // 2. Encrypt the file key for each device
+        const fileKeyEncryption = await signalManager.encryptFileKey(fileKey, userDevicesAndKeys);
+        fileKeysMetadata = fileKeyEncryption.ciphertexts;
+      }
+
+      // 3. Encrypt the text content
+      const encryptionMetadata = await signalManager.encryptMessage(content || "[Attachment]", userDevicesAndKeys);
       
+      // 4. Send the message with both text and file encryption metadata
       await sendMessage({
         chatId: chat._id as any,
-        content: "[Encrypted Message]", // Fallback for clients without E2EE
+        content: "[Encrypted Message]",
         senderId: me._id,
-        encryptionMetadata: encryptionMetadata as any,
+        encryptionMetadata: {
+          ...encryptionMetadata,
+          fileKeys: fileKeysMetadata.length > 0 ? fileKeysMetadata : undefined,
+        } as any,
+        attachments: attachments.length > 0 ? attachments : undefined,
       });
+
       setInput("");
+      setSelectedFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (e) {
       console.error("Failed to send encrypted message", e);
-      // Fallback to unencrypted if needed, or show error
       toast({
-        title: "Encryption Failed",
-        description: "Could not encrypt message for all devices.",
+        title: "Sending Failed",
+        description: "Could not encrypt or upload your message.",
         variant: "destructive"
       });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -323,6 +371,7 @@ export default function ChatThread({
                                 "&:hover": { color: themeVar("primary"), bgcolor: "rgba(255,255,255,0.05)" },
                               }}
                               title="React to message"
+                              aria-label="React to message"
                             >
                               <Smile size={14} />
                             </IconButton>
@@ -330,7 +379,7 @@ export default function ChatThread({
                         </Box>
                       )}
 
-                      <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word", overflowWrap: "anywhere", color: themeVar("foreground") }}>
+                      <Typography component="div" variant="body2" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word", overflowWrap: "anywhere", color: themeVar("foreground") }}>
                         <MessageContent 
                           m={m} 
                           meId={me?._id as any} 
@@ -340,44 +389,68 @@ export default function ChatThread({
                       </Typography>
 
                       {/* Reactions display */}
-                      {(m as any).reactions && (m as any).reactions.length > 0 && (
-                        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 1 }}>
-                          {Object.entries(
-                            (m as any).reactions.reduce((acc: any, r: any) => {
-                              acc[r.reaction] = (acc[r.reaction] || 0) + 1;
-                              return acc;
-                            }, {})
-                          ).map(([reaction, count]) => {
-                            const isMyReaction = (m as any).reactions.some((r: any) => r.reaction === reaction && r.userId === me?._id);
-                            const url = emojiMap.get(reaction);
-                            return (
+                      {(m as any).reactions && (m as any).reactions.length > 0 && (() => {
+                        const grouped = (m as any).reactions.reduce((acc: any, r: any) => {
+                          acc[r.reaction] = (acc[r.reaction] || 0) + 1;
+                          return acc;
+                        }, {});
+                        const entries = Object.entries(grouped);
+                        const REACTION_LIMIT = 10;
+                        const displayed = entries.slice(0, REACTION_LIMIT);
+                        const hasOverflow = entries.length > REACTION_LIMIT;
+
+                        return (
+                          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 1 }}>
+                            {displayed.map(([reaction, count]) => {
+                              const isMyReaction = (m as any).reactions.some((r: any) => r.reaction === reaction && r.userId === me?._id);
+                              const url = emojiMap.get(reaction);
+                              return (
+                                <Box
+                                  key={reaction}
+                                  onClick={() => toggleReaction({ messageId: m._id as any, userId: me!._id, reaction })}
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 0.5,
+                                    px: 0.75,
+                                    py: 0.25,
+                                    borderRadius: 1.5,
+                                    bgcolor: isMyReaction ? `color-mix(in oklab, ${themeVar("primary")} 20%, transparent)` : "rgba(0,0,0,0.1)",
+                                    border: `1px solid ${isMyReaction ? themeVar("primary") : themeVar("border")}`,
+                                    cursor: "pointer",
+                                    "&:hover": { bgcolor: "rgba(255,255,255,0.05)" }
+                                  }}
+                                >
+                                  {url ? (
+                                    <Box component="img" src={url} sx={{ width: 14, height: 14 }} />
+                                  ) : (
+                                    <Typography variant="caption">{reaction}</Typography>
+                                  )}
+                                  <Typography variant="caption" sx={{ fontWeight: 800 }}>{count as number}</Typography>
+                                </Box>
+                              );
+                            })}
+                            {hasOverflow && (
                               <Box
-                                key={reaction}
-                                onClick={() => toggleReaction({ messageId: m._id as any, userId: me!._id, reaction })}
+                                onClick={() => setReactionsModalMessageId(m._id)}
                                 sx={{
                                   display: "flex",
                                   alignItems: "center",
-                                  gap: 0.5,
-                                  px: 0.75,
+                                  px: 1,
                                   py: 0.25,
                                   borderRadius: 1.5,
-                                  bgcolor: isMyReaction ? `color-mix(in oklab, ${themeVar("primary")} 20%, transparent)` : "rgba(0,0,0,0.1)",
-                                  border: `1px solid ${isMyReaction ? themeVar("primary") : themeVar("border")}`,
+                                  bgcolor: "rgba(0,0,0,0.1)",
+                                  border: `1px solid ${themeVar("border")}`,
                                   cursor: "pointer",
                                   "&:hover": { bgcolor: "rgba(255,255,255,0.05)" }
                                 }}
                               >
-                                {url ? (
-                                  <Box component="img" src={url} sx={{ width: 14, height: 14 }} />
-                                ) : (
-                                  <Typography variant="caption">{reaction}</Typography>
-                                )}
-                                <Typography variant="caption" sx={{ fontWeight: 800 }}>{count as number}</Typography>
+                                <Typography variant="caption" sx={{ fontWeight: 800 }}>...</Typography>
                               </Box>
-                            );
-                          })}
-                        </Box>
-                      )}
+                            )}
+                          </Box>
+                        );
+                      })()}
                     </Box>
                   </Box>
                 </Box>
@@ -392,12 +465,26 @@ export default function ChatThread({
       {/* Composer (hidden for system chats) */}
       {!isSystemChat && (
         <Box sx={{ borderTop: `1px solid ${themeVar("border")}`, backgroundColor: themeVar("card"), p: 1 }}>
+          {selectedFile && (
+            <Box sx={{ p: 1, mb: 1, display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.03)', borderRadius: 1, border: `1px solid ${themeVar("border")}` }}>
+               <ImageIcon size={16} style={{ color: themeVar("primary") }} />
+               <Typography variant="caption" noWrap sx={{ flex: 1 }}>{selectedFile.name}</Typography>
+               <IconButton size="small" aria-label="Remove attachment" onClick={() => setSelectedFile(null)}><X size={14} /></IconButton>
+            </Box>
+          )}
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 1 }}>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={onFileSelect}
+              accept="image/*"
+            />
             <TextField
               size="small"
-              placeholder={me ? "Type a message" : "Select a chat to start typing"}
+              placeholder={me ? (isUploading ? "Uploading..." : "Type a message") : "Select a chat to start typing"}
               value={input}
-              disabled={!me}
+              disabled={!me || isUploading}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -410,6 +497,7 @@ export default function ChatThread({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   backgroundColor: themeVar("input"),
+                  // ... rest stays same
                   '& fieldset': { borderColor: themeVar("border") },
                   '&:hover fieldset': { borderColor: `color-mix(in oklab, ${themeVar("primary")}, transparent 40%)` },
                   '&.Mui-focused fieldset': {
@@ -424,16 +512,26 @@ export default function ChatThread({
             <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
               <IconButton
                 size="small"
+                aria-label="Add emoji"
                 onClick={(e) => {
                   setReactionTargetId(null);
                   setEmotePickerAnchor(e.currentTarget);
                 }}
-                disabled={!me}
+                disabled={!me || isUploading}
                 sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("primary") } }}
               >
                 <Smile size={16} />
               </IconButton>
-              <IconButton size="small" onClick={handleSend} disabled={!canSend} sx={{ color: canSend ? themeVar("secondary") : themeVar("mutedForeground") }}>
+              <IconButton
+                size="small"
+                aria-label="Attach image"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={!me || isUploading}
+                sx={{ color: themeVar("mutedForeground"), "&:hover": { color: themeVar("primary") } }}
+              >
+                <ImageIcon size={16} />
+              </IconButton>
+              <IconButton size="small" aria-label="Send message" onClick={handleSend} disabled={!canSend || isUploading} sx={{ color: canSend ? themeVar("secondary") : themeVar("mutedForeground") }}>
                 <Send size={16} />
               </IconButton>
             </Stack>
@@ -448,13 +546,103 @@ export default function ChatThread({
         onSelect={handleEmoteSelect}
       />
 
+      <ReactionsModal
+        message={orderedMessages.find(m => m._id === reactionsModalMessageId)}
+        open={Boolean(reactionsModalMessageId)}
+        onClose={() => setReactionsModalMessageId(null)}
+        senderMap={senderMap}
+        emojiMap={emojiMap}
+        onToggleReaction={(reaction) => {
+          if (reactionsModalMessageId) {
+            toggleReaction({ messageId: reactionsModalMessageId as any, userId: me!._id, reaction });
+          }
+        }}
+        meId={me?._id as any}
+      />
+
     </Box>
+  );
+}
+
+function ReactionsModal({ 
+  message, 
+  open, 
+  onClose, 
+  senderMap, 
+  emojiMap,
+  onToggleReaction,
+  meId
+}: { 
+  message: any; 
+  open: boolean; 
+  onClose: () => void;
+  senderMap: Map<string, any>;
+  emojiMap: Map<string, string>;
+  onToggleReaction: (reaction: string) => void;
+  meId: string;
+}) {
+  if (!message) return null;
+
+  const grouped = (message.reactions || []).reduce((acc: any, r: any) => {
+    if (!acc[r.reaction]) acc[r.reaction] = [];
+    acc[r.reaction].push(r.userId);
+    return acc;
+  }, {});
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 2, bgcolor: themeVar("card") } }}>
+      <Box sx={{ p: 2, color: themeVar("foreground") }}>
+        <Typography variant="subtitle1" sx={{ mb: 1.5, fontWeight: 700 }}>Message Reactions</Typography>
+        
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+          {Object.entries(grouped).map(([reaction, userIds]: [string, any]) => {
+            const url = emojiMap.get(reaction);
+            const isMyReaction = userIds.includes(meId);
+            
+            const tooltipTitle = userIds.map((uid: string) => {
+                const u = senderMap.get(uid);
+                return u?.displayName || u?.username || "Unknown";
+            }).join(", ");
+
+            return (
+              <Tooltip key={reaction} title={tooltipTitle} arrow placement="top">
+                <Box
+                  onClick={() => onToggleReaction(reaction)}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.75,
+                    px: 1.25,
+                    py: 0.75,
+                    borderRadius: 1.5,
+                    cursor: "pointer",
+                    bgcolor: isMyReaction ? `color-mix(in oklab, ${themeVar("primary")} 15%, transparent)` : "rgba(255,255,255,0.05)",
+                    border: `1px solid ${isMyReaction ? themeVar("primary") : themeVar("border")}`,
+                    "&:hover": { bgcolor: "rgba(255,255,255,0.1)" }
+                  }}
+                >
+                  {url ? <Box component="img" src={url} sx={{ width: 18, height: 18 }} /> : <Typography variant="body2">{reaction}</Typography>}
+                  <Typography variant="body2" sx={{ fontWeight: 800, opacity: 0.9 }}>{userIds.length}</Typography>
+                </Box>
+              </Tooltip>
+            );
+          })}
+        </Box>
+
+        <Box sx={{ mt: 2.5, display: "flex", justifyContent: "flex-end" }}>
+          <Button onClick={onClose} size="small" variant="contained" sx={{ bgcolor: themeVar("primary"), color: "white", px: 3 }}>
+            Done
+          </Button>
+        </Box>
+      </Box>
+    </Dialog>
   );
 }
 
 function MessageContent({ m, meId, emojiMap, isOnlyEmotes }: { m: any; meId: string; emojiMap: Map<string, string>; isOnlyEmotes: (content: string) => boolean }) {
   const isEncrypted = !!m.encryptionMetadata;
   const [decryptedContent, setDecryptedContent] = useState<string | null>(null);
+  const [decryptedImages, setDecryptedImages] = useState<Record<string, string>>({});
   const [isDecrypting, setIsDecrypting] = useState(isEncrypted);
 
   useEffect(() => {
@@ -462,8 +650,9 @@ function MessageContent({ m, meId, emojiMap, isOnlyEmotes }: { m: any; meId: str
     const decrypt = async () => {
       try {
         const myDeviceId = await signalManager.initializeDevice(meId);
+        
+        // 1. Decrypt text content
         const myCiphertext = m.encryptionMetadata.ciphertexts.find((c: any) => c.deviceId === myDeviceId.deviceId);
-
         if (myCiphertext) {
           const text = await signalManager.decryptMessage(
             m.senderId,
@@ -475,6 +664,44 @@ function MessageContent({ m, meId, emojiMap, isOnlyEmotes }: { m: any; meId: str
         } else {
           setDecryptedContent("[Message not encrypted for this device]");
         }
+
+        // 2. Decrypt attachments if any
+        if (m.attachments && m.attachments.length > 0 && m.encryptionMetadata.fileKeys) {
+          const myFileKeyCiphertext = m.encryptionMetadata.fileKeys.find((c: any) => c.deviceId === myDeviceId.deviceId);
+          if (myFileKeyCiphertext) {
+            const fileKey = await signalManager.decryptFileKey(
+              m.senderId,
+              m.encryptionMetadata.senderDeviceId,
+              myFileKeyCiphertext.ciphertext,
+              myFileKeyCiphertext.type
+            );
+
+            const newDecryptedImages: Record<string, string> = {};
+            for (const att of m.attachments) {
+              if (att.mimeType?.startsWith("image/")) {
+                try {
+                  const resp = await fetch(att.fileUrl);
+                  const blob = await resp.blob();
+                  const arrayBuffer = await blob.arrayBuffer();
+                  const data = new Uint8Array(arrayBuffer);
+                  
+                  // XOR Decrypt (prototype)
+                  const resultData = new Uint8Array(data.length);
+                  const keyBytes = new TextEncoder().encode(fileKey);
+                  for (let i = 0; i < data.length; i++) {
+                    resultData[i] = data[i] ^ keyBytes[i % keyBytes.length];
+                  }
+                  
+                  const decryptedBlob = new Blob([resultData], { type: att.mimeType });
+                  newDecryptedImages[att.fileId || att.fileUrl] = URL.createObjectURL(decryptedBlob);
+                } catch (err) {
+                  console.error("Failed to decrypt attachment", err);
+                }
+              }
+            }
+            setDecryptedImages(newDecryptedImages);
+          }
+        }
       } catch (e) {
         console.error("Decryption failed", e);
         setDecryptedContent("[Decryption Error]");
@@ -483,6 +710,11 @@ function MessageContent({ m, meId, emojiMap, isOnlyEmotes }: { m: any; meId: str
       }
     };
     decrypt();
+
+    return () => {
+      // Cleanup blob URLs
+      Object.values(decryptedImages).forEach(url => URL.revokeObjectURL(url));
+    };
   }, [m._id, isEncrypted, meId]);
 
   const content = isEncrypted ? (decryptedContent || (isDecrypting ? "Decrypting..." : "[Encrypted]")) : m.content;
@@ -492,32 +724,77 @@ function MessageContent({ m, meId, emojiMap, isOnlyEmotes }: { m: any; meId: str
 
   const parts = content.split(/(:[a-zA-Z0-9_]+:)/g);
   return (
-    <Box component="span" sx={{ fontSize: emojiSize, display: "inline-block", verticalAlign: "middle" }}>
-      {parts.map((part: string, i: number) => {
-        if (part.startsWith(":") && part.endsWith(":")) {
-          const name = part.slice(1, -1);
-          const url = emojiMap.get(name);
-          if (url) {
-            return (
-              <Tooltip key={i} title={part}>
-                <Box
-                  component="img"
-                  src={url}
-                  sx={{
-                    width: size,
-                    height: size,
-                    verticalAlign: "middle",
-                    display: "inline-block",
-                    mx: 0.25,
-                    transition: "transform 0.2s"
-                  }}
-                />
-              </Tooltip>
-            );
+    <Box>
+      <Box component="span" sx={{ fontSize: emojiSize, display: "inline-block", verticalAlign: "middle" }}>
+        {parts.map((part: string, i: number) => {
+          if (part.startsWith(":") && part.endsWith(":")) {
+            const name = part.slice(1, -1);
+            const url = emojiMap.get(name);
+            if (url) {
+              return (
+                <Tooltip key={i} title={part}>
+                  <Box
+                    component="img"
+                    src={url}
+                    sx={{
+                      width: size,
+                      height: size,
+                      verticalAlign: "middle",
+                      display: "inline-block",
+                      mx: 0.25,
+                      transition: "transform 0.2s"
+                    }}
+                  />
+                </Tooltip>
+              );
+            }
           }
-        }
-        return <span key={i}>{part}</span>;
-      })}
+          return <span key={i}>{part}</span>;
+        })}
+      </Box>
+
+      {/* Attachments Display */}
+      {m.attachments && m.attachments.length > 0 && (
+        <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
+          {m.attachments.map((att: any, i: number) => {
+            const isImage = att.mimeType?.startsWith("image/");
+            const displayUrl = isEncrypted ? decryptedImages[att.fileId || att.fileUrl] : att.fileUrl;
+
+            if (isImage && displayUrl) {
+              return (
+                <Box
+                  key={i}
+                  component="img"
+                  src={displayUrl}
+                  sx={{
+                    maxWidth: "100%",
+                    maxHeight: 300,
+                    borderRadius: 1,
+                    cursor: "pointer",
+                    "&:hover": { opacity: 0.9 }
+                  }}
+                  onClick={() => window.open(displayUrl, "_blank")}
+                />
+              );
+            } else if (isImage && isEncrypted && !displayUrl) {
+                return <Typography key={i} variant="caption">Decrypting Image...</Typography>;
+            }
+
+            return (
+              <Button
+                key={i}
+                variant="outlined"
+                size="small"
+                startIcon={<ImageIcon size={14} />}
+                onClick={() => window.open(att.fileUrl, "_blank")}
+                sx={{ textTransform: "none" }}
+              >
+                {att.fileName}
+              </Button>
+            );
+          })}
+        </Box>
+      )}
     </Box>
   );
 }

@@ -25,6 +25,15 @@
     0 0 30px var(--glow-color);
 }
 
+.glow-pilled-button:focus {
+  outline: none;
+}
+
+.glow-pilled-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--glow-color), 0 0 0 4px color-mix(in oklab, var(--glow-color), transparent 80%);
+}
+
 /* Accent hover variant to match the New chat chip background */
 .accentHover:hover {
   background: linear-gradient(

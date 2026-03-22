@@ -10,14 +10,17 @@ export const getUserOwnedSpacesCount = query({
     args: {},
     handler: async (ctx) => {
         const user = await ensureUserActive(ctx).catch(() => null);
-        if (!user) return 0;
+        if (!user) return { count: 0, max: 5 };
 
         const ownedSpaces = await ctx.db
             .query("spaces")
             .withIndex("by_owner", (q) => q.eq("ownerId", user._id))
             .collect();
 
-        return ownedSpaces.length;
+        return {
+            count: ownedSpaces.length,
+            max: user.maxSpaces ?? 5,
+        };
     },
 });
 
@@ -97,14 +100,15 @@ export const createSpace = mutation({
             .unique();
         if (existingWithName) throw new Error(`A space with the name "${args.name}" already exists.`);
 
-        // Enforce limit: max 5 owned spaces
+        // Enforce limit: use the user's maxSpaces or default to 5
         const ownedCount = await ctx.db
             .query("spaces")
             .withIndex("by_owner", (q) => q.eq("ownerId", user._id))
             .collect();
 
-        if (ownedCount.length >= 5) {
-            throw new Error("You have reached the maximum limit of 5 owned spaces.");
+        const limit = user.maxSpaces ?? 5;
+        if (ownedCount.length >= limit) {
+            throw new Error(`You have reached the maximum limit of ${limit} owned spaces.`);
         }
 
         const now = Date.now();

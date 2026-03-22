@@ -6,17 +6,28 @@ import { Volume2, User, Shield, Ban, MicOff, Headphones } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "convex/_generated/api";
 import { Participant, Track, RemoteAudioTrack, ParticipantEvent } from "livekit-client";
+import { useUser } from "@clerk/clerk-react";
+import { Id } from "convex/_generated/dataModel";
+import SpaceMemberProfile from "./SpaceMemberProfile";
 
 interface ParticipantContextMenuProps {
     anchorPosition: { mouseX: number; mouseY: number } | null;
     onClose: () => void;
     participant: Participant | any; // Any because it might be the presence object too
     clerkUserId: string;
+    isSelf?: boolean;
+    spaceId?: Id<"spaces">;
+    userId?: Id<"users">;
 }
 
-const ParticipantContextMenu = ({ anchorPosition, onClose, participant, clerkUserId }: ParticipantContextMenuProps) => {
+const ParticipantContextMenu = ({ anchorPosition, onClose, participant, clerkUserId, isSelf: isSelfProp, spaceId, userId }: ParticipantContextMenuProps) => {
+    const { user: activeUser } = useUser();
+    const activeClerkUserId = activeUser?.id;
     const volumes = useQuery(api.users.settings.getVoiceVolumes);
     const setVoiceVolume = useMutation(api.users.settings.setVoiceVolume);
+
+    // Profile state
+    const [profileOpen, setProfileOpen] = useState(false);
 
     // Find the current db volume if it exists, otherwise default to 1.0 (100)
     const storedVolumeRow = volumes?.find(v => v.targetUserId === clerkUserId);
@@ -65,80 +76,102 @@ const ParticipantContextMenu = ({ anchorPosition, onClose, participant, clerkUse
     };
 
     const open = Boolean(anchorPosition);
+    const isSelf = isSelfProp || clerkUserId === activeClerkUserId || (participant as Participant)?.isLocal;
 
     return (
-        <Menu
-            open={open}
-            onClose={onClose}
-            anchorReference="anchorPosition"
-            anchorPosition={
-                anchorPosition !== null
-                    ? { top: anchorPosition.mouseY, left: anchorPosition.mouseX }
-                    : undefined
-            }
-            sx={{
-                '& .MuiPaper-root': {
-                    bgcolor: 'var(--card)',
-                    color: 'var(--foreground)',
-                    border: '1px solid var(--border)',
-                    boxShadow: '0px 4px 20px rgba(0,0,0,0.5)',
-                    minWidth: 200,
-                    p: 0.5
+        <>
+            <Menu
+                open={open}
+                onClose={onClose}
+                anchorReference="anchorPosition"
+                anchorPosition={
+                    anchorPosition !== null
+                        ? { top: anchorPosition.mouseY, left: anchorPosition.mouseX }
+                        : undefined
                 }
-            }}
-        >
-            <Box sx={{ px: 2, py: 1 }}>
-                <Typography variant="caption" sx={{ color: 'var(--muted-foreground)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.65rem' }}>
-                    User Volume
-                </Typography>
-                <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 1 }}>
-                    <Volume2 size={16} color="var(--muted-foreground)" />
-                    <Slider
-                        size="small"
-                        value={localVolume}
-                        onChange={handleVolumeChange}
-                        onChangeCommitted={handleVolumeChangeCommitted}
-                        min={0}
-                        max={100}
-                        sx={{
-                            color: "var(--primary)",
-                            "& .MuiSlider-thumb": {
-                                width: 12,
-                                height: 12,
-                            },
-                        }}
-                    />
-                    <Typography variant="caption" sx={{ width: 25, textAlign: 'right', fontWeight: 600 }}>
-                        {Math.round(localVolume)}%
-                    </Typography>
-                </Stack>
-            </Box>
+                sx={{
+                    '& .MuiPaper-root': {
+                        bgcolor: 'var(--card)',
+                        color: 'var(--foreground)',
+                        border: '1px solid var(--border)',
+                        boxShadow: '0px 4px 20px rgba(0,0,0,0.5)',
+                        minWidth: 200,
+                        p: 0.5
+                    }
+                }}
+            >
+                {!isSelf && [
+                    <Box key="volume-box" sx={{ px: 2, py: 1 }}>
+                        <Typography variant="caption" sx={{ color: 'var(--muted-foreground)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                            User Volume
+                        </Typography>
+                        <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 1 }}>
+                            <Volume2 size={16} color="var(--muted-foreground)" />
+                            <Slider
+                                size="small"
+                                value={localVolume}
+                                onChange={handleVolumeChange}
+                                onChangeCommitted={handleVolumeChangeCommitted}
+                                min={0}
+                                max={100}
+                                sx={{
+                                    color: "var(--primary)",
+                                    "& .MuiSlider-thumb": {
+                                        width: 12,
+                                        height: 12,
+                                    },
+                                }}
+                            />
+                            <Typography variant="caption" sx={{ width: 25, textAlign: 'right', fontWeight: 600 }}>
+                                {Math.round(localVolume)}%
+                            </Typography>
+                        </Stack>
+                    </Box>,
 
-            <Divider sx={{ my: 0.5, borderColor: 'var(--border)' }} />
+                    <Divider key="volume-divider" sx={{ my: 0.5, borderColor: 'var(--border)' }} />
+                ]}
 
-            <MenuItem onClick={onClose} sx={{ gap: 1.5, py: 1 }}>
-                <ListItemIcon sx={{ minWidth: 'unset', color: 'var(--foreground)' }}>
-                    <User size={18} />
-                </ListItemIcon>
-                <ListItemText primary="Profile" primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }} />
-            </MenuItem>
+                <MenuItem 
+                    onClick={() => {
+                        setProfileOpen(true);
+                        onClose();
+                    }} 
+                    sx={{ gap: 1.5, py: 1 }}
+                >
+                    <ListItemIcon sx={{ minWidth: 'unset', color: 'var(--foreground)' }}>
+                        <User size={18} />
+                    </ListItemIcon>
+                    <ListItemText primary="Profile" primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }} />
+                </MenuItem>
 
-            <MenuItem onClick={onClose} sx={{ gap: 1.5, py: 1 }}>
-                <ListItemIcon sx={{ minWidth: 'unset', color: 'var(--primary)' }}>
-                    <Shield size={18} />
-                </ListItemIcon>
-                <ListItemText primary="Mention" primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }} />
-            </MenuItem>
+                {!isSelf && [
+                    <MenuItem key="mention-item" onClick={onClose} sx={{ gap: 1.5, py: 1 }}>
+                        <ListItemIcon sx={{ minWidth: 'unset', color: 'var(--primary)' }}>
+                            <Shield size={18} />
+                        </ListItemIcon>
+                        <ListItemText primary="Mention" primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }} />
+                    </MenuItem>,
 
-            <Divider sx={{ my: 0.5, borderColor: 'var(--border)' }} />
+                    <Divider key="block-divider" sx={{ my: 0.5, borderColor: 'var(--border)' }} />,
 
-            <MenuItem onClick={onClose} sx={{ gap: 1.5, py: 1, color: 'var(--error, #ef4444)' }}>
-                <ListItemIcon sx={{ minWidth: 'unset', color: 'inherit' }}>
-                    <Ban size={18} />
-                </ListItemIcon>
-                <ListItemText primary="Block" primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }} />
-            </MenuItem>
-        </Menu>
+                    <MenuItem key="block-item" onClick={onClose} sx={{ gap: 1.5, py: 1, color: 'var(--error, #ef4444)' }}>
+                        <ListItemIcon sx={{ minWidth: 'unset', color: 'inherit' }}>
+                            <Ban size={18} />
+                        </ListItemIcon>
+                        <ListItemText primary="Block" primaryTypographyProps={{ variant: 'body2', fontWeight: 500 }} />
+                    </MenuItem>
+                ]}
+            </Menu>
+
+            {spaceId && userId && (
+                <SpaceMemberProfile
+                    open={profileOpen}
+                    onClose={() => setProfileOpen(false)}
+                    spaceId={spaceId}
+                    userId={userId}
+                />
+            )}
+        </>
     );
 };
 

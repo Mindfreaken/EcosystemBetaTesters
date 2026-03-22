@@ -129,9 +129,9 @@ export default function UsersManagement() {
                       </td>
                       <td className="px-8 py-5">
                         <div className="flex justify-center">
-                          {user.overseeradmin ? (
+                          {user.role === 'admin' ? (
                             <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
-                              <ShieldCheck size={12} /> Overseer
+                              <ShieldCheck size={12} /> Admin
                             </div>
                           ) : (
                             <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-foreground/5 border border-border/50 text-muted-foreground/60 text-[10px] font-black uppercase tracking-widest">
