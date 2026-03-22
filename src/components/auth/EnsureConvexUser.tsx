@@ -22,20 +22,11 @@ export default function EnsureConvexUser() {
         const displayName = (displayNameMeta && displayNameMeta.trim().length > 0)
           ? displayNameMeta
           : username || email.split("@")[0] || "User";
-        const dobMeta = (user?.publicMetadata as any)?.dateOfBirth as string | number | undefined;
-        let dateOfBirth: number | undefined = undefined;
-        if (typeof dobMeta === "number") {
-          dateOfBirth = dobMeta;
-        } else if (typeof dobMeta === "string" && dobMeta) {
-          const t = Date.parse(dobMeta);
-          if (!Number.isNaN(t)) dateOfBirth = t;
-        }
         // Always call to ensure user exists/links in Convex. Server normalizes DOB and allows creation.
         await convex.mutation(api.users.onboarding.onboarding.ensureUser, {
           email,
           displayName,
           username,
-          dateOfBirth,
         });
         ranRef.current = true;
       } catch (e) {
