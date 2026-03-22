@@ -10,6 +10,7 @@ export interface ProfileCardProps {
   title: string;
   followers: string;   // format strings (e.g., "12.4k")
   projects: string;
+  xp: string;
   about: string;
   footerLabel: string;
   footerBadge: string;
@@ -23,6 +24,7 @@ export default function ProfileCardSVG({
   title,
   followers,
   projects,
+  xp,
   about,
   footerLabel,
   footerBadge,
@@ -160,12 +162,12 @@ export default function ProfileCardSVG({
           <text x="0" y="22" className="stat-value">{followers}</text>
         </g>
         <g transform="translate(118,0)">
-          <text x="0" y="0" className="stat-label">Coming soon</text>
-          <text x="0" y="22" className="stat-value">—</text>
+          <text x="0" y="0" className="stat-label">Projects</text>
+          <text x="0" y="22" className="stat-value">{projects}</text>
         </g>
         <g transform="translate(236,0)">
-          <text x="0" y="0" className="stat-label">Coming soon</text>
-          <text x="0" y="22" className="stat-value">—</text>
+          <text x="0" y="0" className="stat-label">XP</text>
+          <text x="0" y="22" className="stat-value">{xp}</text>
         </g>
       </g>
 
