@@ -72,6 +72,12 @@ export default function ProfileCardModal({ show, onClose, userId, prefill, child
       ?? (isSelf ? (me as any)?.projectsCount : undefined)
       ?? 0
   );
+  const xp = formatCompact(
+    prefill?.xp
+      ?? ovProfile.xp
+      ?? (isSelf ? (me as any)?.xp : undefined)
+      ?? 10
+  );
   const about = prefill?.bio
     ?? ovProfile.bio
     ?? (isSelf ? me?.bio : undefined)
@@ -129,6 +135,7 @@ export default function ProfileCardModal({ show, onClose, userId, prefill, child
             title={title}
             followers={followers}
             projects={projects}
+            xp={xp}
             about={about}
             footerLabel={footerLabel}
             footerBadge={footerBadge}
